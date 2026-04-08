@@ -6,6 +6,7 @@ import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/validators/validation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -130,7 +131,22 @@ class CContactDetailsScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      InkWell(
+                      CCustomIconBtn(
+                        height: 40,
+                        iconData: Icon(
+                          Iconsax.call_outgoing,
+                          color: contactItem.contactPhone == ''
+                              ? CColors.darkerGrey
+                              : isDarkTheme
+                              ? CColors.white
+                              : CColors.rBrown,
+                        ),
+                        iconLabel: 'Call',
+                        labelColor: contactItem.contactPhone == ''
+                            ? CColors.darkerGrey
+                            : isDarkTheme
+                            ? CColors.white
+                            : CColors.rBrown,
                         onTap: contactItem.contactPhone == ''
                             ? null
                             : () {
@@ -138,50 +154,26 @@ class CContactDetailsScreen extends StatelessWidget {
                                   contactItem.contactPhone,
                                 );
                               },
-                        child: Column(
-                          children: [
-                            CRoundedContainer(
-                              bgColor: CColors.rBrown.withValues(
-                                alpha: .2,
-                              ),
-                              borderRadius: CSizes.borderRadiusLg * 4,
-                              height: 60.0,
-                              width: 80.0,
-                              child: Icon(
-                                Iconsax.call_outgoing,
-                                color: contactItem.contactPhone == ''
-                                    ? CColors.darkGrey
-                                    : isDarkTheme
-                                    ? CColors.white
-                                    : CColors.rBrown,
-                              ),
-                            ),
-                            Text(
-                              'Call',
-                              style: Theme.of(context).textTheme.labelLarge!
-                                  .apply(
-                                    color: contactItem.contactPhone == ''
-                                        ? CColors.darkGrey
-                                        : isDarkTheme
-                                        ? CColors.white
-                                        : CColors.rBrown,
-                                  ),
-                            ),
-                          ],
-                        ),
+                        width: 55.0,
                       ),
+
                       CCustomIconBtn(
-                        iconData: Icon(
-                          Iconsax.message,
-                          color: contactItem.contactPhone == ''
-                              ? CColors.darkGrey
-                              : isDarkTheme
-                              ? CColors.white
-                              : CColors.rBrown,
+                        height: 40,
+                        iconData: Center(
+                          child: FaIcon(
+                            FontAwesomeIcons.whatsapp,
+                            color: contactItem.contactPhone == ''
+                                ? CColors.darkerGrey
+                                : isDarkTheme
+                                ? CColors.white
+                                : CColors.rBrown,
+                            size: 24.0,
+                          ),
                         ),
-                        iconLabel: 'Message',
+
+                        iconLabel: 'Whatsapp',
                         labelColor: contactItem.contactPhone == ''
-                            ? CColors.darkGrey
+                            ? CColors.darkerGrey
                             : isDarkTheme
                             ? CColors.white
                             : CColors.rBrown,
@@ -192,20 +184,47 @@ class CContactDetailsScreen extends StatelessWidget {
                                   [contactItem.contactPhone],
                                 );
                               },
+                        width: 55.0,
+                      ),
+                      CCustomIconBtn(
+                        height: 40,
+                        iconData: Icon(
+                          Iconsax.message,
+                          color: contactItem.contactPhone == ''
+                              ? CColors.darkerGrey
+                              : isDarkTheme
+                              ? CColors.white
+                              : CColors.rBrown,
+                        ),
+                        iconLabel: 'Message',
+                        labelColor: contactItem.contactPhone == ''
+                            ? CColors.darkerGrey
+                            : isDarkTheme
+                            ? CColors.white
+                            : CColors.rBrown,
+                        onTap: contactItem.contactPhone == ''
+                            ? null
+                            : () {
+                                contactsController.sendSimpleSms(
+                                  [contactItem.contactPhone],
+                                );
+                              },
+                        width: 55.0,
                       ),
 
                       CCustomIconBtn(
+                        height: 40,
                         iconData: Icon(
                           Icons.email,
                           color: contactItem.contactEmail == ''
-                              ? CColors.darkGrey
+                              ? CColors.darkerGrey
                               : isDarkTheme
                               ? CColors.white
                               : CColors.rBrown,
                         ),
                         iconLabel: 'Email',
                         labelColor: contactItem.contactEmail == ''
-                            ? CColors.darkGrey
+                            ? CColors.darkerGrey
                             : isDarkTheme
                             ? CColors.white
                             : CColors.rBrown,
@@ -216,6 +235,7 @@ class CContactDetailsScreen extends StatelessWidget {
                                   contactItem.contactEmail,
                                 );
                               },
+                        width: 55.0,
                       ),
                     ],
                   ),

@@ -7,16 +7,19 @@ import 'package:flutter/material.dart';
 class CCustomIconBtn extends StatelessWidget {
   const CCustomIconBtn({
     super.key,
-    this.labelColor,
+
     required this.iconData,
     required this.iconLabel,
-
+    this.displayLabel = true,
     this.borderRadius,
     this.height,
+    this.labelColor,
     this.onTap,
+
     this.width,
   });
 
+  final bool displayLabel;
   final Color? labelColor;
   final double? borderRadius, height, width;
 
@@ -40,13 +43,16 @@ class CCustomIconBtn extends StatelessWidget {
             width: width ?? 80.0,
             child: iconData,
           ),
-          Text(
-            iconLabel,
-            style: Theme.of(context).textTheme.labelLarge!.apply(
-              color:
-                  labelColor ?? (isDarkTheme ? CColors.white : CColors.rBrown),
-            ),
-          ),
+          displayLabel
+              ? Text(
+                  iconLabel,
+                  style: Theme.of(context).textTheme.labelLarge!.apply(
+                    color:
+                        labelColor ??
+                        (isDarkTheme ? CColors.white : CColors.rBrown),
+                  ),
+                )
+              : SizedBox.shrink(),
         ],
       ),
     );

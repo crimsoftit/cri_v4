@@ -338,8 +338,12 @@ class CContactsController extends GetxController {
         useRootNavigator: true,
         builder: (context) {
           // -- set field values --
-          contactCountryCode.value = contactItem.contactCountryCode != '' ? contactItem.contactCountryCode : contactCountryCode.value;
-          contactDialCode.value = contactItem.contactIsoCode != '' ? contactItem.contactIsoCode : contactDialCode.value;
+          contactCountryCode.value = contactItem.contactCountryCode != ''
+              ? contactItem.contactCountryCode
+              : contactCountryCode.value;
+          contactDialCode.value = contactItem.contactIsoCode != ''
+              ? contactItem.contactIsoCode
+              : contactDialCode.value;
           txtEmailController.text = txtEmailController.text == ''
               ? contactItem.contactEmail
               : txtEmailController.text.trim();
@@ -692,10 +696,10 @@ class CContactsController extends GetxController {
       );
       if (kDebugMode) {
         print("Messages launched: $result");
-        CPopupSnackBar.successSnackBar(
-          message: result,
-          title: 'Messages launched!',
-        );
+        // CPopupSnackBar.successSnackBar(
+        //   message: result,
+        //   title: 'Messages launched!',
+        // );
       }
     } catch (error) {
       if (kDebugMode) {
