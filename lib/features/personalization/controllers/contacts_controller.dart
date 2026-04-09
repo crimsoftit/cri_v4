@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:clock/clock.dart';
 import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/common/widgets/txt_fields/custom_typeahed_field.dart';
-import 'package:cri_v3/common/widgets/txt_widgets/c_section_headings.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
@@ -16,6 +15,7 @@ import 'package:cri_v3/utils/validators/validation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
@@ -340,6 +340,7 @@ class CContactsController extends GetxController {
         useSafeArea: true,
         useRootNavigator: true,
         builder: (context) {
+          resetFields();
           // -- set field values --
           contactCountryCode.value = contactItem.contactCountryCode != ''
               ? contactItem.contactCountryCode
@@ -633,7 +634,7 @@ class CContactsController extends GetxController {
                                         Get.overlayContext!,
                                         true,
                                       );
-                                      resetFields();
+                                      //resetFields();
                                     }
                                   },
                                 ),
@@ -891,9 +892,17 @@ class CContactsController extends GetxController {
       builder: (context) {
         final isDarkTheme = CHelperFunctions.isDarkMode(context);
 
+        resetFields();
+        // -- set field values --
+        contactCountryCode.value = contactItem.contactCountryCode != ''
+            ? contactItem.contactCountryCode
+            : contactCountryCode.value;
+        contactDialCode.value = contactItem.contactIsoCode != ''
+            ? contactItem.contactIsoCode
+            : contactDialCode.value;
         txtPhoneController.text = contactItem.contactPhone;
         return SizedBox(
-          height: CHelperFunctions.screenHeight() * .26,
+          height: CHelperFunctions.screenHeight() * .28,
           child: Padding(
             padding: const EdgeInsets.all(
               CSizes.lg * .8,
@@ -907,117 +916,158 @@ class CContactsController extends GetxController {
                 const SizedBox(
                   height: CSizes.spaceBtnSections * .7,
                 ),
-                IntlPhoneField(
-                  controller: txtPhoneController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    fillColor: isDarkTheme
-                        ? CColors.transparent
-                        : CColors.lightGrey,
-                    labelText: 'Phone number',
-                  ),
-                  // Default country code (e.g., India)
-                  // initialCountryCode: contactItem.contactIsoCode != ''
-                  //     ? contactItem.contactIsoCode
-                  //     : 'UG',
-                  initialCountryCode: contactItem.contactCountryCode != ''
-                      ? contactItem.contactCountryCode
-                      : 'KE',
-                  invalidNumberMessage: 'Invalid phone number!',
-                  onChanged: (phone) {
-                    contactItem.contactCountryCode = phone.countryCode;
-
-                    contactItem.contactIsoCode = phone.countryISOCode;
-
-                    if (kDebugMode) {
-                      print('=========\n');
-                      print('country code: ${phone.countryCode}\n');
-                      print('---------\n');
-                      print(
-                        'country iso code: ${phone.countryISOCode}\n',
-                      );
-                      print('---------\n');
-                      print(
-                        'complete number: ${phone.completeNumber}\n',
-                      );
-                      print('=========\n');
-                    }
-                  },
-                  onCountryChanged: (country) {
-                    contactItem.contactCountryCode = country.code;
-
-                    contactItem.contactIsoCode = country.dialCode;
-
-                    if (kDebugMode) {
-                      print('=========\n');
-                      print('country code: ${country.code}\n');
-                      print('---------\n');
-                      print(
-                        'dial code: ${country.dialCode}',
-                      );
-                      print('---------\n');
-                      print(
-                        'full country code: ${country.fullCountryCode}\n',
-                      );
-                      print('=========\n');
-                    }
-                  },
-                ),
-
-                const SizedBox(
-                  height: CSizes.spaceBtnSections,
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton.icon(
-                      icon: Icon(
-                        Iconsax.save_add,
-                        size: CSizes.iconSm,
-                        color: isDarkTheme ? CColors.rBrown : CColors.white,
-                      ),
-                      label: Text(
-                        'Proceed',
-                        style: Theme.of(context).textTheme.labelMedium!.apply(
-                          color: isDarkTheme ? CColors.rBrown : CColors.white,
+                SizedBox(
+                  width: CHelperFunctions.screenWidth() * .8,
+                  child: Column(
+                    children: [
+                      IntlPhoneField(
+                        controller: txtPhoneController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          fillColor: isDarkTheme
+                              ? CColors.transparent
+                              : CColors.lightGrey,
+                          labelText: 'Phone number',
                         ),
+                        // Default country code (e.g., India)
+                        // initialCountryCode: contactItem.contactIsoCode != ''
+                        //     ? contactItem.contactIsoCode
+                        //     : 'UG',
+                        initialCountryCode: contactItem.contactCountryCode != ''
+                            ? contactItem.contactCountryCode
+                            : 'KE',
+                        invalidNumberMessage: 'Invalid phone number!',
+                        onChanged: (phone) {
+                          contactItem.contactCountryCode = phone.countryCode;
+
+                          contactItem.contactIsoCode = phone.countryISOCode;
+
+                          if (kDebugMode) {
+                            print('=========\n');
+                            print('country code: ${phone.countryCode}\n');
+                            print('---------\n');
+                            print(
+                              'country iso code: ${phone.countryISOCode}\n',
+                            );
+                            print('---------\n');
+                            print(
+                              'complete number: ${phone.completeNumber}\n',
+                            );
+                            print('=========\n');
+                          }
+                        },
+                        onCountryChanged: (country) {
+                          contactItem.contactCountryCode = country.code;
+
+                          contactItem.contactIsoCode = country.dialCode;
+
+                          if (kDebugMode) {
+                            print('=========\n');
+                            print('country code: ${country.code}\n');
+                            print('---------\n');
+                            print(
+                              'dial code: ${country.dialCode}',
+                            );
+                            print('---------\n');
+                            print(
+                              'full country code: ${country.fullCountryCode}\n',
+                            );
+                            print('=========\n');
+                          }
+                        },
                       ),
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            CColors.white, // foreground (text) color
-                        backgroundColor: isDarkTheme
-                            ? CColors.white
-                            : CColors.rBrown, // background color
+                      const SizedBox(
+                        height: CSizes.spaceBtnSections * .5,
                       ),
-                    ),
-                    TextButton.icon(
-                      icon: const Icon(
-                        Iconsax.undo,
-                        size: CSizes.iconSm,
-                        color: CColors.rBrown,
-                      ),
-                      label: Text(
-                        'Cancel',
-                        style:
-                            Theme.of(
-                              context,
-                            ).textTheme.labelMedium!.apply(
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextButton.icon(
+                            icon: FaIcon(
+                              FontAwesomeIcons.whatsapp,
+                              color: CColors.white,
+                              //size: 24.0,
+                            ),
+                            // Icon(
+                            //   Iconsax.save_add,
+                            //   size: CSizes.iconSm,
+                            //   color: isDarkTheme
+                            //       ? CColors.rBrown
+                            //       : CColors.white,
+                            // ),
+                            label: Text(
+                              'Proceed',
+                              style: Theme.of(context).textTheme.labelMedium!
+                                  .apply(
+                                    color: isDarkTheme
+                                        ? CColors.white
+                                        : CColors.rBrown,
+                                  ),
+                            ),
+                            onPressed: () async {
+                              contactItem.contactCountryCode =
+                                  contactItem.contactCountryCode == ''
+                                  ? contactCountryCode.value
+                                  : contactItem.contactCountryCode;
+                              contactItem.contactIsoCode =
+                                  contactItem.contactIsoCode == ''
+                                  ? contactDialCode.value
+                                  : contactItem.contactIsoCode;
+                              contactItem.contactPhone = txtPhoneController.text
+                                  .trim();
+
+                              if (await updateContact(contactItem)) {
+                                fetchMyContacts().then(
+                                  (_) {
+                                    launchWhatsappChat(
+                                      '+${contactItem.contactIsoCode}${contactItem.contactPhone}',
+                                    );
+                                  },
+                                );
+
+                                //resetFields();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor:
+                                  CColors.white, // foreground (text) color
+                              // backgroundColor: isDarkTheme
+                              //     ? CColors.white
+                              //     : CColors.rBrown, // background color
+                              backgroundColor: Colors.green,
+                            ),
+                          ),
+                          TextButton.icon(
+                            icon: const Icon(
+                              Iconsax.undo,
+                              size: CSizes.iconSm,
                               color: CColors.rBrown,
                             ),
+                            label: Text(
+                              'Cancel',
+                              style:
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.labelMedium!.apply(
+                                    color: CColors.rBrown,
+                                  ),
+                            ),
+                            onPressed: () {
+                              resetFields();
+                              Get.back();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor:
+                                  CColors.rBrown, // foreground (text) color
+                              backgroundColor:
+                                  CColors.white, // background color
+                            ),
+                          ),
+                        ],
                       ),
-                      onPressed: () {
-                        resetFields();
-                        Get.back();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            CColors.rBrown, // foreground (text) color
-                        backgroundColor: CColors.white, // background color
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),

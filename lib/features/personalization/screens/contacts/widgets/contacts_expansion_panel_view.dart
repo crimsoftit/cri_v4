@@ -72,12 +72,6 @@ class CContactsExpansionPanelView extends StatelessWidget {
               }
           }
 
-          if (contactsController.isLoading.value &&
-              contactsController.myContacts.isNotEmpty) {
-            return const CVerticalProductShimmer(
-              itemCount: 5,
-            );
-          }
           if (demContacts.isEmpty && !contactsController.isLoading.value) {
             return Center(
               child: NoDataScreen(
@@ -90,7 +84,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
           }
           if (demContacts.isNotEmpty && contactsController.isLoading.value) {
             return const CVerticalProductShimmer(
-              itemCount: 7,
+              itemCount: 5,
             );
           }
           return Padding(
