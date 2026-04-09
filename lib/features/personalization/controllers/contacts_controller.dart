@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:clock/clock.dart';
 import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/common/widgets/txt_fields/custom_typeahed_field.dart';
+import 'package:cri_v3/common/widgets/txt_widgets/c_section_headings.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
@@ -19,6 +22,7 @@ import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:send_message/send_message.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class CContactsController extends GetxController {
   /// -- constructor --
@@ -288,12 +292,11 @@ class CContactsController extends GetxController {
 
       dbHelper.updateContact(contact);
 
-      fetchMyContacts();
-
       CPopupSnackBar.customToast(
         forInternetConnectivityStatus: false,
         message: 'contact updated successfully',
       );
+      fetchMyContacts();
 
       // -- stop loader --
       isLoading.value = false;
@@ -347,6 +350,7 @@ class CContactsController extends GetxController {
           txtEmailController.text = txtEmailController.text == ''
               ? contactItem.contactEmail
               : txtEmailController.text.trim();
+          txtContactNameController.text = contactItem.contactName;
           txtPhoneController.text = txtPhoneController.text == ''
               ? contactItem.contactPhone
               : txtPhoneController.text.trim();
@@ -410,7 +414,7 @@ class CContactsController extends GetxController {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Visibility(
-                            maintainState: true,
+                            maintainState: false,
                             visible:
                                 updateAction.toLowerCase() ==
                                 'edit'.toLowerCase(),
@@ -459,9 +463,11 @@ class CContactsController extends GetxController {
                           ),
 
                           CCustomTypeahedField(
-                            fieldValidator: (value) {
-                              return CValidator.validateEmail(value);
-                            },
+                            fieldValidator: updateAction == 'add email'
+                                ? (value) {
+                                    return CValidator.validateEmail(value);
+                                  }
+                                : null,
                             fillColor: isDarkTheme
                                 ? CColors.transparent
                                 : CColors.lightGrey,
@@ -612,6 +618,12 @@ class CContactsController extends GetxController {
                                         txtPhoneController.text.trim();
                                     contactItem.contactEmail =
                                         txtEmailController.text.trim();
+                                    contactItem.contactName =
+                                        txtContactNameController.text.trim() !=
+                                                '' &&
+                                            updateAction == 'edit'
+                                        ? txtContactNameController.text.trim()
+                                        : contactItem.contactName;
                                     contactItem.lastModified = DateFormat(
                                       'yyyy-MM-dd kk:mm',
                                     ).format(clock.now());
@@ -621,7 +633,7 @@ class CContactsController extends GetxController {
                                         Get.overlayContext!,
                                         true,
                                       );
-                                      //resetFields();
+                                      resetFields();
                                     }
                                   },
                                 ),
@@ -825,10 +837,201 @@ class CContactsController extends GetxController {
     }
   }
 
+  Future<void> launchWhatsappChat(String recipientNumber) async {
+    try {
+      var androidWhatsappUrl =
+          'whatsapp://send?phone=$recipientNumber&text=wooza!';
+      var iosWhatsappUrl =
+          'https://wa.me/$recipientNumber?text=${Uri.parse('rada...')}';
+
+      if (Platform.isIOS) {
+        if (await canLaunchUrlString(iosWhatsappUrl)) {
+          await launchUrlString(iosWhatsappUrl);
+        } else {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'unable to launch whatsapp chat! please try again later',
+          );
+        }
+      } else {
+        if (await canLaunchUrlString(androidWhatsappUrl)) {
+          await launchUrlString(androidWhatsappUrl);
+        } else {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'unable to launch whatsapp chat! please try again later',
+          );
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('error launching whatsapp: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error launching whatsapp: $e',
+          title: 'error launching whatsapp',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message: 'unable to launch whatsapp chat! please try again later',
+          title: 'error launching whatsapp',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- bottomSheetModal for when usp is less than ubp --
+  updateDialCodeDialog(
+    BuildContext context,
+    CContactsModel contactItem,
+  ) async {
+    return showModalBottomSheet(
+      context: context,
+
+      builder: (context) {
+        final isDarkTheme = CHelperFunctions.isDarkMode(context);
+
+        txtPhoneController.text = contactItem.contactPhone;
+        return SizedBox(
+          height: CHelperFunctions.screenHeight() * .26,
+          child: Padding(
+            padding: const EdgeInsets.all(
+              CSizes.lg * .8,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'Whatsapp requires your contact\'s country code...',
+                  style: Theme.of(context).textTheme.bodyMedium!.apply(),
+                ),
+                const SizedBox(
+                  height: CSizes.spaceBtnSections * .7,
+                ),
+                IntlPhoneField(
+                  controller: txtPhoneController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    fillColor: isDarkTheme
+                        ? CColors.transparent
+                        : CColors.lightGrey,
+                    labelText: 'Phone number',
+                  ),
+                  // Default country code (e.g., India)
+                  // initialCountryCode: contactItem.contactIsoCode != ''
+                  //     ? contactItem.contactIsoCode
+                  //     : 'UG',
+                  initialCountryCode: contactItem.contactCountryCode != ''
+                      ? contactItem.contactCountryCode
+                      : 'KE',
+                  invalidNumberMessage: 'Invalid phone number!',
+                  onChanged: (phone) {
+                    contactItem.contactCountryCode = phone.countryCode;
+
+                    contactItem.contactIsoCode = phone.countryISOCode;
+
+                    if (kDebugMode) {
+                      print('=========\n');
+                      print('country code: ${phone.countryCode}\n');
+                      print('---------\n');
+                      print(
+                        'country iso code: ${phone.countryISOCode}\n',
+                      );
+                      print('---------\n');
+                      print(
+                        'complete number: ${phone.completeNumber}\n',
+                      );
+                      print('=========\n');
+                    }
+                  },
+                  onCountryChanged: (country) {
+                    contactItem.contactCountryCode = country.code;
+
+                    contactItem.contactIsoCode = country.dialCode;
+
+                    if (kDebugMode) {
+                      print('=========\n');
+                      print('country code: ${country.code}\n');
+                      print('---------\n');
+                      print(
+                        'dial code: ${country.dialCode}',
+                      );
+                      print('---------\n');
+                      print(
+                        'full country code: ${country.fullCountryCode}\n',
+                      );
+                      print('=========\n');
+                    }
+                  },
+                ),
+
+                const SizedBox(
+                  height: CSizes.spaceBtnSections,
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      icon: Icon(
+                        Iconsax.save_add,
+                        size: CSizes.iconSm,
+                        color: isDarkTheme ? CColors.rBrown : CColors.white,
+                      ),
+                      label: Text(
+                        'Proceed',
+                        style: Theme.of(context).textTheme.labelMedium!.apply(
+                          color: isDarkTheme ? CColors.rBrown : CColors.white,
+                        ),
+                      ),
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            CColors.white, // foreground (text) color
+                        backgroundColor: isDarkTheme
+                            ? CColors.white
+                            : CColors.rBrown, // background color
+                      ),
+                    ),
+                    TextButton.icon(
+                      icon: const Icon(
+                        Iconsax.undo,
+                        size: CSizes.iconSm,
+                        color: CColors.rBrown,
+                      ),
+                      label: Text(
+                        'Cancel',
+                        style:
+                            Theme.of(
+                              context,
+                            ).textTheme.labelMedium!.apply(
+                              color: CColors.rBrown,
+                            ),
+                      ),
+                      onPressed: () {
+                        resetFields();
+                        Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            CColors.rBrown, // foreground (text) color
+                        backgroundColor: CColors.white, // background color
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   resetFields() {
     contactCountryCode.value = 'KE';
     contactDialCode.value = '254';
     txtEmailController.text = '';
+    txtContactNameController.text = '';
     txtPhoneController.text = '';
   }
 }
