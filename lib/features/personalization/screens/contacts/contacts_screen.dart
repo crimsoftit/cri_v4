@@ -1,6 +1,5 @@
 import 'package:cri_v3/common/widgets/appbar/tab_bar.dart';
 import 'package:cri_v3/common/widgets/appbar/v2_app_bar.dart';
-import 'package:cri_v3/common/widgets/shimmers/vert_items_shimmer.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/screens/contacts/widgets/contacts_expansion_panel_view.dart';
 import 'package:cri_v3/features/store/screens/store_items_tings/widgets/store_screen_header.dart';

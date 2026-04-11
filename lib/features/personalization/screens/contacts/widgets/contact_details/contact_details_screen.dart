@@ -1,5 +1,8 @@
 import 'package:cri_v3/common/widgets/buttons/icon_buttons/custom_icon_btn.dart';
+import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
+import 'package:cri_v3/features/personalization/models/contacts_model.dart';
+import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/widgets/contact_items_display.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
@@ -243,6 +246,92 @@ class CContactDetailsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(
+                  height: CSizes.spaceBtnItems,
+                ),
+
+                /// -- phone number display --
+                CContactItemsDisplay(
+                  contactItem: contactItem,
+                  includeTrailingWidget: true,
+                  leadingIcon: Icon(
+                    Iconsax.call,
+                    color: contactItem.contactPhone != ''
+                        ? CColors.rBrown
+                        : CColors.rOrange,
+                  ),
+                  onLeadingIconPressed: contactItem.contactPhone == ''
+                      ? null
+                      : () {
+                          contactsController.launchPhoneDialer(
+                            contactItem.contactPhone,
+                          );
+                        },
+                  subTitleWidget: Text(
+                    'Mobile',
+                    style:
+                        Theme.of(
+                          context,
+                        ).textTheme.labelMedium!.apply(
+                          color: contactItem.contactPhone != ''
+                              ? CColors.rBrown
+                              : CColors.rOrange,
+                          fontSizeDelta: .8,
+                        ),
+                  ),
+                  title: contactItem.contactPhone != ''
+                      ? '${contactItem.contactCountryCode} ${contactItem.contactPhone}'
+                      : 'Add phone no.',
+                  titleColor: contactItem.contactPhone != ''
+                      ? CColors.rBrown
+                      : CColors.rOrange,
+                  trailingIcon: contactItem.contactPhone != ''
+                      ? Icon(
+                          Iconsax.message,
+                          color: contactItem.contactPhone != ''
+                              ? CColors.rBrown
+                              : CColors.rOrange,
+                        )
+                      : SizedBox.shrink(),
+                ),
+
+                /// -- phone number display --
+                CContactItemsDisplay(
+                  contactItem: contactItem,
+                  includeTrailingWidget: false,
+                  leadingIcon: Icon(
+                    Icons.email,
+                    color: contactItem.contactEmail != ''
+                        ? CColors.rBrown
+                        : CColors.rOrange,
+                  ),
+                  onLeadingIconPressed: contactItem.contactEmail == ''
+                            ? null
+                            : () {
+                                contactsController.launchEmailApp(
+                                  contactItem.contactEmail,
+                                );
+                              },
+                  // subTitleWidget: Text(
+                  //   'Mobile',
+                  //   style:
+                  //       Theme.of(
+                  //         context,
+                  //       ).textTheme.labelMedium!.apply(
+                  //         color: contactItem.contactPhone != ''
+                  //             ? CColors.rBrown
+                  //             : CColors.rOrange,
+                  //         fontSizeDelta: .8,
+                  //       ),
+                  // ),
+                  title: contactItem.contactEmail != ''
+                      ? contactItem.contactEmail
+                      : 'Add email',
+                  titleColor: contactItem.contactEmail != ''
+                      ? CColors.rBrown
+                      : CColors.rOrange,
+                  trailingIcon: null,
                 ),
                 Text(
                   'country code: ${contactItem.contactCountryCode}',

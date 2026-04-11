@@ -9,14 +9,22 @@ class ROutlinedButtonTheme {
     style: OutlinedButton.styleFrom(
       elevation: 0,
       foregroundColor: CColors.rBrown,
-      side: const BorderSide(color: CColors.rBrown),
+      side: const BorderSide(
+        color: CColors.rBrown,
+      ),
       textStyle: const TextStyle(
         fontSize: 11.0,
         color: CColors.rBrown,
         fontWeight: FontWeight.w600,
       ),
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+      padding: const EdgeInsets.symmetric(
+        vertical: 10.0,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+          5.0,
+        ),
+      ),
     ),
   );
 
@@ -24,7 +32,9 @@ class ROutlinedButtonTheme {
   static final outlinedBtnDarkTheme = OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
       foregroundColor: CColors.white,
-      side: const BorderSide(color: rPrimaryBrown),
+      side: const BorderSide(
+        color: CColors.rPrimaryBrown,
+      ),
       textStyle: const TextStyle(
         fontSize: 11.0,
         color: CColors.white,

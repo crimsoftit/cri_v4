@@ -46,7 +46,7 @@ class CContactsController extends GetxController {
   final RxString contactCountryCode = 'KE'.obs;
   final RxString contactDialCode = '254'.obs;
 
-  // TODO: FETCH CLOUD CONTACTS FROM INVENTORY AND SALES
+  
   @override
   void onInit() async {
     foundMatches.value = [];
@@ -630,11 +630,15 @@ class CContactsController extends GetxController {
                                     ).format(clock.now());
 
                                     if (await updateContact(contactItem)) {
+                                      
+                                      Get.toNamed(
+                                        '/my_contacts/contact_details',
+                                        arguments: contactItem.contactId,
+                                      );
                                       Navigator.pop(
                                         Get.overlayContext!,
                                         true,
                                       );
-                                      //resetFields();
                                     }
                                   },
                                 ),

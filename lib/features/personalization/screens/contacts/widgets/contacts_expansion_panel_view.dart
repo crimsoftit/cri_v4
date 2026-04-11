@@ -1,3 +1,5 @@
+import 'package:cri_v3/common/widgets/buttons/icon_buttons/custom_icon_btn.dart';
+import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/common/widgets/shimmers/vert_items_shimmer.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/screens/no_data/no_data_screen.dart';
@@ -9,6 +11,7 @@ import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:cri_v3/utils/validators/validation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -141,9 +144,17 @@ class CContactsExpansionPanelView extends StatelessWidget {
                         highlightColor: CColors.rBrown,
                         headerBuilder: (context, isExpanded) {
                           return ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 5.0,
-                              vertical: 2.0,
+                            // contentPadding: const EdgeInsets.only(
+                            //   bottom: 2.0,
+                            //   left: 5.0,
+                            //   right: 5.0,
+                            //   top: 2.0,
+                            // ),
+                            contentPadding: EdgeInsets.fromLTRB(
+                              5.0,
+                              2.0,
+                              5.0,
+                              2.0,
                             ),
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -174,9 +185,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                 const SizedBox(
                                   width: CSizes.spaceBtnItems,
                                 ),
-                                // Text(
-                                //   contact.contactId.toString(),
-                                // ),
+
                                 Text(
                                   contact.contactName,
                                   style: Theme.of(context)
@@ -188,6 +197,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            titleAlignment: ListTileTitleAlignment.top,
                             trailing: SizedBox.shrink(),
                           );
                         },
@@ -196,7 +206,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
                         body: Padding(
                           padding: const EdgeInsets.only(
                             bottom: 4.0,
-                            left: 63.0,
+                            left: 61.0,
                             right: 4.0,
                           ),
                           child: Column(
@@ -336,6 +346,42 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                   ),
                                   IconButton.outlined(
                                     color: CColors.rBrown,
+                                    disabledColor: CColors.grey,
+                                    focusColor: CColors.grey,
+
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.whatsapp,
+                                      applyTextScaling: true,
+                                      color:
+                                          contact.contactPhone == '' &&
+                                              isDarkTheme
+                                          ? CColors.darkerGrey
+                                          : contact.contactPhone == '' &&
+                                                !isDarkTheme
+                                          ? CColors.grey
+                                          : isDarkTheme
+                                          ? CColors.white
+                                          : CColors.rBrown,
+                                      fill: .2,
+                                    ),
+                                    onPressed: contact.contactPhone == ''
+                                        ? null
+                                        : () {
+                                            contact.contactIsoCode == ''
+                                                ? contactsController
+                                                      .updateDialCodeDialog(
+                                                        context,
+                                                        contact,
+                                                      )
+                                                : contactsController
+                                                      .launchWhatsappChat(
+                                                        '+${contact.contactIsoCode}${contact.contactPhone}',
+                                                      );
+                                          },
+                                  ),
+
+                                  IconButton.outlined(
+                                    color: CColors.rBrown,
                                     disabledColor: CColors.darkGrey,
                                     //focusColor: CColors.rBrown,
                                     icon: Icon(
@@ -391,10 +437,9 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                           }
                                         : null,
                                   ),
-
-                                  IconButton.outlined(
+                                  IconButton(
                                     icon: Icon(
-                                      Iconsax.information,
+                                      Icons.info_outlined,
                                       color: isDarkTheme
                                           ? CColors.white
                                           : CColors.rBrown,
