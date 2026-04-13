@@ -351,7 +351,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
 
                                     icon: FaIcon(
                                       FontAwesomeIcons.whatsapp,
-                                      applyTextScaling: false,
+                                      applyTextScaling: true,
                                       color:
                                           contact.contactPhone == '' &&
                                               isDarkTheme
