@@ -6,14 +6,22 @@ import 'package:flutter/material.dart';
 class CCustomTxtField extends StatelessWidget {
   const CCustomTxtField({
     super.key,
+    this.autoFocus,
     this.fieldHeight = 40.0,
+    this.fieldValidator,
+    this.onFieldValueChanged,
+    this.keyboardType,
     required this.txtFieldController,
     required this.labelTxt,
   });
 
-  final TextEditingController txtFieldController;
-  final String labelTxt;
+  final bool? autoFocus;
   final double fieldHeight;
+  final FormFieldValidator<String>? fieldValidator;
+  final String labelTxt;
+  final TextEditingController txtFieldController;
+  final TextInputType? keyboardType;
+  final void Function(String)? onFieldValueChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +31,7 @@ class CCustomTxtField extends StatelessWidget {
     return SizedBox(
       height: fieldHeight,
       child: TextFormField(
-        keyboardType: TextInputType.text,
+        keyboardType: keyboardType ?? TextInputType.text,
         // focusNode: checkoutController
         //     .customerNameFocusNode
         //     .value,
@@ -48,10 +56,12 @@ class CCustomTxtField extends StatelessWidget {
           ),
           labelText: labelTxt,
         ),
+        onChanged: onFieldValueChanged,
         style: TextStyle(
           fontWeight: FontWeight.normal,
           color: isDarkTheme ? CColors.white : CColors.rBrown,
         ),
+        //validator: (value) {},
       ),
     );
   }

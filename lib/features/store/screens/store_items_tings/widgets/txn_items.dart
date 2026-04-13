@@ -461,7 +461,7 @@ class CTxnItemsListView extends StatelessWidget {
                                   child: Row(
                                     mainAxisAlignment: space == 'sales'
                                         ? MainAxisAlignment.spaceBetween
-                                        : MainAxisAlignment.end,
+                                        : MainAxisAlignment.spaceBetween,
                                     children: [
                                       if (space == 'sales')
                                         TextButton.icon(
@@ -489,10 +489,50 @@ class CTxnItemsListView extends StatelessWidget {
                                             );
                                           },
                                         ),
+
+                                      /// -- partial invoice payment btn
+                                      if (space == 'invoices')
+                                        TextButton.icon(
+                                          icon: Icon(
+                                            Icons.monetization_on,
+                                          ),
+                                          label: Text(
+                                            'Partial payment',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelMedium!
+                                                .apply(
+                                                  color: CColors.white,
+                                                  fontSizeFactor: 1.1,
+                                                ),
+                                          ),
+                                          onPressed: () {
+                                            txnsController.takePartialPayment(
+                                              context,
+                                              item,
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                CNetworkManager
+                                                    .instance
+                                                    .hasConnection
+                                                    .value
+                                                ? CColors.rBrown
+                                                : CColors.black,
+                                            foregroundColor: CColors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                10.0,
+                                              ), // Set the desired radius here
+                                            ),
+                                          ),
+                                        ),
+
                                       SizedBox(
                                         width: space == 'invoices'
                                             ? CHelperFunctions.screenWidth() *
-                                                  0.45
+                                                  0.43
                                             : CHelperFunctions.screenWidth() *
                                                   0.30,
                                         child: TextButton.icon(
@@ -526,14 +566,14 @@ class CTxnItemsListView extends StatelessWidget {
                                           ),
                                           label: Text(
                                             space == 'invoices'
-                                                ? 'complete txn'
+                                                ? 'Complete txn'
                                                 : 'refund',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .labelMedium!
                                                 .apply(
                                                   color: CColors.white,
-                                                  fontSizeFactor: 1.2,
+                                                  fontSizeFactor: 1.1,
                                                 ),
                                           ),
                                           style: ElevatedButton.styleFrom(

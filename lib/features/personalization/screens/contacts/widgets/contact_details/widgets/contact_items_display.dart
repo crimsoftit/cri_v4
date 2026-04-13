@@ -4,13 +4,14 @@ import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 
 class CContactItemsDisplay extends StatelessWidget {
   const CContactItemsDisplay({
     super.key,
+    this.child,
     this.includeTrailingWidget,
     this.leadingIcon,
+    this.rowMainAxisAlignment = MainAxisAlignment.spaceBetween,
     this.onLeadingIconPressed,
     this.subTitleWidget,
     this.titleColor,
@@ -22,7 +23,8 @@ class CContactItemsDisplay extends StatelessWidget {
   final bool? includeTrailingWidget;
   final CContactsModel contactItem;
   final Color? titleColor;
-  final Widget? leadingIcon, subTitleWidget, trailingIcon;
+  final MainAxisAlignment rowMainAxisAlignment;
+  final Widget? child, leadingIcon, subTitleWidget, trailingIcon;
   final String title;
 
   final VoidCallback? onLeadingIconPressed;
@@ -43,59 +45,42 @@ class CContactItemsDisplay extends StatelessWidget {
       ),
       width: CHelperFunctions.screenWidth() * .845,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: rowMainAxisAlignment,
         children: [
-          IconButton(
-            onPressed: onLeadingIconPressed,
-            // onPressed: contactItem.contactPhone == ''
-            //     ? null
-            //     : () {
-            //         contactsController.launchPhoneDialer(
-            //           contactItem.contactPhone,
-            //         );
-            //       },
-            icon:
-                leadingIcon ??
-                Icon(
-                  Iconsax.call,
-                  color: isDarkTheme ? CColors.grey : CColors.rBrown,
-                ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 8.0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SelectableText(
-                  title,
-
-                  style:
-                      Theme.of(
-                        context,
-                      ).textTheme.headlineMedium!.apply(
-                        color: titleColor,
-                        fontSizeDelta: 1.1,
-                      ),
-                ),
-
-                ?subTitleWidget,
-              ],
+          Expanded(
+            flex: 1,
+            child: IconButton(
+              onPressed: onLeadingIconPressed,
+              icon: leadingIcon!,
             ),
           ),
-          if (includeTrailingWidget!)
-            IconButton(
-              onPressed: () {},
-              icon:
-                  trailingIcon ??
-                  Icon(
-                    Iconsax.message,
-                    color: titleColor,
+          Expanded(
+            flex: 4,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 8.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SelectableText(
+                    title,
+                    style: Theme.of(context).textTheme.headlineMedium!.apply(
+                      color: titleColor,
+                    ),
                   ),
+                  subTitleWidget!,
+                ],
+              ),
             ),
+          ),
+
+          includeTrailingWidget!
+              ? Expanded(
+                  flex: 1,
+                  child: trailingIcon!,
+                )
+              : SizedBox.shrink(),
         ],
       ),
     );

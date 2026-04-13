@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:cri_v3/api/sheets/store_sheets_api.dart';
 import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
+import 'package:cri_v3/common/widgets/txt_fields/custom_txtfield.dart';
 import 'package:cri_v3/features/personalization/controllers/notification_tings/flutter_local_notifications/local_notifications_controller.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/store/controllers/dashboard_controller.dart';
@@ -85,6 +86,9 @@ class CTxnsController extends GetxController {
   /// -- summary variables --
   final RxDouble costOfSales = 0.0.obs;
   final RxDouble grossRevenue = 0.0.obs;
+
+  final RxDouble invoiceAmountOwed = 0.0.obs;
+
   final RxDouble invoicesValue = 0.0.obs;
   final RxDouble moneyCollected = 0.0.obs;
   final RxDouble totalProfit = 0.0.obs;
@@ -114,12 +118,13 @@ class CTxnsController extends GetxController {
   final RxDouble customerBal = 0.0.obs;
 
   /// -- controllers - classes --
-
   final userController = Get.put(CUserController());
   final searchController = Get.put(CSearchBarController());
   final invController = Get.put(CInventoryController());
   final notsController = Get.put(CLocalNotificationsController());
   final txnsFormKey = GlobalKey<FormState>();
+
+  final invoicePaymentFormKey = GlobalKey<FormState>();
 
   @override
   void onInit() async {
@@ -751,6 +756,7 @@ class CTxnsController extends GetxController {
   /// -- reset sales --
   resetSalesFields() {
     customerBal.value = 0.0;
+    invoiceAmountOwed.value = 0.0;
     sellItemScanResults.value = '';
     selectedPaymentMethod.value == 'Cash';
     itemExists.value = false;
@@ -1676,5 +1682,198 @@ class CTxnsController extends GetxController {
     );
 
     return yrSales.isNotEmpty;
+  }
+
+  /// -- take partial payment on invoices --
+  Future<dynamic> takePartialPayment(
+    BuildContext context,
+    CTxnsModel txnItem,
+  ) async {
+    final isDarkTheme = CHelperFunctions.isDarkMode(context);
+    final userCurrency = CHelperFunctions.formatCurrency(
+      userController.user.value.currencyCode,
+    );
+
+    try {
+      return showModalBottomSheet(
+        backgroundColor: isDarkTheme
+            ? CColors.black.withValues(
+                alpha: .9,
+              )
+            : CColors.white,
+        context: context,
+        isDismissible: false,
+        isScrollControlled: true,
+        useSafeArea: true,
+        useRootNavigator: true,
+        builder: (context) {
+          invoiceAmountOwed.value = txnItem.amountIssued - txnItem.totalAmount;
+
+          // -- reset fields --
+          txtAmountIssued.text = '';
+
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: CRoundedContainer(
+              bgColor: CColors.transparent,
+              height: CHelperFunctions.screenHeight() * .39,
+              padding: const EdgeInsets.all(
+                CSizes.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Partial payment',
+                      ),
+
+                      Text(
+                        'of $userCurrency.${txnItem.totalAmount}',
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(
+                    height: CSizes.spaceBtnSections,
+                  ),
+
+                  Form(
+                    key: invoicePaymentFormKey,
+                    child: Column(
+                      children: [
+                        Obx(
+                          () {
+                            return Align(
+                              alignment: Alignment.bottomRight,
+                              child: Text(
+                                'amount owed $userCurrency.${invoiceAmountOwed.value}',
+                                style: Theme.of(context).textTheme.labelLarge!
+                                    .apply(
+                                      color: invoiceAmountOwed.value < 0
+                                          ? CColors.error
+                                          : isDarkTheme
+                                          ? CColors.white
+                                          : CColors.rBrown,
+                                    ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(
+                          height: CSizes.spaceBtnItems,
+                        ),
+                        CCustomTxtField(
+                          fieldHeight: 70.0,
+                          fieldValidator: (value) {
+                            if (value == '') {
+                              return 'this field is required';
+                            }
+                            return null;
+                          },
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                            signed: false,
+                          ),
+                          labelTxt: 'enter amount issued',
+                          onFieldValueChanged: (value) {
+                            if (value != '') {
+                              computeWhatIsOwed(
+                                double.parse(value),
+                                txnItem.totalAmount,
+                              );
+                            }
+                          },
+                          txtFieldController: txtAmountIssued,
+                        ),
+
+                        const SizedBox(
+                          height: CSizes.spaceBtnItems,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextButton.icon(
+                              icon: Icon(
+                                Iconsax.save_add,
+                                size: CSizes.iconSm,
+                                color: CColors.white,
+                              ),
+                              label: Text('Update'),
+                              onPressed: () {
+                                if (invoicePaymentFormKey.currentState!
+                                    .validate()) {
+                                  return;
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor:
+                                    CColors.white, // foreground (text) color
+                                backgroundColor:
+                                    CColors.rBrown, // background color
+                              ),
+                            ),
+
+                            TextButton.icon(
+                              icon: const Icon(
+                                Iconsax.undo,
+                                size: CSizes.iconSm,
+                                color: CColors.rBrown,
+                              ),
+                              label: Text(
+                                'Cancel',
+                                style:
+                                    Theme.of(
+                                      context,
+                                    ).textTheme.labelMedium!.apply(
+                                      color: CColors.rBrown,
+                                    ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor:
+                                    CColors.rBrown, // foreground (text) color
+                                backgroundColor:
+                                    CColors.white, // background color
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Text(
+                  //   'customer balance $userCurrency.${txnItem.customerBalance}',
+                  // ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('error displaying partial payment dialog: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error displaying partial payment dialog: $e',
+          title: 'error popping dialog!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error displaying partial payment dialog!',
+          title: 'error popping dialog!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  computeWhatIsOwed(double amountIssued, double tAmount) {
+    invoiceAmountOwed.value = amountIssued - tAmount;
   }
 }

@@ -268,20 +268,28 @@ class CContactDetailsScreen extends StatelessWidget {
                             contactItem.contactPhone,
                           );
                         },
-                  subTitleWidget: Text(
-                    'Mobile',
-                    style:
-                        Theme.of(
-                          context,
-                        ).textTheme.labelMedium!.apply(
-                          color: contactItem.contactPhone != ''
-                              ? CColors.rBrown
-                              : CColors.rOrange,
-                          fontSizeDelta: .8,
-                        ),
-                  ),
-                  title: contactItem.contactPhone != ''
+                  //rowMainAxisAlignment: MainAxisAlignment.start,
+                  subTitleWidget: contactItem.contactPhone != ''
+                      ? Text(
+                          'Mobile',
+                          style:
+                              Theme.of(
+                                context,
+                              ).textTheme.labelMedium!.apply(
+                                color: contactItem.contactPhone != ''
+                                    ? CColors.rBrown
+                                    : CColors.rOrange,
+                                fontSizeDelta: .8,
+                              ),
+                        )
+                      : SizedBox.shrink(),
+                  title:
+                      contactItem.contactPhone != '' &&
+                          contactItem.contactCountryCode != ''
                       ? '${contactItem.contactCountryCode} ${contactItem.contactPhone}'
+                      : contactItem.contactPhone != '' &&
+                            contactItem.contactCountryCode == ''
+                      ? contactItem.contactPhone
                       : 'Add phone no.',
                   titleColor: contactItem.contactPhone != ''
                       ? CColors.rBrown
@@ -296,7 +304,11 @@ class CContactDetailsScreen extends StatelessWidget {
                       : SizedBox.shrink(),
                 ),
 
-                /// -- phone number display --
+                const SizedBox(
+                  height: CSizes.spaceBtnItems / 3.0,
+                ),
+
+                /// -- email address display --
                 CContactItemsDisplay(
                   contactItem: contactItem,
                   includeTrailingWidget: false,
@@ -307,24 +319,26 @@ class CContactDetailsScreen extends StatelessWidget {
                         : CColors.rOrange,
                   ),
                   onLeadingIconPressed: contactItem.contactEmail == ''
-                            ? null
-                            : () {
-                                contactsController.launchEmailApp(
-                                  contactItem.contactEmail,
-                                );
-                              },
-                  // subTitleWidget: Text(
-                  //   'Mobile',
-                  //   style:
-                  //       Theme.of(
-                  //         context,
-                  //       ).textTheme.labelMedium!.apply(
-                  //         color: contactItem.contactPhone != ''
-                  //             ? CColors.rBrown
-                  //             : CColors.rOrange,
-                  //         fontSizeDelta: .8,
-                  //       ),
-                  // ),
+                      ? null
+                      : () {
+                          contactsController.launchEmailApp(
+                            contactItem.contactEmail,
+                          );
+                        },
+                  subTitleWidget: contactItem.contactEmail != ''
+                      ? Text(
+                          'Email',
+                          style:
+                              Theme.of(
+                                context,
+                              ).textTheme.labelMedium!.apply(
+                                color: contactItem.contactEmail != ''
+                                    ? CColors.rBrown
+                                    : CColors.rOrange,
+                                fontSizeDelta: .8,
+                              ),
+                        )
+                      : SizedBox.shrink(),
                   title: contactItem.contactEmail != ''
                       ? contactItem.contactEmail
                       : 'Add email',

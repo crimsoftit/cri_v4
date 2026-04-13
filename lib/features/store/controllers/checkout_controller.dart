@@ -186,9 +186,11 @@ class CCheckoutController extends GetxController {
             selectedPaymentMethod.value.platformName == 'cash'
                 ? double.parse(amtIssuedFieldController.text.trim())
                 : 0.00,
-            selectedPaymentMethod.value.platformName == 'cash'
+            selectedPaymentMethod.value.platformName == 'cash' ||
+                    selectedPaymentMethod.value.platformName == 'credit'
                 ? customerBal.value
                 : 0.00,
+            //customerBal.value,
             saleItemUnitBP,
             cartItem.price,
             0.00,
@@ -669,6 +671,8 @@ class CCheckoutController extends GetxController {
   computeCustomerBal(double cartTotals, double amtIssued) {
     customerBal.value = amtIssued - cartTotals;
     customerBalField.text = customerBal.value.toString();
+
+    return customerBal.value;
   }
 
   resetSalesFields() {
