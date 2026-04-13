@@ -345,11 +345,13 @@ class CContactDetailsScreen extends StatelessWidget {
                   title: contactItem.contactEmail != ''
                       ? contactItem.contactEmail
                       : 'Add email',
-                  titleColor: contactItem.contactEmail != ''
-                      ? CColors.rBrown
-                      : CColors.rOrange,
+                  titleColor: contactItem.contactEmail == ''
+                      ? CColors.rOrange
+                      : isDarkTheme
+                      ? CColors.white
+                      : CColors.rBrown,
                   titleTopPadding: contactItem.contactEmail != '' ? 10.0 : 13.0,
-                  trailingIcon: SizedBox.shrink(),
+                  trailingIcon: SizedBox(),
                 ),
                 Text(
                   'country code: ${contactItem.contactCountryCode}',
