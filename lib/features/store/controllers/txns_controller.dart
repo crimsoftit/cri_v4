@@ -1377,11 +1377,17 @@ class CTxnsController extends GetxController {
                         },
                         label: Text(
                           'REFUND',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium!.apply(color: Colors.red),
+                          style:
+                              Theme.of(
+                                context,
+                              ).textTheme.bodyMedium!.apply(
+                                color: Colors.red,
+                              ),
                         ),
-                        icon: Icon(Iconsax.wallet_check, color: Colors.red),
+                        icon: Icon(
+                          Iconsax.wallet_check,
+                          color: Colors.red,
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: CColors.black.withValues(alpha: 0.5),
                         ),
@@ -1716,9 +1722,11 @@ class CTxnsController extends GetxController {
             padding: MediaQuery.of(context).viewInsets,
             child: CRoundedContainer(
               bgColor: CColors.transparent,
-              height: CHelperFunctions.screenHeight() * .39,
-              padding: const EdgeInsets.all(
-                CSizes.lg,
+              height: CHelperFunctions.screenHeight() * .3,
+              padding: const EdgeInsets.only(
+                left: CSizes.lg,
+                right: CSizes.lg,
+                top: CSizes.lg / 4,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -1749,7 +1757,7 @@ class CTxnsController extends GetxController {
                             return Align(
                               alignment: Alignment.bottomRight,
                               child: Text(
-                                'amount owed $userCurrency.${invoiceAmountOwed.value}',
+                                'amount owed: $userCurrency.${invoiceAmountOwed.value}',
                                 style: Theme.of(context).textTheme.labelLarge!
                                     .apply(
                                       color: invoiceAmountOwed.value < 0
@@ -1789,9 +1797,9 @@ class CTxnsController extends GetxController {
                           txtFieldController: txtAmountIssued,
                         ),
 
-                        const SizedBox(
-                          height: CSizes.spaceBtnItems,
-                        ),
+                        // const SizedBox(
+                        //   height: CSizes.spaceBtnItems / 4.0,
+                        // ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1803,16 +1811,59 @@ class CTxnsController extends GetxController {
                               ),
                               label: Text('Update'),
                               onPressed: () {
-                                if (invoicePaymentFormKey.currentState!
+                                if (!invoicePaymentFormKey.currentState!
                                     .validate()) {
                                   return;
                                 }
+
+                                if (double.parse(txtAmountIssued.text.trim()) <=
+                                    0) {
+                                  CPopupSnackBar.errorSnackBar(
+                                    message: 'Invalid amount',
+                                    title: 'invalid amount',
+                                  );
+                                  return;
+                                }
+
+                                txnItem.amountIssued += double.parse(
+                                  txtAmountIssued.text.trim(),
+                                );
+
+                                txnItem.totalAmount -= double.parse(
+                                  txtAmountIssued.text.trim(),
+                                );
+                                txnItem.lastModified = DateFormat(
+                                  'yyyy-MM-dd @ kk:mm',
+                                ).format(clock.now());
+                                txnItem.syncAction = txnItem.isSynced == 0
+                                    ? 'append'
+                                    : 'update';
+                                txnItem.txnStatus = txnItem.totalAmount <= 0
+                                    ? 'complete'
+                                    : txnItem.txnStatus;
+
+                                // -- update txn on local db --
+                                dbHelper
+                                    .updateReceiptItem(
+                                      txnItem,
+                                      txnItem.soldItemId!,
+                                    )
+                                    .then((_) {
+                                      fetchTxns();
+                                    });
+
+                                Navigator.of(
+                                  context,
+                                ).pop(true);
                               },
                               style: ElevatedButton.styleFrom(
-                                foregroundColor:
-                                    CColors.white, // foreground (text) color
-                                backgroundColor:
-                                    CColors.rBrown, // background color
+                                backgroundColor: CColors.rBrown,
+                                foregroundColor: CColors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    10.0,
+                                  ), // Set the desired radius here
+                                ),
                               ),
                             ),
 
@@ -1832,12 +1883,19 @@ class CTxnsController extends GetxController {
                                     ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                foregroundColor:
-                                    CColors.rBrown, // foreground (text) color
                                 backgroundColor:
                                     CColors.white, // background color
+                                foregroundColor:
+                                    CColors.rBrown, // foreground (text) color
+
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    10.0,
+                                  ), // Set the desired radius here
+                                ),
                               ),
                               onPressed: () {
+                                resetSalesFields();
                                 Navigator.pop(context, true);
                               },
                             ),

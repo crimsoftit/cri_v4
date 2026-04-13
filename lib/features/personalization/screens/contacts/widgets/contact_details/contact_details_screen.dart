@@ -285,21 +285,23 @@ class CContactDetailsScreen extends StatelessWidget {
                       : SizedBox.shrink(),
                   title:
                       contactItem.contactPhone != '' &&
-                          contactItem.contactCountryCode != ''
-                      ? '${contactItem.contactCountryCode} ${contactItem.contactPhone}'
+                          contactItem.contactIsoCode != ''
+                      ? '+${contactItem.contactIsoCode} ${contactItem.contactPhone}'
                       : contactItem.contactPhone != '' &&
-                            contactItem.contactCountryCode == ''
+                            contactItem.contactIsoCode == ''
                       ? contactItem.contactPhone
                       : 'Add phone no.',
                   titleColor: contactItem.contactPhone != ''
                       ? CColors.rBrown
                       : CColors.rOrange,
+                  titleTopPadding: contactItem.contactPhone != '' ? 10.0 : 15.0,
                   trailingIcon: contactItem.contactPhone != ''
                       ? Icon(
                           Iconsax.message,
                           color: contactItem.contactPhone != ''
                               ? CColors.rBrown
                               : CColors.rOrange,
+                          size: CSizes.iconMd,
                         )
                       : SizedBox.shrink(),
                 ),
@@ -317,9 +319,10 @@ class CContactDetailsScreen extends StatelessWidget {
                     color: contactItem.contactEmail != ''
                         ? CColors.rBrown
                         : CColors.rOrange,
+                    size: CSizes.iconMd,
                   ),
                   onLeadingIconPressed: contactItem.contactEmail == ''
-                      ? null
+                      ? SizedBox.shrink
                       : () {
                           contactsController.launchEmailApp(
                             contactItem.contactEmail,
@@ -345,7 +348,8 @@ class CContactDetailsScreen extends StatelessWidget {
                   titleColor: contactItem.contactEmail != ''
                       ? CColors.rBrown
                       : CColors.rOrange,
-                  trailingIcon: null,
+                  titleTopPadding: contactItem.contactEmail != '' ? 10.0 : 13.0,
+                  trailingIcon: SizedBox.shrink(),
                 ),
                 Text(
                   'country code: ${contactItem.contactCountryCode}',

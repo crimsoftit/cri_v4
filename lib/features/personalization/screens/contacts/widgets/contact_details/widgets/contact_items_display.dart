@@ -15,6 +15,7 @@ class CContactItemsDisplay extends StatelessWidget {
     this.onLeadingIconPressed,
     this.subTitleWidget,
     this.titleColor,
+    this.titleTopPadding = 10.0,
     this.trailingIcon,
     required this.contactItem,
     required this.title,
@@ -23,6 +24,7 @@ class CContactItemsDisplay extends StatelessWidget {
   final bool? includeTrailingWidget;
   final CContactsModel contactItem;
   final Color? titleColor;
+  final double titleTopPadding;
   final MainAxisAlignment rowMainAxisAlignment;
   final Widget? child, leadingIcon, subTitleWidget, trailingIcon;
   final String title;
@@ -33,7 +35,7 @@ class CContactItemsDisplay extends StatelessWidget {
   Widget build(
     BuildContext context,
   ) {
-    final isDarkTheme = CHelperFunctions.isDarkMode(context);
+    //final isDarkTheme = CHelperFunctions.isDarkMode(context);
     return CRoundedContainer(
       bgColor: CColors.rBrown.withValues(
         alpha: .2,
@@ -43,7 +45,7 @@ class CContactItemsDisplay extends StatelessWidget {
       padding: const EdgeInsets.all(
         5.0,
       ),
-      width: CHelperFunctions.screenWidth() * .845,
+      width: CHelperFunctions.screenWidth() * .855,
       child: Row(
         mainAxisAlignment: rowMainAxisAlignment,
         children: [
@@ -54,11 +56,14 @@ class CContactItemsDisplay extends StatelessWidget {
               icon: leadingIcon!,
             ),
           ),
+          const SizedBox(
+            width: CSizes.spaceBtnItems,
+          ),
           Expanded(
             flex: 4,
             child: Padding(
-              padding: const EdgeInsets.only(
-                top: 8.0,
+              padding: EdgeInsets.only(
+                top: titleTopPadding,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
