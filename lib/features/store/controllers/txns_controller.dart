@@ -1552,7 +1552,7 @@ class CTxnsController extends GetxController {
           )
           .fold(
             0.0,
-            (sum, sale) => sum + (sale.quantity * sale.unitSellingPrice),
+            (sum, sale) => sum + ((sale.quantity * sale.unitSellingPrice) - sale.amountIssued),
           );
 
       // -- compute cost of sales --
@@ -1652,7 +1652,10 @@ class CTxnsController extends GetxController {
           .where((sale) => sale.txnStatus.toLowerCase().contains('invoiced'))
           .fold(
             0.0,
-            (sum, credit) => sum + (credit.unitSellingPrice * credit.quantity),
+            (sum, credit) =>
+                sum +
+                ((credit.unitSellingPrice * credit.quantity) -
+                    credit.amountIssued),
           );
 
       // -- compute gross revenue --
@@ -1713,7 +1716,7 @@ class CTxnsController extends GetxController {
         useSafeArea: true,
         useRootNavigator: true,
         builder: (context) {
-          invoiceAmountOwed.value = txnItem.amountIssued - txnItem.totalAmount;
+          invoiceAmountOwed.value = txnItem.totalAmount - txnItem.amountIssued;
 
           // -- reset fields --
           txtAmountIssued.text = '';
@@ -1739,7 +1742,7 @@ class CTxnsController extends GetxController {
                       ),
 
                       Text(
-                        'of $userCurrency.${txnItem.totalAmount}',
+                        'of $userCurrency.${txnItem.totalAmount - txnItem.amountIssued}',
                       ),
                     ],
                   ),
@@ -1754,19 +1757,34 @@ class CTxnsController extends GetxController {
                       children: [
                         Obx(
                           () {
-                            return Align(
-                              alignment: Alignment.bottomRight,
-                              child: Text(
-                                'amount owed: $userCurrency.${invoiceAmountOwed.value}',
-                                style: Theme.of(context).textTheme.labelLarge!
-                                    .apply(
-                                      color: invoiceAmountOwed.value < 0
-                                          ? CColors.error
-                                          : isDarkTheme
-                                          ? CColors.white
-                                          : CColors.rBrown,
-                                    ),
-                              ),
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'paid: $userCurrency.${txnItem.amountIssued}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.labelLarge!
+                                      .apply(
+                                        color: CColors.rBrown,
+                                      ),
+                                ),
+                                Text(
+                                  invoiceAmountOwed.value < 0
+                                      ? 'debit: $userCurrency.${invoiceAmountOwed.value.abs()}'
+                                      : 'credit: $userCurrency.${invoiceAmountOwed.value}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.labelLarge!
+                                      .apply(
+                                        color: invoiceAmountOwed.value >= 0
+                                            ? CColors.error
+                                            : isDarkTheme
+                                            ? CColors.white
+                                            : CColors.rBrown,
+                                      ),
+                                ),
+                              ],
                             );
                           },
                         ),
@@ -1789,8 +1807,9 @@ class CTxnsController extends GetxController {
                           onFieldValueChanged: (value) {
                             if (value != '') {
                               computeWhatIsOwed(
-                                double.parse(value),
                                 txnItem.totalAmount,
+                                txnItem.amountIssued,
+                                double.parse(value),
                               );
                             }
                           },
@@ -1829,9 +1848,6 @@ class CTxnsController extends GetxController {
                                   txtAmountIssued.text.trim(),
                                 );
 
-                                txnItem.totalAmount -= double.parse(
-                                  txtAmountIssued.text.trim(),
-                                );
                                 txnItem.lastModified = DateFormat(
                                   'yyyy-MM-dd @ kk:mm',
                                 ).format(clock.now());
@@ -1884,7 +1900,7 @@ class CTxnsController extends GetxController {
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    CColors.white, // background color
+                                    CColors.darkGrey, // background color
                                 foregroundColor:
                                     CColors.rBrown, // foreground (text) color
 
@@ -1931,7 +1947,7 @@ class CTxnsController extends GetxController {
     }
   }
 
-  computeWhatIsOwed(double amountIssued, double tAmount) {
-    invoiceAmountOwed.value = amountIssued - tAmount;
+  computeWhatIsOwed(double tAmount, double amountIssued, double value) {
+    invoiceAmountOwed.value = (tAmount - amountIssued) - value;
   }
 }

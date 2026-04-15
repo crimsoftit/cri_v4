@@ -46,7 +46,6 @@ class CContactsController extends GetxController {
   final RxString contactCountryCode = 'KE'.obs;
   final RxString contactDialCode = '254'.obs;
 
-  
   @override
   void onInit() async {
     foundMatches.value = [];
@@ -164,6 +163,7 @@ class CContactsController extends GetxController {
             : contact!.createdAt,
         0,
         'add',
+        0,
       );
 
       await dbHelper.addContact(contact ?? contactDetails);
@@ -515,9 +515,8 @@ class CContactsController extends GetxController {
                             // initialCountryCode: contactItem.contactIsoCode != ''
                             //     ? contactItem.contactIsoCode
                             //     : 'UG',
-                            initialCountryCode:
-                                contactItem.contactCountryCode != ''
-                                ? contactItem.contactCountryCode
+                            initialCountryCode: contactItem.contactIsoCode != ''
+                                ? contactItem.contactIsoCode
                                 : 'KE',
                             invalidNumberMessage: 'Invalid phone number!',
                             onChanged: (phone) {
@@ -541,9 +540,9 @@ class CContactsController extends GetxController {
                               }
                             },
                             onCountryChanged: (country) {
-                              contactItem.contactCountryCode = country.code;
+                              contactCountryCode.value = country.code;
 
-                              contactItem.contactIsoCode = country.dialCode;
+                              contactDialCode.value = country.dialCode;
 
                               if (kDebugMode) {
                                 print('=========\n');
@@ -630,11 +629,7 @@ class CContactsController extends GetxController {
                                     ).format(clock.now());
 
                                     if (await updateContact(contactItem)) {
-                                      
-                                      Get.toNamed(
-                                        '/my_contacts/contact_details',
-                                        arguments: contactItem.contactId,
-                                      );
+                                      resetFields();
                                       Navigator.pop(
                                         Get.overlayContext!,
                                         true,

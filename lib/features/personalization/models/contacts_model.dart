@@ -15,6 +15,7 @@ class CContactsModel {
   String _createdAt = '';
   int _isSynced = 0;
   String _syncAction = '';
+  int _isTrashed = 0;
 
   CContactsModel(
     this._addedBy,
@@ -29,6 +30,7 @@ class CContactsModel {
     this._createdAt,
     this._isSynced,
     this._syncAction,
+    this._isTrashed,
   );
 
   CContactsModel.withId(
@@ -45,6 +47,7 @@ class CContactsModel {
     this._createdAt,
     this._isSynced,
     this._syncAction,
+    this._isTrashed,
   );
 
   CContactsModel empty() {
@@ -62,6 +65,7 @@ class CContactsModel {
       '',
       0,
       '',
+      0,
     );
   }
 
@@ -78,6 +82,7 @@ class CContactsModel {
   String get createdAt => _createdAt;
   int get isSynced => _isSynced;
   String get syncAction => _syncAction;
+  int get isTrashed => _isTrashed;
 
   set contactId(int? newContactId) {
     _contactId = newContactId;
@@ -131,6 +136,10 @@ class CContactsModel {
     _syncAction = newSyncAction;
   }
 
+  set isTrashed(int trashStatus) {
+    _isTrashed = trashStatus;
+  }
+
   /// -- convert a Contact object into a Map object --
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -145,6 +154,7 @@ class CContactsModel {
       'createdAt': _createdAt,
       'isSynced': _isSynced,
       'syncAction': _syncAction,
+      'isTrashed': _isTrashed,
     };
     if (contactId != null) {
       map['contactId'] = _contactId;
@@ -170,5 +180,6 @@ class CContactsModel {
     _createdAt = map['createdAt'];
     _isSynced = map['isSynced'];
     _syncAction = map['syncAction'];
+    _isTrashed = map['isTrashed'];
   }
 }

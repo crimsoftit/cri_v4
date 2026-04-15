@@ -206,7 +206,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
                         body: Padding(
                           padding: const EdgeInsets.only(
                             bottom: 4.0,
-                            left: 61.0,
+                            left: 60.0,
                             right: 4.0,
                           ),
                           child: Column(

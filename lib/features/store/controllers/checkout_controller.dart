@@ -849,6 +849,7 @@ class CCheckoutController extends GetxController {
             DateFormat('yyyy-MM-dd kk:mm').format(clock.now()),
             0,
             'append',
+            0,
           );
 
           contactsController

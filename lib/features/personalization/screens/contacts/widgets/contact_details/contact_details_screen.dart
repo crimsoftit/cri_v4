@@ -1,8 +1,10 @@
 import 'package:cri_v3/common/widgets/buttons/icon_buttons/custom_icon_btn.dart';
 import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
+import 'package:cri_v3/common/widgets/list_tiles/menu_tile.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
 import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/widgets/contact_items_display.dart';
+import 'package:cri_v3/features/personalization/screens/profile/profile.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
@@ -252,106 +254,174 @@ class CContactDetailsScreen extends StatelessWidget {
                 ),
 
                 /// -- phone number display --
-                CContactItemsDisplay(
-                  contactItem: contactItem,
-                  includeTrailingWidget: true,
-                  leadingIcon: Icon(
-                    Iconsax.call,
-                    color: contactItem.contactPhone != ''
-                        ? CColors.rBrown
-                        : CColors.rOrange,
+                CMenuTile(
+                  bgColor: CColors.rBrown.withValues(
+                    alpha: .2,
                   ),
-                  onLeadingIconPressed: contactItem.contactPhone == ''
-                      ? null
-                      : () {
-                          contactsController.launchPhoneDialer(
-                            contactItem.contactPhone,
+                  containerWidth: CHelperFunctions.screenWidth() * .855,
+                  displayTrailingWidget: true,
+
+                  leadingWidget: IconButton(
+                    icon: Icon(
+                      contactItem.contactPhone == ''
+                          ? Iconsax.call_add
+                          : Iconsax.call,
+                      color: contactItem.contactPhone != ''
+                          ? CColors.rBrown
+                          : CColors.rOrange,
+                      size: CSizes.iconMd,
+                    ),
+                    onPressed: contactItem.contactPhone == ''
+                        ? null
+                        : () {
+                            contactsController.launchPhoneDialer(
+                              contactItem.contactPhone,
+                            );
+                          },
+                  ),
+                  onTap: contactItem.contactPhone == ''
+                      ? () {
+                          contactsController.addUpdateContactActionModal(
+                            context,
+                            contactItem,
+                            'add phone',
                           );
-                        },
-                  //rowMainAxisAlignment: MainAxisAlignment.start,
-                  subTitleWidget: contactItem.contactPhone != ''
-                      ? Text(
-                          'Mobile',
-                          style:
-                              Theme.of(
-                                context,
-                              ).textTheme.labelMedium!.apply(
-                                color: contactItem.contactPhone != ''
-                                    ? CColors.rBrown
-                                    : CColors.rOrange,
-                                fontSizeDelta: .8,
-                              ),
-                        )
-                      : SizedBox.shrink(),
+                        }
+                      : null,
+                  subTitle: contactItem.contactPhone != '' ? 'Mobile' : '',
                   title:
-                      contactItem.contactPhone != '' &&
-                          contactItem.contactIsoCode != ''
-                      ? '+${contactItem.contactIsoCode} ${contactItem.contactPhone}'
+                      contactItemintl.contactPhone != '' &&
+                          contactItem.contactCountryCode != ''
+                      ? '${contactItem.contactCountryCode} ${contactItem.contactPhone}'
                       : contactItem.contactPhone != '' &&
-                            contactItem.contactIsoCode == ''
+                            contactItem.contactCountryCode == ''
                       ? contactItem.contactPhone
-                      : 'Add phone no.',
-                  titleColor: contactItem.contactPhone != ''
-                      ? CColors.rBrown
-                      : CColors.rOrange,
-                  titleTopPadding: contactItem.contactPhone != '' ? 10.0 : 15.0,
-                  trailingIcon: contactItem.contactPhone != ''
-                      ? Icon(
-                          Iconsax.message,
-                          color: contactItem.contactPhone != ''
-                              ? CColors.rBrown
-                              : CColors.rOrange,
-                          size: CSizes.iconMd,
+                      : 'Add phone number',
+                  titleMaxLines: 1,
+                  titleStyle: Theme.of(context).textTheme.headlineMedium!.apply(
+                    color: contactItem.contactPhone == ''
+                        ? CColors.rOrange
+                        : CColors.rBrown,
+                  ),
+                  titleTopPadding: contactItem.contactPhone != '' ? 0 : 12.0,
+
+                  trailing: contactItem.contactPhone != ''
+                      ? IconButton(
+                          icon: Icon(
+                            Iconsax.message,
+                            color: contactItem.contactPhone != ''
+                                ? CColors.rBrown
+                                : CColors.rOrange,
+                            size: CSizes.iconMd,
+                          ),
+                          onPressed: contactItem.contactPhone == ''
+                              ? null
+                              : () {
+                                  contactsController.sendSimpleSms(
+                                    [contactItem.contactPhone],
+                                  );
+                                },
                         )
                       : SizedBox.shrink(),
+                  useCustomLeadingWiget: true,
                 ),
 
                 const SizedBox(
                   height: CSizes.spaceBtnItems / 3.0,
                 ),
 
+                // CContactItemsDisplay(
+                //   contactItem: contactItem,
+
+                //   includeTrailingWidget: false,
+                //   leadingIcon: Icon(
+                //     Icons.email,
+                //     color: contactItem.contactEmail != ''
+                //         ? CColors.rBrown
+                //         : CColors.rOrange,
+                //     size: CSizes.iconMd,
+                //   ),
+                //   onLeadingIconPressed: contactItem.contactEmail == ''
+                //       ? null
+                //       : () {
+                //           contactsController.launchEmailApp(
+                //             contactItem.contactEmail,
+                //           );
+                //         },
+                //   subTitleWidget: contactItem.contactEmail != ''
+                //       ? Text(
+                //           'Email',
+                //           style:
+                //               Theme.of(
+                //                 context,
+                //               ).textTheme.labelMedium!.apply(
+                //                 color: contactItem.contactEmail != ''
+                //                     ? CColors.rBrown
+                //                     : CColors.rOrange,
+                //                 fontSizeDelta: .8,
+                //               ),
+                //         )
+                //       : SizedBox.shrink(),
+                //   title: contactItem.contactEmail != ''
+                //       ? contactItem.contactEmail
+                //       : 'Add email',
+                //   titleColor: contactItem.contactEmail == ''
+                //       ? CColors.rOrange
+                //       : CColors.rBrown,
+                //   titleTopPadding: contactItem.contactEmail != '' ? 10.0 : 13.0,
+                //   trailingIcon: SizedBox(),
+                // ),
+
+                // const SizedBox(
+                //   height: CSizes.spaceBtnItems / 3.0,
+                // ),
                 /// -- email address display --
-                CContactItemsDisplay(
-                  contactItem: contactItem,
-                  includeTrailingWidget: false,
-                  leadingIcon: Icon(
-                    Icons.email,
-                    color: contactItem.contactEmail != ''
-                        ? CColors.rBrown
-                        : CColors.rOrange,
-                    size: CSizes.iconMd,
+                CMenuTile(
+                  bgColor: CColors.rBrown.withValues(
+                    alpha: .2,
                   ),
-                  onLeadingIconPressed: contactItem.contactEmail == ''
-                      ? SizedBox.shrink
-                      : () {
-                          contactsController.launchEmailApp(
-                            contactItem.contactEmail,
-                          );
-                        },
-                  subTitleWidget: contactItem.contactEmail != ''
-                      ? Text(
-                          'Email',
-                          style:
-                              Theme.of(
-                                context,
-                              ).textTheme.labelMedium!.apply(
-                                color: contactItem.contactEmail != ''
-                                    ? CColors.rBrown
-                                    : CColors.rOrange,
-                                fontSizeDelta: .8,
-                              ),
-                        )
-                      : SizedBox.shrink(),
+                  containerWidth: CHelperFunctions.screenWidth() * .855,
+                  displayTrailingWidget: false,
+                  icon: Iconsax.user_edit,
+                  leadingWidget: IconButton(
+                    icon: Icon(
+                      Icons.email,
+                      color: contactItem.contactEmail != ''
+                          ? CColors.rBrown
+                          : CColors.rOrange,
+                      size: CSizes.iconMd,
+                    ),
+                    onPressed: contactItem.contactEmail == ''
+                        ? null
+                        : () {
+                            contactsController.launchEmailApp(
+                              contactItem.contactEmail,
+                            );
+                          },
+                  ),
+                  onTap: () {},
+                  subTitle: contactItem.contactEmail != '' ? 'Email' : '',
                   title: contactItem.contactEmail != ''
                       ? contactItem.contactEmail
                       : 'Add email',
-                  titleColor: contactItem.contactEmail == ''
-                      ? CColors.rOrange
-                      : isDarkTheme
-                      ? CColors.white
-                      : CColors.rBrown,
-                  titleTopPadding: contactItem.contactEmail != '' ? 10.0 : 13.0,
-                  trailingIcon: SizedBox(),
+                  titleMaxLines: 1,
+                  titleStyle: Theme.of(context).textTheme.headlineMedium!.apply(
+                    color: contactItem.contactEmail == ''
+                        ? CColors.rOrange
+                        : CColors.rBrown,
+                    fontSizeFactor: contactItem.contactEmail != '' ? .85 : 1.0,
+                  ),
+                  titleTopPadding: contactItem.contactEmail != '' ? 0 : 12.0,
+
+                  // trailing: IconButton(
+                  //   onPressed: () {
+                  //     Get.to(() => const CProfileScreen());
+                  //   },
+                  //   icon: const Icon(
+                  //     Iconsax.arrow_right,
+                  //   ),
+                  // ),
+                  useCustomLeadingWiget: true,
                 ),
                 Text(
                   'country code: ${contactItem.contactCountryCode}',

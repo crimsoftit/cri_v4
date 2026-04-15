@@ -273,7 +273,7 @@ class CTxnItemsListView extends StatelessWidget {
                                           : space == 'refunds'
                                           ? 'refunded: $userCurrency.${(item.unitSellingPrice * item.qtyRefunded)}'
                                           : space == 'invoices'
-                                          ? 'Amt owed: $userCurrency.${item.totalAmount}'
+                                          ? 'Amt owed: $userCurrency.${item.totalAmount - item.amountIssued}'
                                           : 'txn Amt: $userCurrency.${item.totalAmount}',
                                       style: Theme.of(context)
                                           .textTheme
