@@ -4,7 +4,8 @@ import 'package:cri_v3/features/authentication/screens/pswd_config/forgot_passwo
 import 'package:cri_v3/features/authentication/screens/signup/signup.dart';
 import 'package:cri_v3/features/authentication/screens/signup/verify_email.dart';
 import 'package:cri_v3/features/personalization/screens/contacts/contacts_screen.dart';
-import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/contact_details_screen.dart';
+import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/contact_detailz_screen.dart';
+
 import 'package:cri_v3/features/personalization/screens/profile/profile.dart';
 import 'package:cri_v3/features/personalization/screens/settings/user_settings_screen.dart';
 import 'package:cri_v3/features/store/screens/home/home.dart';

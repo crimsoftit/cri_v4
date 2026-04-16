@@ -1,10 +1,6 @@
 import 'package:cri_v3/common/widgets/buttons/icon_buttons/custom_icon_btn.dart';
-import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/common/widgets/list_tiles/menu_tile.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
-import 'package:cri_v3/features/personalization/models/contacts_model.dart';
-import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/widgets/contact_items_display.dart';
-import 'package:cri_v3/features/personalization/screens/profile/profile.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
