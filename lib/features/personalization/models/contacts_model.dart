@@ -7,7 +7,7 @@ class CContactsModel {
   String _addedBy = '';
   String _contactName = '';
   String _contactCountryCode = '';
-  String _contactIsoCode = '';
+  String _contactDialCode = '';
   String _contactPhone = '';
   String _contactEmail = '';
   String _contactCategory = '';
@@ -22,7 +22,7 @@ class CContactsModel {
     this._productId,
     this._contactName,
     this._contactCountryCode,
-    this._contactIsoCode,
+    this._contactDialCode,
     this._contactPhone,
     this._contactEmail,
     this._contactCategory,
@@ -39,7 +39,7 @@ class CContactsModel {
     this._contactId,
     this._contactName,
     this._contactCountryCode,
-    this._contactIsoCode,
+    this._contactDialCode,
     this._contactPhone,
     this._contactEmail,
     this._contactCategory,
@@ -74,7 +74,7 @@ class CContactsModel {
   String get addedBy => _addedBy;
   String get contactName => _contactName;
   String get contactCountryCode => _contactCountryCode;
-  String get contactIsoCode => _contactIsoCode;
+  String get contactDialCode => _contactDialCode;
   String get contactPhone => _contactPhone;
   String get contactEmail => _contactEmail;
   String get contactCategory => _contactCategory;
@@ -104,8 +104,8 @@ class CContactsModel {
     _contactCountryCode = newCountryCode;
   }
 
-  set contactIsoCode(String newIsoCode) {
-    _contactIsoCode = newIsoCode;
+  set contactDialCode(String newDialCode) {
+    _contactDialCode = newDialCode;
   }
 
   set contactPhone(String newContactPhone) {
@@ -146,7 +146,7 @@ class CContactsModel {
       'addedBy': _addedBy,
       'contactName': _contactName,
       'contactCountryCode': _contactCountryCode,
-      'contactIsoCode': _contactIsoCode,
+      'contactDialCode': _contactDialCode,
       'contactPhone': _contactPhone,
       'contactEmail': _contactEmail,
       'contactCategory': _contactCategory,
@@ -172,7 +172,7 @@ class CContactsModel {
     _addedBy = map['addedBy'];
     _contactName = map['contactName'];
     _contactCountryCode = map['contactCountryCode'];
-    _contactIsoCode = map['contactIsoCode'];
+    _contactDialCode = map['contactDialCode'];
     _contactPhone = map['contactPhone'];
     _contactEmail = map['contactEmail'];
     _contactCategory = map['contactCategory'];

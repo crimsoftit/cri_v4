@@ -184,13 +184,13 @@ class CContactDetailsScreen extends StatelessWidget {
                         onTap: contactItem.contactPhone == ''
                             ? null
                             : () {
-                                contactItem.contactIsoCode == ''
+                                contactItem.contactDialCode == ''
                                     ? contactsController.updateDialCodeDialog(
                                         context,
                                         contactItem,
                                       )
                                     : contactsController.launchWhatsappChat(
-                                        '+${contactItem.contactIsoCode}${contactItem.contactPhone}',
+                                        '+${contactItem.contactDialCode}${contactItem.contactPhone}',
                                       );
                               },
                         width: 55.0,
@@ -290,7 +290,7 @@ class CContactDetailsScreen extends StatelessWidget {
                       : null,
                   subTitle: contactItem.contactPhone != '' ? 'Mobile' : '',
                   title:
-                      contactItemintl.contactPhone != '' &&
+                      contactItem.contactPhone != '' &&
                           contactItem.contactCountryCode != ''
                       ? '${contactItem.contactCountryCode} ${contactItem.contactPhone}'
                       : contactItem.contactPhone != '' &&
@@ -424,13 +424,13 @@ class CContactDetailsScreen extends StatelessWidget {
                   useCustomLeadingWiget: true,
                 ),
                 Text(
-                  'country code: ${contactItem.contactCountryCode}',
+                  'country code (eg. KE): ${contactItem.contactCountryCode}',
                   style: Theme.of(context).textTheme.labelLarge!.apply(
                     fontSizeFactor: 1.0,
                   ),
                 ),
                 Text(
-                  'iso code: ${contactItem.contactIsoCode}',
+                  'dial code (eg. +254): ${contactItem.contactDialCode}',
                   style: Theme.of(context).textTheme.labelLarge!.apply(
                     fontSizeFactor: 1.0,
                     color: CColors.white,

@@ -157,7 +157,7 @@ class DbHelper extends GetxController {
             addedBy TEXT NOT NULL,
             contactName TEXT NOT NULL,
             contactCountryCode TEXT NOT NULL,
-            contactIsoCode TEXT NOT NULL,
+            contactDialCode TEXT NOT NULL,
             contactPhone TEXT NOT NULL,
             contactEmail TEXT NOT NULL,
             contactCategory TEXT NOT NULL,

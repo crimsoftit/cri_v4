@@ -345,8 +345,8 @@ class CContactsController extends GetxController {
           contactCountryCode.value = contactItem.contactCountryCode != ''
               ? contactItem.contactCountryCode
               : contactCountryCode.value;
-          contactDialCode.value = contactItem.contactIsoCode != ''
-              ? contactItem.contactIsoCode
+          contactDialCode.value = contactItem.contactDialCode != ''
+              ? contactItem.contactDialCode
               : contactDialCode.value;
           txtEmailController.text = txtEmailController.text == ''
               ? contactItem.contactEmail
@@ -515,15 +515,15 @@ class CContactsController extends GetxController {
                             // initialCountryCode: contactItem.contactIsoCode != ''
                             //     ? contactItem.contactIsoCode
                             //     : 'UG',
-                            initialCountryCode: contactItem.contactIsoCode != ''
-                                ? contactItem.contactIsoCode
+                            initialCountryCode:
+                                contactItem.contactCountryCode != ''
+                                ? contactItem.contactCountryCode
                                 : 'KE',
                             invalidNumberMessage: 'Invalid phone number!',
                             onChanged: (phone) {
-                              contactItem.contactCountryCode =
-                                  phone.countryCode;
+                              contactCountryCode.value = phone.countryISOCode;
 
-                              contactItem.contactIsoCode = phone.countryISOCode;
+                              contactDialCode.value = phone.countryCode;
 
                               if (kDebugMode) {
                                 print('=========\n');
@@ -610,10 +610,10 @@ class CContactsController extends GetxController {
                                         contactItem.contactCountryCode == ''
                                         ? contactCountryCode.value
                                         : contactItem.contactCountryCode;
-                                    contactItem.contactIsoCode =
-                                        contactItem.contactIsoCode == ''
+                                    contactItem.contactDialCode =
+                                        contactItem.contactDialCode == ''
                                         ? contactDialCode.value
-                                        : contactItem.contactIsoCode;
+                                        : contactItem.contactDialCode;
                                     contactItem.contactPhone =
                                         txtPhoneController.text.trim();
                                     contactItem.contactEmail =
@@ -896,8 +896,8 @@ class CContactsController extends GetxController {
         contactCountryCode.value = contactItem.contactCountryCode != ''
             ? contactItem.contactCountryCode
             : contactCountryCode.value;
-        contactDialCode.value = contactItem.contactIsoCode != ''
-            ? contactItem.contactIsoCode
+        contactDialCode.value = contactItem.contactDialCode != ''
+            ? contactItem.contactDialCode
             : contactDialCode.value;
         txtPhoneController.text = contactItem.contactPhone;
         return SizedBox(
@@ -937,28 +937,33 @@ class CContactsController extends GetxController {
                             : 'KE',
                         invalidNumberMessage: 'Invalid phone number!',
                         onChanged: (phone) {
-                          contactItem.contactCountryCode = phone.countryCode;
-
-                          contactItem.contactIsoCode = phone.countryISOCode;
+                          contactCountryCode.value = phone.countryISOCode;
+                          contactDialCode.value = phone.countryCode;
 
                           if (kDebugMode) {
                             print('=========\n');
-                            print('country code: ${phone.countryCode}\n');
+                            print('country code: ${phone.countryISOCode}\n');
                             print('---------\n');
                             print(
-                              'country iso code: ${phone.countryISOCode}\n',
+                              'country iso code: ${phone.countryCode}\n',
                             );
                             print('---------\n');
                             print(
                               'complete number: ${phone.completeNumber}\n',
                             );
                             print('=========\n');
+
+                            CPopupSnackBar.customToast(
+                              forInternetConnectivityStatus: false,
+                              message:
+                                  'country code: ${contactCountryCode.value}\n dial code: ${contactDialCode.value}',
+                            );
                           }
                         },
                         onCountryChanged: (country) {
-                          contactItem.contactCountryCode = country.code;
+                          contactCountryCode.value = country.code;
 
-                          contactItem.contactIsoCode = country.dialCode;
+                          contactDialCode.value = country.dialCode;
 
                           if (kDebugMode) {
                             print('=========\n');
@@ -1009,10 +1014,10 @@ class CContactsController extends GetxController {
                                   contactItem.contactCountryCode == ''
                                   ? contactCountryCode.value
                                   : contactItem.contactCountryCode;
-                              contactItem.contactIsoCode =
-                                  contactItem.contactIsoCode == ''
+                              contactItem.contactDialCode =
+                                  contactItem.contactDialCode == ''
                                   ? contactDialCode.value
-                                  : contactItem.contactIsoCode;
+                                  : contactItem.contactDialCode;
                               contactItem.contactPhone = txtPhoneController.text
                                   .trim();
 
@@ -1020,7 +1025,7 @@ class CContactsController extends GetxController {
                                 fetchMyContacts().then(
                                   (_) {
                                     launchWhatsappChat(
-                                      '+${contactItem.contactIsoCode}${contactItem.contactPhone}',
+                                      '+${contactItem.contactDialCode}${contactItem.contactPhone}',
                                     );
                                   },
                                 );
