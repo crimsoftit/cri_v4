@@ -575,9 +575,13 @@ class CInventoryController extends GetxController {
       isLoading.value = true;
 
       // -- update entry
+      // await dbHelper.updateInventoryItem(
+      //   inventoryItem,
+      //   int.parse(txtId.text.trim()),
+      // );
       await dbHelper.updateInventoryItem(
         inventoryItem,
-        int.parse(txtId.text.trim()),
+        inventoryItem.productId!,
       );
 
       // -- refresh inventory list

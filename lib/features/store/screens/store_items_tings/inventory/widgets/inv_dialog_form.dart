@@ -59,8 +59,8 @@ class AddUpdateInventoryForm extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Visibility(
-                    maintainState: true,
-                    visible: false,
+                    maintainState: false,
+                    visible: true,
                     child: Column(
                       children: [
                         TextFormField(

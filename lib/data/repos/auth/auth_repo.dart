@@ -93,10 +93,13 @@ class AuthRepo extends GetxController {
           deviceStorage.writeIfNull('SyncTxnsDataWithCloud', true);
 
           if (await userController.fetchUserDetails()) {
-            await invController.initInvSync();
+            if (CNetworkManager.instance.hasConnection.value) {
+              await invController.initInvSync();
+              await txnsController.initTxnsSync();
+            }
+
             await invController.fetchUserInventoryItems();
 
-            await txnsController.initTxnsSync();
             await txnsController.fetchSoldItems();
             Get.put(CCheckoutController());
 

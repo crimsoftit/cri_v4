@@ -34,7 +34,9 @@ class CContactDetailsScreen extends StatelessWidget {
         appBar: AppBar(
           automaticallyImplyLeading: true,
           elevation: 1.0,
-          shadowColor: CColors.rBrown.withValues(alpha: 0.1),
+          shadowColor: CColors.rBrown.withValues(
+            alpha: 0.1,
+          ),
           iconTheme: IconThemeData(
             color: isDarkTheme ? CColors.white : CColors.rBrown,
           ),
@@ -119,10 +121,10 @@ class CContactDetailsScreen extends StatelessWidget {
                 const SizedBox(
                   height: CSizes.spaceBtnItems,
                 ),
-                Text(
+                SelectableText(
                   contactItem.contactName,
                   style: Theme.of(context).textTheme.labelLarge!.apply(
-                    fontSizeFactor: 2.0,
+                    fontSizeFactor: 1.6,
                   ),
                 ),
                 const SizedBox(
@@ -350,7 +352,9 @@ class CContactDetailsScreen extends StatelessWidget {
                               );
                             },
                       child: Icon(
-                        Icons.attach_email,
+                        contactItem.contactEmail != ''
+                            ? Icons.email
+                            : Icons.attach_email,
                         color: contactItem.contactEmail != ''
                             ? CColors.rBrown
                             : CColors.rOrange,
@@ -425,13 +429,15 @@ class CContactDetailsScreen extends StatelessWidget {
                       size: CSizes.iconMd,
                     ),
                     onPressed: () {
-                      CPopupSnackBar.customToast(
-                        forInternetConnectivityStatus: false,
-                        message: 'trash contact',
-                      );
+                      contactsController.onTrashAction(context, contactItem);
                     },
                   ),
-                  onLeadingIconPressed: () {},
+                  onLeadingIconPressed: () {
+                    contactsController.onTrashAction(context, contactItem);
+                  },
+                  onTitlePressed: () {
+                    contactsController.onTrashAction(context, contactItem);
+                  },
                   subTitleWidget: SizedBox.shrink(),
                   title: 'Trash',
                   titleColor: CColors.rOrange,
@@ -467,15 +473,18 @@ class CContactDetailsScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      "Delete permanently",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineMedium!
-                                          .apply(
-                                            color: CColors.error,
-                                            fontSizeFactor: .9,
-                                          ),
+                                    TextButton(
+                                      onPressed: () {},
+                                      child: Text(
+                                        "Delete permanently",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineMedium!
+                                            .apply(
+                                              color: CColors.error,
+                                              fontSizeFactor: .9,
+                                            ),
+                                      ),
                                     ),
                                   ],
                                 ),

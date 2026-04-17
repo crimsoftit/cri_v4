@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:clock/clock.dart';
 import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
+import 'package:cri_v3/common/widgets/flushbars/flushbars.dart';
 import 'package:cri_v3/common/widgets/txt_fields/custom_typeahed_field.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
@@ -43,7 +44,6 @@ class CContactsController extends GetxController {
   final RxList<CContactsModel> foundMatches = <CContactsModel>[].obs;
   final RxList<CContactsModel> myContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> trashedContacts = <CContactsModel>[].obs;
-  
 
   final RxString contactCountryCode = 'KE'.obs;
   final RxString contactDialCode = '254'.obs;
@@ -1081,6 +1081,51 @@ class CContactsController extends GetxController {
         );
       },
     );
+  }
+
+  /// -- on trash contact button pressed --
+  Future<void> onTrashAction(
+    BuildContext context,
+    CContactsModel trashItem,
+  ) async {
+    try {
+      // -- move contact item to a temporary list --
+
+      final itemIndex = myContacts.indexWhere(
+        (contact) => contact.contactId == trashItem.contactId,
+      );
+      final temp = myContacts.removeAt(itemIndex);
+
+      CFlushbars.undo(
+        duration: const Duration(
+          seconds: 11,
+        ),
+        message: 'you can still undo this action!!',
+        onUndo: () {
+          Navigator.pop(context, true);
+          myContacts.insert(
+            itemIndex,
+            temp,
+          );
+          onInit();
+        },
+      ).show(context);
+    } catch (e) {
+      if (kDebugMode) {
+        print('error trashing contact: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error trashing contact: $e',
+          title: 'error trashing contact',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to send contact to trash bin. Please try again later',
+          title: 'error trashing contact',
+        );
+      }
+      rethrow;
+    }
   }
 
   resetFields() {

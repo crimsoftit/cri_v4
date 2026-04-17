@@ -12,8 +12,10 @@ class CContactSettingsDisplay extends StatelessWidget {
     this.conatinerHeight = 100.0,
     this.includeTrailingWidget,
     this.leadingIcon,
-    this.rowMainAxisAlignment = MainAxisAlignment.spaceBetween,
     this.onLeadingIconPressed,
+    this.onTitlePressed,
+    this.rowMainAxisAlignment = MainAxisAlignment.spaceBetween,
+
     this.subTitleWidget,
     this.titleColor,
     this.titleTopPadding = 10.0,
@@ -30,7 +32,7 @@ class CContactSettingsDisplay extends StatelessWidget {
   final Widget? child, leadingIcon, subTitleWidget, trailingIcon;
   final String title;
 
-  final VoidCallback? onLeadingIconPressed;
+  final VoidCallback? onLeadingIconPressed, onTitlePressed;
 
   @override
   Widget build(
@@ -73,13 +75,16 @@ class CContactSettingsDisplay extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SelectableText(
-                          title,
-                          style: Theme.of(context).textTheme.headlineMedium!
-                              .apply(
-                                color: titleColor,
-                                fontSizeFactor: .9,
-                              ),
+                        TextButton(
+                          onPressed: onTitlePressed,
+                          child: Text(
+                            title,
+                            style: Theme.of(context).textTheme.headlineMedium!
+                                .apply(
+                                  color: titleColor,
+                                  fontSizeFactor: .9,
+                                ),
+                          ),
                         ),
                         subTitleWidget!,
                       ],
