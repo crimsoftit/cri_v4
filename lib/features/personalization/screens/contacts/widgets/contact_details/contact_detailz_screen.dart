@@ -1,9 +1,13 @@
 import 'package:cri_v3/common/widgets/buttons/icon_buttons/custom_icon_btn.dart';
+import 'package:cri_v3/common/widgets/dividers/c_divider.dart';
 import 'package:cri_v3/common/widgets/list_tiles/menu_tile.dart';
+import 'package:cri_v3/common/widgets/txt_widgets/c_section_headings.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
+import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/widgets/contact_settings_display.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
+import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:cri_v3/utils/validators/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -287,10 +291,10 @@ class CContactDetailsScreen extends StatelessWidget {
                   subTitle: contactItem.contactPhone != '' ? 'Mobile' : '',
                   title:
                       contactItem.contactPhone != '' &&
-                          contactItem.contactCountryCode != ''
-                      ? '${contactItem.contactCountryCode} ${contactItem.contactPhone}'
+                          contactItem.contactDialCode != ''
+                      ? '+${contactItem.contactDialCode} ${contactItem.contactPhone}'
                       : contactItem.contactPhone != '' &&
-                            contactItem.contactCountryCode == ''
+                            contactItem.contactDialCode == ''
                       ? contactItem.contactPhone
                       : 'Add phone number',
                   titleMaxLines: 1,
@@ -326,51 +330,6 @@ class CContactDetailsScreen extends StatelessWidget {
                   height: CSizes.spaceBtnItems / 3.0,
                 ),
 
-                // CContactItemsDisplay(
-                //   contactItem: contactItem,
-
-                //   includeTrailingWidget: false,
-                //   leadingIcon: Icon(
-                //     Icons.email,
-                //     color: contactItem.contactEmail != ''
-                //         ? CColors.rBrown
-                //         : CColors.rOrange,
-                //     size: CSizes.iconMd,
-                //   ),
-                //   onLeadingIconPressed: contactItem.contactEmail == ''
-                //       ? null
-                //       : () {
-                //           contactsController.launchEmailApp(
-                //             contactItem.contactEmail,
-                //           );
-                //         },
-                //   subTitleWidget: contactItem.contactEmail != ''
-                //       ? Text(
-                //           'Email',
-                //           style:
-                //               Theme.of(
-                //                 context,
-                //               ).textTheme.labelMedium!.apply(
-                //                 color: contactItem.contactEmail != ''
-                //                     ? CColors.rBrown
-                //                     : CColors.rOrange,
-                //                 fontSizeDelta: .8,
-                //               ),
-                //         )
-                //       : SizedBox.shrink(),
-                //   title: contactItem.contactEmail != ''
-                //       ? contactItem.contactEmail
-                //       : 'Add email',
-                //   titleColor: contactItem.contactEmail == ''
-                //       ? CColors.rOrange
-                //       : CColors.rBrown,
-                //   titleTopPadding: contactItem.contactEmail != '' ? 10.0 : 13.0,
-                //   trailingIcon: SizedBox(),
-                // ),
-
-                // const SizedBox(
-                //   height: CSizes.spaceBtnItems / 3.0,
-                // ),
                 /// -- email address display --
                 CMenuTile(
                   bgColor: CColors.rBrown.withValues(
@@ -380,12 +339,23 @@ class CContactDetailsScreen extends StatelessWidget {
                   displayTrailingWidget: false,
                   icon: Iconsax.user_edit,
                   leadingWidget: IconButton(
-                    icon: Icon(
-                      Icons.email,
-                      color: contactItem.contactEmail != ''
-                          ? CColors.rBrown
-                          : CColors.rOrange,
-                      size: CSizes.iconMd,
+                    icon: InkWell(
+                      onTap: contactItem.contactEmail != ''
+                          ? null
+                          : () {
+                              contactsController.addUpdateContactActionModal(
+                                context,
+                                contactItem,
+                                'add email',
+                              );
+                            },
+                      child: Icon(
+                        Icons.attach_email,
+                        color: contactItem.contactEmail != ''
+                            ? CColors.rBrown
+                            : CColors.rOrange,
+                        size: CSizes.iconMd,
+                      ),
                     ),
                     onPressed: contactItem.contactEmail == ''
                         ? null
@@ -395,7 +365,15 @@ class CContactDetailsScreen extends StatelessWidget {
                             );
                           },
                   ),
-                  onTap: () {},
+                  onTap: contactItem.contactEmail != ''
+                      ? null
+                      : () {
+                          contactsController.addUpdateContactActionModal(
+                            context,
+                            contactItem,
+                            'add email',
+                          );
+                        },
                   subTitle: contactItem.contactEmail != '' ? 'Email' : '',
                   title: contactItem.contactEmail != ''
                       ? contactItem.contactEmail
@@ -418,6 +396,100 @@ class CContactDetailsScreen extends StatelessWidget {
                   //   ),
                   // ),
                   useCustomLeadingWiget: true,
+                ),
+
+                // const SizedBox(
+                //   height: CSizes.spaceBtnItems,
+                // ),
+                Padding(
+                  padding: const EdgeInsets.all(
+                    20.0,
+                  ),
+                  child: const CSectionHeading(
+                    btnTitle: '',
+                    editFontSize: true,
+                    fSize: 12.0,
+                    showActionBtn: false,
+                    title: 'Contact settings',
+                  ),
+                ),
+
+                CContactSettingsDisplay(
+                  contactItem: contactItem,
+                  conatinerHeight: 130.0,
+                  includeTrailingWidget: false,
+                  leadingIcon: IconButton(
+                    icon: Icon(
+                      Icons.delete,
+                      color: CColors.rOrange,
+                      size: CSizes.iconMd,
+                    ),
+                    onPressed: () {
+                      CPopupSnackBar.customToast(
+                        forInternetConnectivityStatus: false,
+                        message: 'trash contact',
+                      );
+                    },
+                  ),
+                  onLeadingIconPressed: () {},
+                  subTitleWidget: SizedBox.shrink(),
+                  title: 'Trash',
+                  titleColor: CColors.rOrange,
+                  titleTopPadding: 0.0,
+                  trailingIcon: SizedBox(),
+                  child: Expanded(
+                    child: Column(
+                      children: [
+                        CDivider(),
+                        Row(
+                          //mainAxisAlignment: rowMainAxisAlignment,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Iconsax.close_circle,
+                                  color: CColors.error,
+                                  size: CSizes.iconMd,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: CSizes.spaceBtnItems,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  top: 0.0,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Delete permanently",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium!
+                                          .apply(
+                                            color: CColors.error,
+                                            fontSizeFactor: .9,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(
+                  height: CSizes.spaceBtnItems / 3.0,
                 ),
                 Text(
                   'country code (eg. KE): ${contactItem.contactCountryCode}',

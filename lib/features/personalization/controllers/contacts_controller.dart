@@ -40,8 +40,10 @@ class CContactsController extends GetxController {
 
   final RxBool isLoading = false.obs;
 
-  final RxList<CContactsModel> myContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> foundMatches = <CContactsModel>[].obs;
+  final RxList<CContactsModel> myContacts = <CContactsModel>[].obs;
+  final RxList<CContactsModel> trashedContacts = <CContactsModel>[].obs;
+  
 
   final RxString contactCountryCode = 'KE'.obs;
   final RxString contactDialCode = '254'.obs;

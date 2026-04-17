@@ -1552,7 +1552,9 @@ class CTxnsController extends GetxController {
           )
           .fold(
             0.0,
-            (sum, sale) => sum + ((sale.quantity * sale.unitSellingPrice) - sale.amountIssued),
+            (sum, sale) =>
+                sum +
+                ((sale.quantity * sale.unitSellingPrice) - sale.amountIssued),
           );
 
       // -- compute cost of sales --
@@ -1854,9 +1856,10 @@ class CTxnsController extends GetxController {
                                 txnItem.syncAction = txnItem.isSynced == 0
                                     ? 'append'
                                     : 'update';
-                                txnItem.txnStatus = txnItem.totalAmount <= 0
+                                txnItem.txnStatus = invoiceAmountOwed.value <= 0
                                     ? 'complete'
                                     : txnItem.txnStatus;
+                                // txnItem.txnStatus = computeWhatIsOwed(txnItem.totalAmount, txnItem.amountIssued, double.parse(txtAmountIssued.text)) > 0
 
                                 // -- update txn on local db --
                                 dbHelper
@@ -1864,13 +1867,15 @@ class CTxnsController extends GetxController {
                                       txnItem,
                                       txnItem.soldItemId!,
                                     )
-                                    .then((_) {
-                                      fetchTxns();
-                                    });
-
-                                Navigator.of(
-                                  context,
-                                ).pop(true);
+                                    .then(
+                                      (_) {
+                                        fetchTxns();
+                                        Navigator.of(
+                                          Get.overlayContext!,
+                                        ).pop(true);
+                                        resetSalesFields();
+                                      },
+                                    );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: CColors.rBrown,
@@ -1949,5 +1954,6 @@ class CTxnsController extends GetxController {
 
   computeWhatIsOwed(double tAmount, double amountIssued, double value) {
     invoiceAmountOwed.value = (tAmount - amountIssued) - value;
+    return invoiceAmountOwed.value;
   }
 }

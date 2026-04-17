@@ -15,8 +15,8 @@ class CPopupSnackBar extends GetxController {
   IconData? iconData;
 
   static customToast({
-    required message,
     required forInternetConnectivityStatus,
+    required message,
   }) async {
     final isDarkTheme = CHelperFunctions.isDarkMode(Get.context!);
     // -- check internet connectivity
