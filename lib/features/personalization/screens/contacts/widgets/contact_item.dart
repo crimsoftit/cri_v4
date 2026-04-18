@@ -1,4 +1,3 @@
-
 import 'package:cri_v3/common/widgets/shimmers/vert_items_shimmer.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/screens/no_data/no_data_screen.dart';
@@ -39,27 +38,44 @@ class CContactsExpansionPanelView extends StatelessWidget {
             case 'customers':
               demContacts.assignAll(
                 contactsController.myContacts.where(
-                  (contact) => contact.contactCategory.toLowerCase().contains(
-                    'customer'.toLowerCase(),
-                  ),
+                  (contact) =>
+                      contact.contactCategory.toLowerCase().contains(
+                        'customer'.toLowerCase(),
+                      ) &&
+                      contact.isTrashed == 0,
                 ),
               );
               break;
             case 'friends':
               demContacts.assignAll(
                 contactsController.myContacts.where(
-                  (contact) => contact.contactCategory.toLowerCase().contains(
-                    'friend'.toLowerCase(),
-                  ),
+                  (contact) =>
+                      contact.contactCategory.toLowerCase().contains(
+                        'friend'.toLowerCase(),
+                      ) &&
+                      contact.isTrashed == 0,
                 ),
               );
               break;
             case 'suppliers':
               demContacts.assignAll(
                 contactsController.myContacts.where(
-                  (contact) => contact.contactCategory.toLowerCase().contains(
-                    'supplier'.toLowerCase(),
-                  ),
+                  (contact) =>
+                      contact.contactCategory.toLowerCase().contains(
+                        'supplier'.toLowerCase(),
+                      ) &&
+                      contact.isTrashed == 0,
+                ),
+              );
+              break;
+            case 'trashed':
+              demContacts.assignAll(
+                contactsController.myContacts.where(
+                  (contact) =>
+                      contact.contactCategory.toLowerCase().contains(
+                        'supplier'.toLowerCase(),
+                      ) &&
+                      contact.isTrashed == 1,
                 ),
               );
               break;
@@ -86,7 +102,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
           }
           if (demContacts.isNotEmpty && contactsController.isLoading.value) {
             return const CVerticalProductShimmer(
-              itemCount: 5,
+              itemCount: 6,
             );
           }
           return Padding(

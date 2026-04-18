@@ -1,8 +1,6 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:cri_v3/common/widgets/dialogs/count_down_widget.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
-import 'package:flutter/animation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CFlushbars {

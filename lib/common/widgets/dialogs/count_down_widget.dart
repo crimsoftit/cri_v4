@@ -62,11 +62,13 @@ class _CCountDownWidgetState extends State<CCountDownWidget>
                 value: animationController.value,
               ),
             ),
-            Text(
-              counterText,
-              style: Theme.of(context).textTheme.labelMedium!.apply(
-                fontWeightDelta: 2,
-                color: CColors.darkGrey,
+            Center(
+              child: Text(
+                counterText,
+                style: Theme.of(context).textTheme.labelMedium!.apply(
+                  fontWeightDelta: 2,
+                  color: CColors.darkGrey,
+                ),
               ),
             ),
           ],

@@ -47,7 +47,7 @@ class CAddToCartBtn extends StatelessWidget {
           } else {
             final cartItem = cartController.convertInvToCartItem(
               invItem,
-              invItem.calibration == 'units' ? 1 : .25,
+              invItem.calibration == 'units' ? 1 : .1,
             );
             cartController.addSingleItemToCart(
               cartItem,

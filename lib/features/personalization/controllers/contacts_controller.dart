@@ -1091,10 +1091,17 @@ class CContactsController extends GetxController {
     try {
       // -- move contact item to a temporary list --
 
-      final itemIndex = myContacts.indexWhere(
-        (contact) => contact.contactId == trashItem.contactId,
-      );
-      final temp = myContacts.removeAt(itemIndex);
+      // final itemIndex = myContacts.indexWhere(
+      //   (contact) => contact.contactId == trashItem.contactId,
+      // );
+      // final temp = myContacts.removeAt(itemIndex);
+      trashItem.isTrashed = 1;
+      trashItem.lastModified = DateFormat(
+        'yyyy-MM-dd kk:mm',
+      ).format(clock.now());
+
+      updateContact(trashItem);
+      fetchMyContacts();
 
       CFlushbars.undo(
         duration: const Duration(
@@ -1102,12 +1109,12 @@ class CContactsController extends GetxController {
         ),
         message: 'you can still undo this action!!',
         onUndo: () {
+          trashItem.isTrashed = 0;
+          trashItem.lastModified = trashItem.lastModified;
+          updateContact(trashItem);
+          fetchMyContacts();
+          fetchMyContacts();
           Navigator.pop(context, true);
-          myContacts.insert(
-            itemIndex,
-            temp,
-          );
-          onInit();
         },
       ).show(context);
     } catch (e) {

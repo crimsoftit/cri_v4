@@ -60,7 +60,7 @@ class AddUpdateInventoryForm extends StatelessWidget {
                 children: [
                   Visibility(
                     maintainState: false,
-                    visible: true,
+                    visible: false,
                     child: Column(
                       children: [
                         TextFormField(
@@ -733,7 +733,6 @@ class AddUpdateInventoryForm extends StatelessWidget {
                                   invController.txtSupplierContacts.text.trim(),
                                 ) &&
                                 (invController.includeSupplierDetails.value)) {
-                            
                               contactsController.addContact(
                                 true,
                                 null,

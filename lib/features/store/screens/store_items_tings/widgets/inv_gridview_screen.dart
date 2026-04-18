@@ -374,7 +374,7 @@ class CInvGridviewScreen extends StatelessWidget {
                       ? qtySold.toStringAsFixed(0)
                       : qtySold.toString(),
                   syncAction: syncAction,
-                  stockValue: stockValue.toString(),
+                  stockValue: stockValue.toStringAsFixed(2),
                   // titleColor: expiryDate != ''
                   //     ? CDateTimeComputations.timeRangeFromNow(
                   //                 expiryDate.replaceAll('@ ', ''),

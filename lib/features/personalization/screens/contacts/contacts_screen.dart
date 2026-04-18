@@ -22,7 +22,7 @@ class CContactsScreen extends StatelessWidget {
       animationDuration: Duration(
         milliseconds: 300,
       ),
-      length: 4,
+      length: 5,
       child: Container(
         color: isDarkTheme ? CColors.transparent : CColors.white,
         child: Scaffold(
@@ -58,6 +58,12 @@ class CContactsScreen extends StatelessWidget {
                       Tab(
                         child: Text(
                           'Friends',
+                        ),
+                      ),
+
+                      Tab(
+                        child: Text(
+                          'Trashed',
                         ),
                       ),
                     ],
@@ -102,6 +108,10 @@ class CContactsScreen extends StatelessWidget {
 
                 CContactsExpansionPanelView(
                   space: 'friends',
+                ),
+
+                CContactsExpansionPanelView(
+                  space: 'trashed',
                 ),
               ],
             ),
