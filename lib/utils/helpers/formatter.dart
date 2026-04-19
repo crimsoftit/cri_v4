@@ -2,14 +2,8 @@ import 'package:cri_v3/features/store/controllers/inv_controller.dart';
 import 'package:cri_v3/features/store/controllers/txns_controller.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_libphonenumber/flutter_libphonenumber.dart';
-import 'package:flutter_libphonenumber/flutter_libphonenumber.dart'
-    as PhoneNumber
-    show parse;
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:intl_phone_field/phone_number.dart';
-import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
 class CFormatter {
   static String formatDate(DateTime? date) {
