@@ -35,12 +35,20 @@ class CCircularIconBtn extends StatelessWidget {
         color: bgColor != null
             ? bgColor!
             : isDarkTheme
-            ? CColors.rBrown.withValues(alpha: 0.6)
-            : CColors.white.withValues(alpha: 0.9),
+            ? CColors.rBrown.withValues(
+                alpha: 0.6,
+              )
+            : CColors.white.withValues(
+                alpha: 0.9,
+              ),
       ),
       child: IconButton(
         onPressed: onPressed,
-        icon: Icon(icon, color: iconColor, size: iconSize),
+        icon: Icon(
+          icon,
+          color: iconColor,
+          size: iconSize,
+        ),
       ),
     );
   }

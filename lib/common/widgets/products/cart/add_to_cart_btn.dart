@@ -86,7 +86,7 @@ class CAddToCartBtn extends StatelessWidget {
                   ? Text(
                       invItem.calibration == 'units'
                           ? pQtyInCart.toStringAsFixed(0)
-                          : pQtyInCart.toString(),
+                          : pQtyInCart.toStringAsFixed(2),
                       style: Theme.of(
                         context,
                       ).textTheme.bodyLarge!.apply(color: CColors.white),

@@ -52,7 +52,9 @@ class _CCountDownWidgetState extends State<CCountDownWidget>
         return Stack(
           children: [
             CRoundedContainer(
-              bgColor: CColors.rBrown,
+              bgColor: CColors.rBrown.withValues(
+                alpha: .3,
+              ),
               height: 25.0,
               width: 25.0,
               child: CircularProgressIndicator(
@@ -62,7 +64,9 @@ class _CCountDownWidgetState extends State<CCountDownWidget>
                 value: animationController.value,
               ),
             ),
-            Center(
+            Positioned(
+              right: 5.0,
+              top: 5.0,
               child: Text(
                 counterText,
                 style: Theme.of(context).textTheme.labelMedium!.apply(

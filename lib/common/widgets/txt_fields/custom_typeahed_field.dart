@@ -47,6 +47,8 @@ class CCustomTypeahedField extends StatelessWidget {
     final isDarkTheme = CHelperFunctions.isDarkMode(context);
     final screenWidth = CHelperFunctions.screenWidth();
 
+    contactsController.fetchMyContacts();
+
     return CRoundedContainer(
       bgColor: CColors.transparent,
       height: fieldHeight ?? 60.0,

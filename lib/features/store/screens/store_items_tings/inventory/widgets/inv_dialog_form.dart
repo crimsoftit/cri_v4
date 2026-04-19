@@ -212,6 +212,9 @@ class AddUpdateInventoryForm extends StatelessWidget {
                           //     : CColors.rBrown,
                           defaultItemColor: CColors.white,
                           defaultItemFontSizeFactor: 1.3,
+                          dropdownBoxColor: CColors.rBrown.withValues(
+                            alpha: .7,
+                          ),
                           iconColor: CColors.white,
                           onValueChanged: (value) {
                             if (value != '') {
@@ -355,6 +358,7 @@ class AddUpdateInventoryForm extends StatelessWidget {
                           style: const TextStyle(
                             fontWeight: FontWeight.normal,
                           ),
+                          textAlign: TextAlign.center,
                           validator: (value) {
                             return CValidator.validateNumber(
                               'Buying price',
@@ -396,12 +400,20 @@ class AddUpdateInventoryForm extends StatelessWidget {
                                             'units')
                                 ? 'Unit Selling Price($currency):'
                                 : 'Selling price per ${invController.itemMetrics.value}($currency):',
+                            // invController.itemMetrics.value == '' ||
+                            //     (invController.itemMetrics.value != '' &&
+                            //         invController.itemMetrics.value ==
+                            //             'units')
+                            // ? 'Unit Selling Price($currency):'
+                            // : invController.itemMetrics.value == 'litre'
+                            // ? '1${invController.itemMetrics.value[0]} Selling price($currency):'
+                            // : '1${invController.itemMetrics.value} Selling price:',
                             maintainHintSize: true,
-                            prefixIcon: Icon(
-                              Iconsax.bitcoin_card,
-                              color: CColors.darkGrey,
-                              size: CSizes.iconXs,
-                            ),
+                            // prefixIcon: Icon(
+                            //   Iconsax.bitcoin_card,
+                            //   color: CColors.darkGrey,
+                            //   size: CSizes.iconXs,
+                            // ),
                           ),
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
@@ -416,6 +428,7 @@ class AddUpdateInventoryForm extends StatelessWidget {
                             fontWeight: FontWeight.normal,
                             height: 1.5,
                           ),
+                          textAlign: TextAlign.center,
                           validator: (value) {
                             return CValidator.validateNumber(
                               'Unit selling price',

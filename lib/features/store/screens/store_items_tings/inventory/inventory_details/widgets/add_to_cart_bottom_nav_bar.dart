@@ -6,6 +6,7 @@ import 'package:cri_v3/utils/computations/date_time_computations.dart'
     show CDateTimeComputations;
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
+import 'package:cri_v3/utils/helpers/formatter.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
@@ -90,7 +91,7 @@ class CAddToCartBottomNavBar extends StatelessWidget {
                     cartController.itemQtyInCart.value < 0.1
                         ? null
                         : cartController.itemQtyInCart.value -=
-                              inventoryItem.calibration == 'units' ? 1 : .25;
+                              inventoryItem.calibration == 'units' ? 1 : .1;
                   },
                 ),
                 //const CFavoriteIcon(),
@@ -98,7 +99,9 @@ class CAddToCartBottomNavBar extends StatelessWidget {
                 Text(
                   inventoryItem.calibration == 'units'
                       ? '${cartController.itemQtyInCart.value.toStringAsFixed(0)} ${inventoryItem.calibration}'
-                      : '${cartController.itemQtyInCart.value} ${inventoryItem.calibration}(s)',
+                      : inventoryItem.calibration == 'litre'
+                      ? '${cartController.itemQtyInCart.value.toStringAsFixed(2)} ${inventoryItem.calibration[0]}'
+                      : '${cartController.itemQtyInCart.value.toStringAsFixed(2)} ${CFormatter.formatItemMetrics(inventoryItem.calibration, cartController.itemQtyInCart.value)}',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
 
@@ -119,7 +122,7 @@ class CAddToCartBottomNavBar extends StatelessWidget {
                     if (cartController.itemQtyInCart.value <
                         inventoryItem.quantity) {
                       cartController.itemQtyInCart.value +=
-                          inventoryItem.calibration == 'units' ? 1 : .25;
+                          inventoryItem.calibration == 'units' ? 1 : .1;
                     } else {
                       CPopupSnackBar.warningSnackBar(
                         title:
