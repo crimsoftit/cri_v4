@@ -21,6 +21,7 @@ import 'package:cri_v3/features/store/screens/store_items_tings/checkout/widgets
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/img_strings.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
+import 'package:cri_v3/utils/helpers/formatter.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:flutter/material.dart';
@@ -257,7 +258,7 @@ class CCheckoutScreen extends StatelessWidget {
                                                           MainAxisSize.min,
                                                       children: [
                                                         Text(
-                                                          'qty(${cartController.cartItems[index].itemMetrics}):',
+                                                          'qty:',
                                                         ),
                                                         // CCircularIconBtn(
                                                         //   icon: Iconsax.minus,
@@ -344,10 +345,10 @@ class CCheckoutScreen extends StatelessWidget {
                                                         //     }
                                                         //   },
                                                         // ),
-                                                        SizedBox(
-                                                          width: CSizes
-                                                              .spaceBtnItems,
-                                                        ),
+                                                        // SizedBox(
+                                                        //   width: CSizes
+                                                        //       .spaceBtnItems,
+                                                        // ),
 
                                                         // -- field to set quantity --
                                                         SizedBox(
@@ -391,8 +392,8 @@ class CCheckoutScreen extends StatelessWidget {
                                                               errorBorder: UnderlineInputBorder(
                                                                 borderSide:
                                                                     BorderSide(
-                                                                      color: Colors
-                                                                          .grey,
+                                                                      color: CColors
+                                                                          .error,
                                                                       width:
                                                                           1.0,
                                                                     ),
@@ -501,6 +502,23 @@ class CCheckoutScreen extends StatelessWidget {
                                                             },
                                                             textAlign: TextAlign
                                                                 .center,
+                                                          ),
+                                                        ),
+
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                top: 5.0,
+                                                              ),
+                                                          child: Text(
+                                                            CFormatter.formatItemMetrics(
+                                                              cartController
+                                                                  .cartItems[index]
+                                                                  .itemMetrics,
+                                                              cartController
+                                                                  .cartItems[index]
+                                                                  .quantity,
+                                                            ),
                                                           ),
                                                         ),
 

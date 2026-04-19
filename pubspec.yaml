@@ -158,22 +158,30 @@ dependencies:
   smooth_page_indicator: any
 
 
-  # -- otp textfield package
+  # -- phone number manennozzz
+  country_codes: any
+  country_code_picker: any
+  flutter_libphonenumber: ^2.7.0
   flutter_otp_text_field: any
-
-  readmore: any
-  carousel_slider: any
-  flutter_rating_bar: any
   intl_phone_field: any
   intl_phone_number_input: ^0.7.5
+  phone_numbers_parser: ^9.0.21
+  
+  
+  carousel_slider: any
+  flutter_rating_bar: any
   path: any
+  percent_indicator: ^4.2.5
+  
   clock: any
   #currency_pickers: any
-  country_code_picker: any
+  
   #flutter_sim_country_code: any
-  country_codes: any
+  
   in_date_utils: ^1.2.4+1
-  percent_indicator: ^4.2.5
+
+  readmore: any
+  
 
   font_awesome_flutter: ^11.0.0
 

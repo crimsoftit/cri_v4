@@ -2,8 +2,14 @@ import 'package:cri_v3/features/store/controllers/inv_controller.dart';
 import 'package:cri_v3/features/store/controllers/txns_controller.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_libphonenumber/flutter_libphonenumber.dart';
+import 'package:flutter_libphonenumber/flutter_libphonenumber.dart'
+    as PhoneNumber
+    show parse;
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:intl_phone_field/phone_number.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
 class CFormatter {
   static String formatDate(DateTime? date) {
@@ -208,4 +214,25 @@ class CFormatter {
       rethrow;
     }
   }
+
+  // seperatePhoneAndDialCode() {
+  //   Map<String, String> foundedCountry = {};
+  //   for (var country in Countries.allCountries) {
+  //     String dialCode = country["dial_code"].toString();
+  //     if (phoneWithDialCode.value.contains(dialCode)) {
+  //       foundedCountry = country;
+  //     }
+  //   }
+
+  //   if (foundedCountry.isNotEmpty) {
+  //     var dialCode = phoneWithDialCode.value.substring(
+  //       0,
+  //       foundedCountry["dial_code"]!.length,
+  //     );
+  //     var newPhoneNumber = phoneWithDialCode.value.substring(
+  //       foundedCountry["dial_code"]!.length,
+  //     );
+  //     print({dialCode, newPhoneNumber});
+  //   }
+  // }
 }
