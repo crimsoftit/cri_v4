@@ -130,6 +130,8 @@ class CUserController extends GetxController {
       CFullScreenLoader.openLoadingDialog(
         'processing...',
         CImages.docerAnimation,
+        null,
+        null,
       );
 
       // check internet connectivity
@@ -168,6 +170,8 @@ class CUserController extends GetxController {
       CFullScreenLoader.openLoadingDialog(
         'processing...',
         CImages.docerAnimation,
+        null,
+        null,
       );
 
       // -- re-authenticate user first

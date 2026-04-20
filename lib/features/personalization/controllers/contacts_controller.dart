@@ -7,6 +7,8 @@ import 'package:cri_v3/common/widgets/txt_fields/custom_typeahed_field.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
+import 'package:cri_v3/features/store/controllers/nav_menu_controller.dart';
+import 'package:cri_v3/nav_menu.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/db/sqflite/db_helper.dart';
@@ -40,6 +42,7 @@ class CContactsController extends GetxController {
   final txtPhoneController = TextEditingController();
 
   final RxBool isLoading = false.obs;
+  final RxBool undoTrashBtnPressed = false.obs;
 
   final RxList<CContactsModel> foundMatches = <CContactsModel>[].obs;
   final RxList<CContactsModel> myContacts = <CContactsModel>[].obs;
@@ -51,6 +54,7 @@ class CContactsController extends GetxController {
   @override
   void onInit() async {
     foundMatches.value = [];
+    undoTrashBtnPressed.value = false;
     await fetchMyContacts();
     super.onInit();
   }
@@ -294,10 +298,10 @@ class CContactsController extends GetxController {
 
       dbHelper.updateContact(contact);
 
-      CPopupSnackBar.customToast(
-        forInternetConnectivityStatus: false,
-        message: 'contact updated successfully',
-      );
+      // CPopupSnackBar.customToast(
+      //   forInternetConnectivityStatus: false,
+      //   message: 'contact updated successfully',
+      // );
       fetchMyContacts();
 
       // -- stop loader --
@@ -1089,19 +1093,12 @@ class CContactsController extends GetxController {
     CContactsModel trashItem,
   ) async {
     try {
-      // -- move contact item to a temporary list --
-
-      // final itemIndex = myContacts.indexWhere(
-      //   (contact) => contact.contactId == trashItem.contactId,
-      // );
-      // final temp = myContacts.removeAt(itemIndex);
       trashItem.isTrashed = 1;
       trashItem.lastModified = DateFormat(
         'yyyy-MM-dd kk:mm',
       ).format(clock.now());
 
       updateContact(trashItem);
-      fetchMyContacts();
 
       CFlushbars.undo(
         duration: const Duration(
@@ -1109,6 +1106,7 @@ class CContactsController extends GetxController {
         ),
         message: 'you can still undo this action!!',
         onUndo: () {
+          undoTrashBtnPressed.value = true;
           trashItem.isTrashed = 0;
           trashItem.lastModified = trashItem.lastModified;
           updateContact(trashItem);
@@ -1116,7 +1114,12 @@ class CContactsController extends GetxController {
           fetchMyContacts();
           Navigator.pop(context, true);
         },
+        undoTextStyle: Theme.of(context).textTheme.bodyMedium!.apply(
+          color: CColors.white,
+        ),
       ).show(context);
+
+      delayedTrashAction();
     } catch (e) {
       if (kDebugMode) {
         print('error trashing contact: $e');
@@ -1135,11 +1138,42 @@ class CContactsController extends GetxController {
     }
   }
 
+  /// -- restore contact from trash --
+
+  void delayedTrashAction() async {
+    // Wait for 2 seconds
+    await Future.delayed(
+      const Duration(
+        seconds: 13,
+      ),
+      () {
+        if (undoTrashBtnPressed.value == false) {
+          Get.to(
+            () {
+              final navController = Get.put(CNavMenuController());
+              navController.selectedIndex.value = 2;
+              undoTrashBtnPressed.value = false;
+              return const NavMenu();
+            },
+          );
+        }
+      },
+    );
+
+    // Perform action after delay
+    if (kDebugMode) {
+      print("Action performed after 2 seconds");
+    }
+
+    resetFields();
+  }
+
   resetFields() {
     contactCountryCode.value = 'KE';
     contactDialCode.value = '254';
     txtEmailController.text = '';
     txtContactNameController.text = '';
     txtPhoneController.text = '';
+    undoTrashBtnPressed.value = false;
   }
 }

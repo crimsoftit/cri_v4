@@ -52,26 +52,30 @@ class _CCountDownWidgetState extends State<CCountDownWidget>
         return Stack(
           children: [
             CRoundedContainer(
-              bgColor: CColors.rBrown.withValues(
-                alpha: .3,
-              ),
+              // bgColor: CColors.rBrown.withValues(
+              //   alpha: .3,
+              // ),
+              bgColor: CColors.transparent,
               height: 25.0,
+              margin: const EdgeInsets.only(
+                left: 10.0,
+              ),
               width: 25.0,
               child: CircularProgressIndicator(
                 backgroundColor: CColors.transparent,
                 color: CColors.white,
-                strokeWidth: 1.0,
+                strokeWidth: 1.2,
                 value: animationController.value,
               ),
             ),
             Positioned(
-              right: 5.0,
+              right: 25.0,
               top: 5.0,
               child: Text(
                 counterText,
                 style: Theme.of(context).textTheme.labelMedium!.apply(
                   fontWeightDelta: 2,
-                  color: CColors.darkGrey,
+                  color: CColors.white,
                 ),
               ),
             ),

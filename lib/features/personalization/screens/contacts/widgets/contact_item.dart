@@ -30,10 +30,14 @@ class CContactsExpansionPanelView extends StatelessWidget {
       child: Obx(
         () {
           var demContacts = [];
-
+          
           switch (space) {
             case 'all':
-              demContacts.assignAll(contactsController.myContacts);
+              demContacts.assignAll(
+                contactsController.myContacts.where(
+                  (contact) => contact.isTrashed == 0,
+                ),
+              );
               break;
             case 'customers':
               demContacts.assignAll(
@@ -224,20 +228,109 @@ class CContactsExpansionPanelView extends StatelessWidget {
                             left: 60.0,
                             right: 4.0,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child:
-                                    contact.contactPhone == '' ||
-                                        contact.contactEmail == ''
-                                    ? Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          contact.contactPhone != ''
-                                              ? Expanded(
+                          child: space == 'trashed'
+                              ? Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton.icon(
+                                      label: Text(
+                                        'Restore',
+                                      ),
+                                      onPressed: () {},
+                                    ),
+                                    TextButton.icon(
+                                      label: Text(
+                                        'Delete permanently',
+                                      ),
+                                      onPressed: () {},
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child:
+                                          contact.contactPhone == '' ||
+                                              contact.contactEmail == ''
+                                          ? Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                contact.contactPhone != ''
+                                                    ? Expanded(
+                                                        child: Text(
+                                                          'Mobile ${contact.contactPhone}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              Theme.of(
+                                                                    context,
+                                                                  )
+                                                                  .textTheme
+                                                                  .labelMedium!
+                                                                  .apply(),
+                                                        ),
+                                                      )
+                                                    : Expanded(
+                                                        child: Text(
+                                                          'Email: ${contact.contactEmail}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              Theme.of(
+                                                                    context,
+                                                                  )
+                                                                  .textTheme
+                                                                  .labelMedium!
+                                                                  .apply(),
+                                                        ),
+                                                      ),
+                                                Expanded(
+                                                  child: TextButton.icon(
+                                                    icon: Icon(
+                                                      Iconsax.edit,
+                                                      color: isDarkTheme
+                                                          ? CColors.white
+                                                          : CColors.rBrown,
+                                                      size: CSizes.iconSm,
+                                                    ),
+                                                    label: Text(
+                                                      contact.contactPhone == ''
+                                                          ? 'add phone no.'
+                                                          : 'add email',
+                                                      style:
+                                                          Theme.of(
+                                                                context,
+                                                              )
+                                                              .textTheme
+                                                              .labelMedium!
+                                                              .apply(),
+                                                    ),
+                                                    onPressed: () {
+                                                      contactsController
+                                                          .addUpdateContactActionModal(
+                                                            context,
+                                                            contact,
+                                                            contact.contactPhone ==
+                                                                    ''
+                                                                ? 'add phone'
+                                                                : 'add email',
+                                                          );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
                                                   child: Text(
                                                     'Mobile ${contact.contactPhone}',
                                                     overflow:
@@ -250,10 +343,11 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                                             .labelMedium!
                                                             .apply(),
                                                   ),
-                                                )
-                                              : Expanded(
+                                                ),
+                                                Expanded(
                                                   child: Text(
                                                     'Email: ${contact.contactEmail}',
+                                                    maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     style:
@@ -265,211 +359,157 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                                             .apply(),
                                                   ),
                                                 ),
-                                          Expanded(
-                                            child: TextButton.icon(
-                                              icon: Icon(
-                                                Iconsax.edit,
-                                                color: isDarkTheme
-                                                    ? CColors.white
-                                                    : CColors.rBrown,
-                                                size: CSizes.iconSm,
-                                              ),
-                                              label: Text(
-                                                contact.contactPhone == ''
-                                                    ? 'add phone no.'
-                                                    : 'add email',
-                                                style:
-                                                    Theme.of(
-                                                          context,
-                                                        ).textTheme.labelMedium!
-                                                        .apply(),
-                                              ),
-                                              onPressed: () {
-                                                contactsController
-                                                    .addUpdateContactActionModal(
-                                                      context,
-                                                      contact,
-                                                      contact.contactPhone == ''
-                                                          ? 'add phone'
-                                                          : 'add email',
-                                                    );
-                                              },
+                                              ],
                                             ),
-                                          ),
-                                        ],
-                                      )
-                                    : Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              'Mobile ${contact.contactPhone}',
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.labelMedium!.apply(),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              'Email: ${contact.contactEmail}',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.labelMedium!.apply(),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                              ),
-                              const SizedBox(
-                                height: CSizes.spaceBtnItems,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IconButton.outlined(
-                                    color: CColors.rBrown,
-                                    disabledColor: CColors.grey,
-                                    focusColor: CColors.grey,
-                                    icon: Icon(
-                                      Iconsax.call_outgoing,
-                                      applyTextScaling: true,
-                                      color:
-                                          contact.contactPhone == '' &&
-                                              isDarkTheme
-                                          ? CColors.darkerGrey
-                                          : contact.contactPhone == '' &&
-                                                !isDarkTheme
-                                          ? CColors.grey
-                                          : isDarkTheme
-                                          ? CColors.white
-                                          : CColors.rBrown,
-                                      fill: .2,
                                     ),
-                                    onPressed: contact.contactPhone != ''
-                                        ? () {
-                                            contactsController
-                                                .launchPhoneDialer(
-                                                  contact.contactPhone,
-                                                );
-                                          }
-                                        : null,
-                                  ),
-                                  IconButton.outlined(
-                                    color: CColors.rBrown,
-                                    disabledColor: CColors.grey,
-                                    focusColor: CColors.grey,
-
-                                    icon: FaIcon(
-                                      FontAwesomeIcons.whatsapp,
-                                      applyTextScaling: true,
-                                      color:
-                                          contact.contactPhone == '' &&
-                                              isDarkTheme
-                                          ? CColors.darkerGrey
-                                          : contact.contactPhone == '' &&
-                                                !isDarkTheme
-                                          ? CColors.grey
-                                          : isDarkTheme
-                                          ? CColors.white
-                                          : CColors.rBrown,
-                                      fill: .2,
+                                    const SizedBox(
+                                      height: CSizes.spaceBtnItems,
                                     ),
-                                    onPressed: contact.contactPhone == ''
-                                        ? null
-                                        : () {
-                                            contact.contactIsoCode == ''
-                                                ? contactsController
-                                                      .updateDialCodeDialog(
-                                                        context,
-                                                        contact,
-                                                      )
-                                                : contactsController
-                                                      .launchWhatsappChat(
-                                                        '+${contact.contactIsoCode}${contact.contactPhone}',
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        IconButton.outlined(
+                                          color: CColors.rBrown,
+                                          disabledColor: CColors.grey,
+                                          focusColor: CColors.grey,
+                                          icon: Icon(
+                                            Iconsax.call_outgoing,
+                                            applyTextScaling: true,
+                                            color:
+                                                contact.contactPhone == '' &&
+                                                    isDarkTheme
+                                                ? CColors.darkerGrey
+                                                : contact.contactPhone == '' &&
+                                                      !isDarkTheme
+                                                ? CColors.grey
+                                                : isDarkTheme
+                                                ? CColors.white
+                                                : CColors.rBrown,
+                                            fill: .2,
+                                          ),
+                                          onPressed: contact.contactPhone != ''
+                                              ? () {
+                                                  contactsController
+                                                      .launchPhoneDialer(
+                                                        contact.contactPhone,
                                                       );
+                                                }
+                                              : null,
+                                        ),
+                                        IconButton.outlined(
+                                          color: CColors.rBrown,
+                                          disabledColor: CColors.grey,
+                                          focusColor: CColors.grey,
+
+                                          icon: FaIcon(
+                                            FontAwesomeIcons.whatsapp,
+                                            applyTextScaling: true,
+                                            color:
+                                                contact.contactPhone == '' &&
+                                                    isDarkTheme
+                                                ? CColors.darkerGrey
+                                                : contact.contactPhone == '' &&
+                                                      !isDarkTheme
+                                                ? CColors.grey
+                                                : isDarkTheme
+                                                ? CColors.white
+                                                : CColors.rBrown,
+                                            fill: .2,
+                                          ),
+                                          onPressed: contact.contactPhone == ''
+                                              ? null
+                                              : () {
+                                                  contact.contactIsoCode == ''
+                                                      ? contactsController
+                                                            .updateDialCodeDialog(
+                                                              context,
+                                                              contact,
+                                                            )
+                                                      : contactsController
+                                                            .launchWhatsappChat(
+                                                              '+${contact.contactIsoCode}${contact.contactPhone}',
+                                                            );
+                                                },
+                                        ),
+
+                                        IconButton.outlined(
+                                          color: CColors.rBrown,
+                                          disabledColor: CColors.darkGrey,
+                                          //focusColor: CColors.rBrown,
+                                          icon: Icon(
+                                            Iconsax.message,
+                                            // color: contact.contactPhone == ''
+                                            //     ? CColors.grey
+                                            //     : isDarkTheme
+                                            //     ? CColors.white
+                                            //     : CColors.rBrown,
+                                            color:
+                                                contact.contactPhone == '' &&
+                                                    isDarkTheme
+                                                ? CColors.darkerGrey
+                                                : contact.contactPhone == '' &&
+                                                      !isDarkTheme
+                                                ? CColors.grey
+                                                : isDarkTheme
+                                                ? CColors.white
+                                                : CColors.rBrown,
+                                          ),
+                                          onPressed: contact.contactPhone != ''
+                                              ? () {
+                                                  contactsController
+                                                      .sendSimpleSms(
+                                                        [contact.contactPhone],
+                                                      );
+                                                }
+                                              : null,
+                                        ),
+
+                                        IconButton.outlined(
+                                          color: CColors.rBrown,
+                                          disabledColor: CColors.darkGrey,
+
+                                          icon: Icon(
+                                            Icons.email,
+
+                                            color:
+                                                contact.contactEmail == '' &&
+                                                    isDarkTheme
+                                                ? CColors.darkerGrey
+                                                : contact.contactEmail == '' &&
+                                                      !isDarkTheme
+                                                ? CColors.grey
+                                                : isDarkTheme
+                                                ? CColors.white
+                                                : CColors.rBrown,
+                                          ),
+                                          onPressed: contact.contactEmail != ''
+                                              ? () {
+                                                  contactsController
+                                                      .launchEmailApp(
+                                                        contact.contactEmail,
+                                                      );
+                                                }
+                                              : null,
+                                        ),
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.info_outlined,
+                                            color: isDarkTheme
+                                                ? CColors.white
+                                                : CColors.rBrown,
+                                          ),
+                                          onPressed: () {
+                                            Get.toNamed(
+                                              '/my_contacts/contact_details',
+                                              arguments: contact.contactId,
+                                            );
                                           },
-                                  ),
-
-                                  IconButton.outlined(
-                                    color: CColors.rBrown,
-                                    disabledColor: CColors.darkGrey,
-                                    //focusColor: CColors.rBrown,
-                                    icon: Icon(
-                                      Iconsax.message,
-                                      // color: contact.contactPhone == ''
-                                      //     ? CColors.grey
-                                      //     : isDarkTheme
-                                      //     ? CColors.white
-                                      //     : CColors.rBrown,
-                                      color:
-                                          contact.contactPhone == '' &&
-                                              isDarkTheme
-                                          ? CColors.darkerGrey
-                                          : contact.contactPhone == '' &&
-                                                !isDarkTheme
-                                          ? CColors.grey
-                                          : isDarkTheme
-                                          ? CColors.white
-                                          : CColors.rBrown,
+                                        ),
+                                      ],
                                     ),
-                                    onPressed: contact.contactPhone != ''
-                                        ? () {
-                                            contactsController.sendSimpleSms(
-                                              [contact.contactPhone],
-                                            );
-                                          }
-                                        : null,
-                                  ),
-
-                                  IconButton.outlined(
-                                    color: CColors.rBrown,
-                                    disabledColor: CColors.darkGrey,
-
-                                    icon: Icon(
-                                      Icons.email,
-
-                                      color:
-                                          contact.contactEmail == '' &&
-                                              isDarkTheme
-                                          ? CColors.darkerGrey
-                                          : contact.contactEmail == '' &&
-                                                !isDarkTheme
-                                          ? CColors.grey
-                                          : isDarkTheme
-                                          ? CColors.white
-                                          : CColors.rBrown,
-                                    ),
-                                    onPressed: contact.contactEmail != ''
-                                        ? () {
-                                            contactsController.launchEmailApp(
-                                              contact.contactEmail,
-                                            );
-                                          }
-                                        : null,
-                                  ),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.info_outlined,
-                                      color: isDarkTheme
-                                          ? CColors.white
-                                          : CColors.rBrown,
-                                    ),
-                                    onPressed: () {
-                                      Get.toNamed(
-                                        '/my_contacts/contact_details',
-                                        arguments: contact.contactId,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                  ],
+                                ),
                         ),
                       );
                     },

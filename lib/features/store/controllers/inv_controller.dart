@@ -1,5 +1,6 @@
 import 'package:cri_v3/api/sheets/store_sheets_api.dart';
 import 'package:cri_v3/common/widgets/txt_widgets/c_section_headings.dart';
+import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/controllers/notification_tings/flutter_local_notifications/local_notifications_controller.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/store/controllers/cart_controller.dart';
@@ -114,6 +115,10 @@ class CInventoryController extends GetxController {
     fetchInvUpdates();
 
     await initInvSync();
+
+    final contactsController = Get.put(CContactsController());
+
+    contactsController.fetchMyContacts();
 
     //await scheduleExpiryAlerts();
 

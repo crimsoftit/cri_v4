@@ -36,8 +36,10 @@ class CSetBiznameController extends GetxController {
     try {
       // -- start loader
       CFullScreenLoader.openLoadingDialog(
-        'we\'re updating your info...',
+        'We\'re updating your info...',
         CImages.docerAnimation,
+        null,
+        null,
       );
 
       // -- check internet connectivity
@@ -66,10 +68,10 @@ class CSetBiznameController extends GetxController {
       CFullScreenLoader.stopLoading();
 
       // -- show success message
-      CPopupSnackBar.successSnackBar(
-        title: 'update successful!',
-        message: 'your business name was updated successfully.',
-      );
+      // CPopupSnackBar.successSnackBar(
+      //   title: 'Update successful!',
+      //   message: 'your business name was updated successfully.',
+      // );
 
       // -- redirect screens accordingly --
       AuthRepo.instance.screenRedirect();

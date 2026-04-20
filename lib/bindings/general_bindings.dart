@@ -1,3 +1,4 @@
+import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/controllers/notification_tings/flutter_local_notifications/local_notifications_controller.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/store/controllers/checkout_controller.dart';
@@ -24,5 +25,6 @@ class CGeneralBindings extends Bindings {
 
       Get.put(CCheckoutController());
     });
+    Get.lazyPut(() => CContactsController());
   }
 }

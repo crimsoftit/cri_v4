@@ -93,6 +93,8 @@ class SignupController extends GetxController {
       CFullScreenLoader.openLoadingDialog(
         "we're processing your info...",
         CImages.docerAnimation,
+        null,
+        null,
       );
 
       // -- check internet connectivity

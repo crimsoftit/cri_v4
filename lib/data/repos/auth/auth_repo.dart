@@ -13,12 +13,15 @@ import 'package:cri_v3/features/store/controllers/inv_controller.dart';
 import 'package:cri_v3/features/store/controllers/nav_menu_controller.dart';
 import 'package:cri_v3/features/store/controllers/txns_controller.dart';
 import 'package:cri_v3/nav_menu.dart';
+import 'package:cri_v3/utils/constants/colors.dart';
+import 'package:cri_v3/utils/constants/img_strings.dart';
 import 'package:cri_v3/utils/exceptions/firebase_auth_exceptions.dart';
 import 'package:cri_v3/utils/exceptions/firebase_exceptions.dart';
 import 'package:cri_v3/utils/exceptions/format_exceptions.dart';
 import 'package:cri_v3/utils/exceptions/platform_exceptions.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:cri_v3/utils/local_storage/storage_utility.dart';
+import 'package:cri_v3/utils/popups/full_screen_loader.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -80,6 +83,14 @@ class AuthRepo extends GetxController {
             () => const CUpdateBusinessNameScreen(autoImplyLeading: false),
           );
         } else {
+          // start the loader
+          CFullScreenLoader.openLoadingDialog(
+            'Redirecting...',
+            CImages.docerAnimation,
+            null,
+            CColors.white,
+          );
+
           /// -- initialize spreadsheets --
           if (await CNetworkManager.instance.isConnected() ||
               CNetworkManager.instance.hasConnection.value) {
@@ -135,6 +146,8 @@ class AuthRepo extends GetxController {
               );
             }
           }
+          // stop loader
+          CFullScreenLoader.stopLoading();
         }
       } else {
         Get.offAll(() => VerifyEmailScreen(email: _auth.currentUser?.email));

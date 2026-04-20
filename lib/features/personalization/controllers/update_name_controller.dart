@@ -38,6 +38,8 @@ class CUpdateNameController extends GetxController {
       CFullScreenLoader.openLoadingDialog(
         'we\'re updating your info...',
         CImages.docerAnimation,
+        null,
+        null,
       );
 
       // -- check internet connectivity

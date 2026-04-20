@@ -13,7 +13,12 @@ class CFullScreenLoader {
   //    - txt: text to be diplayed in the loading dialog widget
   //    - animation: the lottie animation to be displayed
 
-  static void openLoadingDialog(String txt, String animator) {
+  static void openLoadingDialog(
+    String txt,
+    String animator,
+    Color? bgColor,
+    Color? textColor,
+  ) {
     showDialog(
       context:
           Get.overlayContext!, // use Get.overlayContext for overlay dialogs
@@ -22,16 +27,26 @@ class CFullScreenLoader {
       builder: (_) => PopScope(
         canPop: false, // disable popping with the back button
         child: Container(
-          color: CHelperFunctions.isDarkMode(Get.context!)
-              ? CColors.rBrown
-              : CColors.rBrown.withValues(alpha: 0.1),
+          color:
+              bgColor ??
+              (CHelperFunctions.isDarkMode(Get.context!)
+                  ? CColors.rBrown
+                  : CColors.rBrown.withValues(
+                      alpha: 0.25,
+                    )),
           width: double.infinity,
           height: double.infinity,
           child: Column(
             children: [
               // adjust spacing as required
-              const SizedBox(height: 250.0),
-              CAnimatedLoaderWidget(text: txt, animation: animator),
+              const SizedBox(
+                height: 250.0,
+              ),
+              CAnimatedLoaderWidget(
+                text: txt,
+                txtColor: textColor,
+                animation: animator,
+              ),
             ],
           ),
         ),

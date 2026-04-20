@@ -21,6 +21,8 @@ class ForgotPasswordController extends GetxController {
       CFullScreenLoader.openLoadingDialog(
         'processing your request...',
         CImages.docerAnimation,
+        null,
+        null,
       );
 
       // check internet connectivity
@@ -28,7 +30,7 @@ class ForgotPasswordController extends GetxController {
       if (!isConnected) {
         CFullScreenLoader.stopLoading();
         CPopupSnackBar.customToast(
-          message: 'please check your internet connection',
+          message: 'Please check your internet connection',
           forInternetConnectivityStatus: true,
         );
         return;
@@ -68,6 +70,8 @@ class ForgotPasswordController extends GetxController {
       CFullScreenLoader.openLoadingDialog(
         'processing your request...',
         CImages.docerAnimation,
+        null,
+        null,
       );
 
       // check internet connectivity

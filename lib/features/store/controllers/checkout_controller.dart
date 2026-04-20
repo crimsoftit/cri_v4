@@ -133,6 +133,8 @@ class CCheckoutController extends GetxController {
       CFullScreenLoader.openLoadingDialog(
         'processing txn...',
         CImages.docerAnimation,
+        null,
+        null,
       );
 
       txnsController.fetchSoldItems();
