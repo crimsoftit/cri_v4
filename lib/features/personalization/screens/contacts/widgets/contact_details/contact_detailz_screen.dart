@@ -473,7 +473,10 @@ class CContactDetailsScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     TextButton(
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        contactsController
+                                            .onDeleteContactDialog(contactItem);
+                                      },
                                       child: Text(
                                         "Delete permanently",
                                         style: Theme.of(context)

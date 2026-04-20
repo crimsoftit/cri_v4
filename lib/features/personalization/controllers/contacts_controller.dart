@@ -13,6 +13,7 @@ import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/db/sqflite/db_helper.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
+import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:cri_v3/utils/validators/validation.dart';
 import 'package:flutter/foundation.dart';
@@ -699,6 +700,123 @@ class CContactsController extends GetxController {
         CPopupSnackBar.errorSnackBar(
           message: 'error displaying bottom sheet modal: $e',
           title: 'error popping bottom sheet modal!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- delete contact dialog --
+  onDeleteContactDialog(CContactsModel contact) async {
+    try {
+      Get.defaultDialog(
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              backgroundColor: CHelperFunctions.randomAstheticColor(),
+              radius: 30.0,
+              child:
+                  CValidator.isFirstCharacterALetter(
+                    contact.contactName,
+                  )
+                  ? Text(
+                      contact.contactName[0].toUpperCase(),
+                      style: Theme.of(Get.overlayContext!).textTheme.bodyLarge!
+                          .apply(
+                            color: CColors.white,
+                            fontSizeFactor: 1.5,
+                          ),
+                    )
+                  : Icon(
+                      Iconsax.user,
+                      color: CHelperFunctions.randomAstheticColor(),
+                    ),
+            ),
+            const SizedBox(
+              height: CSizes.spaceBtnSections,
+            ),
+            Text(
+              contact.contactName,
+              style: Theme.of(Get.overlayContext!).textTheme.bodyMedium!.apply(
+                fontSizeFactor: 1.3,
+                fontWeightDelta: 2,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(
+              height: CSizes.spaceBtnItems,
+            ),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text:
+                        'Are you certain you want to permanently delete this contact?',
+                  ),
+                  TextSpan(
+                    text: '\n\nTHIS ACTION CAN\'T BE UNDONE!',
+                    style: Theme.of(Get.overlayContext!).textTheme.labelMedium!
+                        .apply(
+                          fontSizeFactor: 1.5,
+                          fontWeightDelta: 2,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        contentPadding: const EdgeInsets.all(
+          CSizes.md,
+        ),
+
+        confirm: ElevatedButton(
+          onPressed: () async {
+            // -- check internet connectivity
+            // final isConnected = CNetworkManager.instance.hasConnection.value;
+
+            // await dbHelper.deleteContact(contact);
+
+            // Navigator.of(Get.overlayContext!).pop();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            side: const BorderSide(
+              color: Colors.red,
+            ),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: CSizes.lg,
+            ),
+            child: Text(
+              'delete',
+            ),
+          ),
+        ),
+        cancel: OutlinedButton(
+          onPressed: () {
+            fetchMyContacts();
+            Navigator.of(Get.overlayContext!).pop();
+          },
+          child: const Text('Cancel'),
+        ),
+
+        title: 'Delete contact?',
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('error displaying bottom sheet modal: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'An unknown error occurred while deleting contact: $e',
+          title: 'error deleting contact!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while deleting contact! Please try again later...',
+          title: 'error deleting contact!',
         );
       }
       rethrow;

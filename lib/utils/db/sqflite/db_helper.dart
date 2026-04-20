@@ -911,4 +911,32 @@ class DbHelper extends GetxController {
       rethrow;
     }
   }
+
+  /// -- delete contact --
+  Future<int> deleteContact(CContactsModel contact) async {
+    try {
+      final db = _db;
+
+      int result = await db!.delete(
+        'contactsTable',
+        where: 'contactId = ?',
+        whereArgs: [contact.contactId],
+      );
+      return result;
+    } catch (e) {
+      if (kDebugMode) {
+        print('error deleting notification: $e');
+        CPopupSnackBar.errorSnackBar(
+          title: 'delete error',
+          message: 'error deleting contact: $e',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'delete error',
+          message: 'error deleting contact!',
+        );
+      }
+      rethrow;
+    }
+  }
 }

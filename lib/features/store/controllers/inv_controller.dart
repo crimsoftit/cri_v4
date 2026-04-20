@@ -116,10 +116,6 @@ class CInventoryController extends GetxController {
 
     await initInvSync();
 
-    final contactsController = Get.put(CContactsController());
-
-    contactsController.fetchMyContacts();
-
     //await scheduleExpiryAlerts();
 
     super.onInit();
@@ -228,6 +224,11 @@ class CInventoryController extends GetxController {
       if (CTxnsController.instance.dateRangeFieldController.text == '') {
         await initializeInventorySummary();
       }
+
+      // -- fetch contacts --
+      final contactsController = Get.put(CContactsController());
+
+      contactsController.fetchMyContacts();
 
       List<CInventoryModel> returnItems;
       if (inventoryItems.isNotEmpty) {
@@ -792,7 +793,7 @@ class CInventoryController extends GetxController {
   ) async {
     Get.defaultDialog(
       contentPadding: const EdgeInsets.all(CSizes.md),
-      title: 'permanently delete ${inventoryItem.name}?',
+      title: 'Permanently delete ${inventoryItem.name}?',
       middleText:
           'Are you certain you want to permanently delete this item? THIS ACTION CAN\'T BE UNDONE!',
       confirm: ElevatedButton(
