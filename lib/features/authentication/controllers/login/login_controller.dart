@@ -4,6 +4,7 @@ import 'package:cri_v3/utils/constants/img_strings.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:cri_v3/utils/popups/full_screen_loader.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -70,14 +71,26 @@ class CLoginController extends GetxController {
         password.text.trim(),
       );
 
-      // stop loader
-      CFullScreenLoader.stopLoading();
-
       // redirect to relevant screen
       AuthRepo.instance.screenRedirect();
+      // stop loader
+      CFullScreenLoader.stopLoading();
     } catch (e) {
       CFullScreenLoader.stopLoading();
-      CPopupSnackBar.errorSnackBar(title: 'Oh Snap!', message: e.toString());
+      if (kDebugMode) {
+        print('sign in error: $e');
+        CPopupSnackBar.errorSnackBar(
+          title: 'Oh Snap! Signin error!',
+          message:
+              'An unknown error occurred while signing you in! please try again later',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'Oh Snap!',
+          message: e.toString(),
+        );
+      }
+      rethrow;
     }
   }
 

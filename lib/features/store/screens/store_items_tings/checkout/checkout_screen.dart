@@ -257,8 +257,14 @@ class CCheckoutScreen extends StatelessWidget {
                                                       mainAxisSize:
                                                           MainAxisSize.min,
                                                       children: [
-                                                        Text(
-                                                          'qty:',
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                top: 8.0,
+                                                              ),
+                                                          child: Text(
+                                                            'qty:',
+                                                          ),
                                                         ),
                                                         // CCircularIconBtn(
                                                         //   icon: Iconsax.minus,
@@ -508,7 +514,7 @@ class CCheckoutScreen extends StatelessWidget {
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets.only(
-                                                                top: 5.0,
+                                                                top: 10.0,
                                                               ),
                                                           child: Text(
                                                             CFormatter.formatItemMetrics(

@@ -282,20 +282,31 @@ class AddUpdateInventoryForm extends StatelessWidget {
                               value,
                             );
                           },
-                          onChanged: (value) {
+                          onChanged: (qty) {
                             if (invController.txtBP.text.isNotEmpty &&
-                                value.isNotEmpty) {
-                              invController.computeUnitBP(
-                                double.parse(
-                                  invController.txtBP.text.trim(),
-                                ),
-                                double.parse(value.trim()),
-                              );
+                                qty.isNotEmpty) {
+                              if (invController.itemExists.value) {
+                                invController.computeUnitBP(
+                                  double.parse(
+                                        invController.txtBP.text.trim(),
+                                      ) +
+                                      (inventoryItem.unitBp *
+                                          inventoryItem.quantity),
+                                  double.parse(qty.trim()),
+                                );
+                              } else {
+                                invController.computeUnitBP(
+                                  double.parse(
+                                    invController.txtBP.text.trim(),
+                                  ),
+                                  double.parse(qty.trim()),
+                                );
+                              }
                             }
 
-                            if (value.isNotEmpty) {
+                            if (qty.isNotEmpty) {
                               invController.computeLowStockThreshold(
-                                double.parse(value.trim()),
+                                double.parse(qty.trim()),
                               );
                             }
                           },
@@ -346,13 +357,22 @@ class AddUpdateInventoryForm extends StatelessWidget {
                               size: CSizes.iconXs,
                             ),
                           ),
-                          onChanged: (value) {
+                          onChanged: (buyingPrice) {
                             if (invController.txtQty.text.isNotEmpty &&
-                                value.isNotEmpty) {
-                              invController.computeUnitBP(
-                                double.parse(value),
-                                double.parse(invController.txtQty.text),
-                              );
+                                buyingPrice.isNotEmpty) {
+                              if (invController.itemExists.value) {
+                                invController.computeUnitBP(
+                                  double.parse(buyingPrice) +
+                                      (inventoryItem.unitBp *
+                                          inventoryItem.quantity),
+                                  double.parse(invController.txtQty.text),
+                                );
+                              } else {
+                                invController.computeUnitBP(
+                                  double.parse(buyingPrice),
+                                  double.parse(invController.txtQty.text),
+                                );
+                              }
                             }
                           },
                           style: const TextStyle(
@@ -447,13 +467,15 @@ class AddUpdateInventoryForm extends StatelessWidget {
                         : true,
                     replacement: SizedBox.shrink(),
                     child: Container(
-                      padding: const EdgeInsets.all(0.0),
+                      padding: const EdgeInsets.only(
+                        bottom: 5.0,
+                      ),
                       width: CHelperFunctions.screenWidth() * .95,
                       height:
                           invController.txtBP.text.isEmpty &&
                               invController.txtQty.text.isEmpty
                           ? 0
-                          : 14.0,
+                          : 20.0,
                       alignment: Alignment.topRight,
                       child: Text(
                         'Unit BP: ~$currency.${invController.unitBP.value.toStringAsFixed(2)}',
