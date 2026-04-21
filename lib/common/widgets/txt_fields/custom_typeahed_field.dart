@@ -62,22 +62,28 @@ class CCustomTypeahedField extends StatelessWidget {
             controller: controller,
             decoration: InputDecoration(
               constraints: BoxConstraints(
-                minHeight: minHeight ?? 70.0,
+                minHeight: minHeight ?? 65.0,
               ),
               filled: true,
               fillColor:
                   fillColor ??
                   (isDarkTheme ? CColors.transparent : CColors.lightGrey),
-              focusColor: CColors.rBrown.withValues(alpha: 0.3),
+              focusColor: CColors.rBrown.withValues(
+                alpha: 0.3,
+              ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(CSizes.cardRadiusXs),
+                borderRadius: BorderRadius.circular(
+                  CSizes.cardRadiusXs,
+                ),
                 borderSide: BorderSide(color: CColors.grey),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
                   color:
                       focusedBorderColor ??
-                      CColors.black.withValues(alpha: 0.3),
+                      CColors.black.withValues(
+                        alpha: 0.3,
+                      ),
                 ),
                 borderRadius: BorderRadius.circular(
                   CSizes.cardRadiusXs,
@@ -99,7 +105,7 @@ class CCustomTypeahedField extends StatelessWidget {
             focusNode: focusNode,
             onChanged: onFieldValueChanged,
             scrollPadding: const EdgeInsets.only(
-              bottom: 200,
+              bottom: 600,
             ),
             style: const TextStyle(
               fontWeight: FontWeight.normal,
@@ -113,19 +119,23 @@ class CCustomTypeahedField extends StatelessWidget {
         hideOnEmpty: true,
         offset: Offset(
           0,
-          5.0,
+          10.0,
         ),
 
         suggestionsCallback: (pattern) {
-          return contactsController.contactSuggestionsCallBackAction(pattern);
+          return contactsController.contactSuggestionsCallBackAction(pattern, );
         },
         itemBuilder: (context, suggestion) {
           if (contactsController.foundMatches.isEmpty) {
             return SizedBox.shrink();
           } else {
             return CRoundedContainer(
-              margin: const EdgeInsets.all(
-                4.0,
+              bgColor: CColors.transparent,
+              borderRadius: 5.0,
+              padding: const EdgeInsets.only(
+                bottom: 4.0,
+                left: 4.0,
+                right: 4.0,
               ),
               child: ListTile(
                 contentPadding:
@@ -138,15 +148,14 @@ class CCustomTypeahedField extends StatelessWidget {
                     5.0,
                   ),
                 ),
-                tileColor: isDarkTheme
-                    ? CColors.rBrown.withValues(
-                        alpha: .6,
-                      )
-                    : CColors.grey,
 
+                tileColor: CColors.rBrown.withValues(
+                  alpha: .3,
+                ),
                 title: Column(
                   //mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     // Text(
                     //   suggestion.lastModified,
@@ -156,23 +165,39 @@ class CCustomTypeahedField extends StatelessWidget {
                     // ),
                     Text(
                       '${suggestion.contactName} ',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.labelMedium!.apply(
                         color: CColors.rBrown,
-                        fontSizeFactor: 1.2,
+                        fontSizeFactor: 1.1,
                         fontWeightDelta: 2,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
                     ),
-                    Text(
-                      '#${suggestion.productId}; phone: ${suggestion.contactPhone}; email: (${suggestion.contactEmail})',
-                      style:
-                          Theme.of(
-                            context,
-                          ).textTheme.labelSmall!.apply(
-                            color: CColors.rBrown,
-                          ),
+                    const SizedBox(
+                      height: CSizes.spaceBtnItems / 4.0,
                     ),
+                    suggestion.contactPhone != ''
+                        ? Text(
+                            'Mobile: (${suggestion.contactDialCode}) ${suggestion.contactPhone}',
+                            style:
+                                Theme.of(
+                                  context,
+                                ).textTheme.labelMedium!.apply(
+                                  color: CColors.black,
+                                ),
+                          )
+                        : SizedBox.shrink(),
+                    suggestion.contactEmail != ''
+                        ? Text(
+                            'Email: ${suggestion.contactEmail}',
+                            style:
+                                Theme.of(
+                                  context,
+                                ).textTheme.labelSmall!.apply(
+                                  color: CColors.black,
+                                ),
+                          )
+                        : SizedBox.shrink(),
                   ],
                 ),
               ),

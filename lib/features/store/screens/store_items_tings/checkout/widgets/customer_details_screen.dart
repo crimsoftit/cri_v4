@@ -21,24 +21,28 @@ class CustomerDetailsScreen extends StatelessWidget {
     return Column(
       children: [
         CCustomTypeahedField(
+          contentPadding: const EdgeInsets.all(
+            5.0,
+          ),
           fieldHeight:
               checkoutController.customerContactsFieldController.text == ''
-              ? 40.0
+              ? 55.0
               : CValidator.isValidPhoneNumber(
                       checkoutController.customerContactsFieldController.text,
                     ) ||
                     CValidator.isValidEmail(
                       checkoutController.customerContactsFieldController.text,
                     )
-              ? 40.0
-              : 55.0,
+              ? 55.0
+              : 65.0,
           fillColor: isDarkTheme ? CColors.transparent : CColors.white,
           includePrefixIcon: false,
           labelTxt: 'Customer\'s name:',
-          minHeight: 50.0,
+          minHeight: 55.0,
           onItemSelected: (suggestion) {
-            invController.txtSupplierName.text = suggestion.contactName;
-            invController.txtSupplierContacts.text =
+            checkoutController.customerNameFieldController.text =
+                suggestion.contactName;
+            checkoutController.customerContactsFieldController.text =
                 suggestion.contactPhone != ''
                 ? suggestion.contactPhone
                 : suggestion.contactEmail;
@@ -64,25 +68,26 @@ class CustomerDetailsScreen extends StatelessWidget {
         //   txtFieldController: checkoutController.customerNameFieldController,
         // ),
         const SizedBox(
-          height: 4.0,
+          height: 2.6,
         ),
         // -- contacts field --
         CCustomTypeahedField(
           fieldHeight:
               checkoutController.customerContactsFieldController.text == ''
-              ? 40.0
+              ? 55.0
               : CValidator.isValidPhoneNumber(
                       checkoutController.customerContactsFieldController.text,
                     ) ||
                     CValidator.isValidEmail(
                       checkoutController.customerContactsFieldController.text,
                     )
-              ? 40.0
-              : 55.0,
-          fillColor: isDarkTheme ? CColors.transparent : CColors.white,
+              ? 55.0
+              : 65.0,
+          // fillColor: isDarkTheme ? CColors.transparent : CColors.white,
+          fillColor: CColors.transparent,
           includePrefixIcon: false,
           labelTxt: 'Phone no. or e-mail:',
-          minHeight: 50.0,
+          minHeight: 55.0,
           onItemSelected: (suggestion) {
             invController.txtSupplierName.text = suggestion.contactName;
             invController.txtSupplierContacts.text =

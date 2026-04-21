@@ -30,7 +30,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
       child: Obx(
         () {
           var demContacts = [];
-          
+
           switch (space) {
             case 'all':
               demContacts.assignAll(
@@ -420,7 +420,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                           onPressed: contact.contactPhone == ''
                                               ? null
                                               : () {
-                                                  contact.contactIsoCode == ''
+                                                  contact.contactDialCode == ''
                                                       ? contactsController
                                                             .updateDialCodeDialog(
                                                               context,
@@ -428,7 +428,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                                             )
                                                       : contactsController
                                                             .launchWhatsappChat(
-                                                              '+${contact.contactIsoCode}${contact.contactPhone}',
+                                                              '+${contact.contactDialCode}${contact.contactPhone}',
                                                             );
                                                 },
                                         ),

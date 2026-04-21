@@ -836,7 +836,7 @@ class CCheckoutScreen extends StatelessWidget {
                                                       ? CHelperFunctions.screenWidth() *
                                                             .75
                                                       : CHelperFunctions.screenWidth() *
-                                                            0.5,
+                                                            0.56,
 
                                                   child:
                                                       checkoutController
