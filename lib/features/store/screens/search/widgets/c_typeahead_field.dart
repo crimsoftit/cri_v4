@@ -6,6 +6,7 @@ import 'package:cri_v3/features/store/controllers/search_bar_controller.dart';
 import 'package:cri_v3/features/store/models/inv_model.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
+import 'package:cri_v3/utils/helpers/formatter.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:flutter/material.dart';
@@ -138,11 +139,32 @@ class CTypeAheadSearchField extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  suggestion.lastModified,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelSmall!.apply(color: CColors.darkGrey),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '#${suggestion.productId}',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelSmall!.apply(color: CColors.darkGrey),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'added: ${suggestion.dateAdded}',
+                        style:
+                            Theme.of(
+                              context,
+                            ).textTheme.labelSmall!.apply(
+                              color: CColors.darkGrey,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: CSizes.spaceBtnInputFields / 3.0,
                 ),
                 Text(
                   '${suggestion.name.toUpperCase()} (@ $currencySymbol.${suggestion.unitSellingPrice})',
@@ -154,7 +176,7 @@ class CTypeAheadSearchField extends StatelessWidget {
                   maxLines: 2,
                 ),
                 Text(
-                  '#${suggestion.productId}; code: ${suggestion.pCode}; (${suggestion.quantity} stocked)',
+                  '#code: ${suggestion.pCode}; (${CFormatter.formatItemQtyDisplays(suggestion.quantity, suggestion.calibration)} ${CFormatter.formatItemMetrics(suggestion.calibration, suggestion.quantity)} stocked)',
                   style: Theme.of(
                     context,
                   ).textTheme.labelSmall!.apply(color: CColors.rBrown),
@@ -206,16 +228,13 @@ class CTypeAheadSearchField extends StatelessWidget {
                           btnsRightPadding: 0,
                           iconWidth: 32.0,
                           iconHeight: 32.0,
-                          add2CartActionBtnTxt:
-                              cartController.itemQtyInCart.value >= 1
-                              ? 'added'
-                              : 'add',
+                          add2CartActionBtnTxt: '',
                           add2CartBtnTxtColor:
-                              cartController.itemQtyInCart.value < 1
+                              cartController.itemQtyInCart.value < 0.1
                               ? CColors.grey
                               : CColors.rBrown,
                           add2CartIconColor:
-                              cartController.itemQtyInCart.value < 1
+                              cartController.itemQtyInCart.value < 0.1
                               ? CColors.grey
                               : CColors.rBrown,
                           // addToCartBtnAction:
@@ -245,11 +264,11 @@ class CTypeAheadSearchField extends StatelessWidget {
                                       suggestion,
                                       suggestion.calibration == 'units'
                                           ? 1
-                                          : .25,
+                                          : .1,
                                     );
                                 cartController.removeSingleItemFromCart(
                                   thisCartItem,
-                                  false,
+                                  true,
                                 );
                                 cartController.fetchCartItems();
 
@@ -270,7 +289,7 @@ class CTypeAheadSearchField extends StatelessWidget {
                                       .toString()
                                 : cartController
                                       .getItemQtyInCart(suggestion.productId!)
-                                      .toString(),
+                                      .toStringAsFixed(2),
                             style: Theme.of(context).textTheme.labelMedium!
                                 .apply(
                                   color: CColors.rBrown,
@@ -287,7 +306,7 @@ class CTypeAheadSearchField extends StatelessWidget {
                               final thisCartItem = cartController
                                   .convertInvToCartItem(
                                     suggestion,
-                                    suggestion.calibration == 'units' ? 1 : .25,
+                                    suggestion.calibration == 'units' ? 1 : .1,
                                   );
                               cartController.addSingleItemToCart(
                                 thisCartItem,

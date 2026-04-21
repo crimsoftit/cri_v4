@@ -1,5 +1,6 @@
 import 'package:cri_v3/data/repos/auth/auth_repo.dart';
 import 'package:cri_v3/features/authentication/screens/pswd_config/reset_password.dart';
+import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/img_strings.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:cri_v3/utils/popups/full_screen_loader.dart';
@@ -68,10 +69,10 @@ class ForgotPasswordController extends GetxController {
     try {
       // start loader
       CFullScreenLoader.openLoadingDialog(
-        'processing your request...',
+        'Processing your request...',
         CImages.docerAnimation,
         null,
-        null,
+        CColors.white,
       );
 
       // check internet connectivity

@@ -1221,7 +1221,7 @@ class CContactsController extends GetxController {
         duration: const Duration(
           seconds: 11,
         ),
-        message: 'you can still undo this action!!',
+        message: 'You can still undo this action!!',
         onUndo: () {
           undoTrashBtnPressed.value = true;
           trashItem.isTrashed = 0;
@@ -1292,5 +1292,14 @@ class CContactsController extends GetxController {
     txtContactNameController.text = '';
     txtPhoneController.text = '';
     undoTrashBtnPressed.value = false;
+  }
+
+  /// -- dispose text editing controllers --
+  @override
+  void dispose() {
+    txtContactNameController.dispose();
+    txtEmailController.dispose();
+    txtPhoneController.dispose();
+    super.dispose();
   }
 }

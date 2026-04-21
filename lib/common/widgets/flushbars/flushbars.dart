@@ -14,6 +14,7 @@ class CFlushbars extends GetxController {
     required Duration duration,
     required String message,
     required VoidCallback onUndo,
+    TextStyle? msgTextStyle,
     TextStyle? undoTextStyle,
   }) {
     return Flushbar<void>(
@@ -40,6 +41,11 @@ class CFlushbars extends GetxController {
       ),
       messageText: Text(
         message,
+        style:
+            msgTextStyle ??
+            Theme.of(Get.overlayContext!).textTheme.labelMedium!.apply(
+              color: CColors.white,
+            ),
       ),
     );
   }

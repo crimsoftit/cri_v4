@@ -182,11 +182,11 @@ class CCartController extends GetxController {
       (cartItem) => cartItem.productId == item.productId,
     );
 
-    switch (itemIndex) {
-      case < 0:
-        break;
-      default:
-    }
+    // switch (itemIndex) {
+    //   case < 0:
+    //     break;
+    //   default:
+    // }
 
     // -- check stock qty --
     final invController = Get.put(CInventoryController());
@@ -320,7 +320,7 @@ class CCartController extends GetxController {
     //final checkoutController = Get.put(CCheckoutController());
     Get.defaultDialog(
       barrierDismissible: false,
-      middleText: 'are you certain you wish to remove this item from the cart?',
+      middleText: 'Are you certain you wish to remove this item from the cart?',
       onCancel: () {
         //checkoutController.handleNavToCheckout();
         //Get.back();
@@ -341,7 +341,7 @@ class CCartController extends GetxController {
         //
         //checkoutController.handleNavToCheckout();
       },
-      title: 'remove item?',
+      title: 'Remove item?',
     );
   }
 

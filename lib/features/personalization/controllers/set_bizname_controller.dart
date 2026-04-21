@@ -13,6 +13,7 @@ class CSetBiznameController extends GetxController {
   static CSetBiznameController get instance => Get.find();
 
   /// -- variables --
+  /// TODO: dispose text editing controllers --
   final bizNameField = TextEditingController();
   final userController = Get.put(CUserController());
   final userRepo = Get.put(CUserRepo());
@@ -89,5 +90,11 @@ class CSetBiznameController extends GetxController {
       );
       throw e.toString();
     }
+  }
+
+  @override
+  void dispose() {
+    bizNameField.dispose();
+    super.dispose();
   }
 }

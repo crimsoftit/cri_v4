@@ -830,17 +830,35 @@ class CCheckoutController extends GetxController {
           customerNameFieldController.text.trim(),
           customerContactsFieldController.text.trim(),
         )) {
+          final (dialCode, mobileNumber) =
+              CValidator.isValidPhoneNumber(
+                customerContactsFieldController.text.trim(),
+              )
+              ? CFormatter.seperatePhoneAndDialCode(
+                  customerContactsFieldController.text.trim(),
+                )
+              : ('', '');
+
           var customerDetails = CContactsModel(
             userController.user.value.email,
             0,
             customerNameFieldController.text.trim(),
             '',
-            '',
             CValidator.isValidPhoneNumber(
                   customerContactsFieldController.text.trim(),
                 )
-                ? customerContactsFieldController.text.trim()
+                ? dialCode.trim()
                 : '',
+            CValidator.isValidPhoneNumber(
+                  customerContactsFieldController.text.trim(),
+                )
+                ? mobileNumber.trim()
+                : '',
+            // CValidator.isValidPhoneNumber(
+            //       customerContactsFieldController.text.trim(),
+            //     )
+            //     ? customerContactsFieldController.text.trim()
+            //     : '',
             CValidator.isValidEmail(customerContactsFieldController.text.trim())
                 ? customerContactsFieldController.text.trim()
                 : '',
@@ -1006,6 +1024,11 @@ class CCheckoutController extends GetxController {
   @override
   void dispose() {
     customerNameFocusNode.value.dispose();
+    amtIssuedFieldController.dispose();
+    customerNameFieldController.dispose();
+    customerContactsFieldController.dispose();
+    customerBalField.dispose();
+    modalQtyFieldController.dispose();
     super.dispose();
   }
 }

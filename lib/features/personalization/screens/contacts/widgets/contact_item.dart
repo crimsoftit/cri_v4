@@ -263,7 +263,11 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                                 contact.contactPhone != ''
                                                     ? Expanded(
                                                         child: Text(
-                                                          'Mobile ${contact.contactPhone}',
+                                                          contact.contactDialCode !=
+                                                                  ''
+                                                              ? 'Mobile (${contact.contactDialCode}) ${contact.contactPhone}'
+                                                              : contact
+                                                                    .contactPhone,
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           style:

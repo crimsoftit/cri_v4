@@ -244,7 +244,7 @@ class CInvGridviewScreen extends StatelessWidget {
                     lowStockNotifierLimit,
                     expiryDate,
                   ),
-                  bp: bp.toString(),
+                  bp: bp.toStringAsFixed(2),
                   //   containerHeight: 195.0,
                   containerHeight: CHelperFunctions.screenHeight() * .2,
                   //containerHeight: double.infinity,
@@ -281,7 +281,7 @@ class CInvGridviewScreen extends StatelessWidget {
                       : CColors.darkGrey,
                   favIconColor: isFavorite == 1 ? Colors.red : CColors.white,
 
-                  isSynced: isSynced.toString(),
+                  isSynced: isSynced.toInt().toString(),
                   itemAvatar: avatarTxt,
                   itemMetrics: itemCalibration,
                   itemName: pName,
@@ -366,13 +366,13 @@ class CInvGridviewScreen extends StatelessWidget {
                   pId: productId!,
                   qtyAvailable: itemCalibration == 'units'
                       ? qtyAvailable.toStringAsFixed(0)
-                      : qtyAvailable.toString(),
+                      : qtyAvailable.toStringAsFixed(2),
                   qtyRefunded: itemCalibration == 'units'
                       ? qtyRefunded.toStringAsFixed(0)
-                      : qtyRefunded.toString(),
+                      : qtyRefunded.toStringAsFixed(2),
                   qtySold: itemCalibration == 'units'
                       ? qtySold.toStringAsFixed(0)
-                      : qtySold.toString(),
+                      : qtySold.toStringAsFixed(2),
                   syncAction: syncAction,
                   stockValue: stockValue.toStringAsFixed(2),
                   // titleColor: expiryDate != ''

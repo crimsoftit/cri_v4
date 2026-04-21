@@ -1,4 +1,4 @@
-class Countries {
+class CCountries {
   static List<Map<String, String>> allCountries = [
     {"name": "Afghanistan", "dial_code": "+93", "code": "AF"},
     {"name": "Aland Islands", "dial_code": "+358", "code": "AX"},

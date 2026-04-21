@@ -47,8 +47,6 @@ class CCustomTypeahedField extends StatelessWidget {
     final isDarkTheme = CHelperFunctions.isDarkMode(context);
     final screenWidth = CHelperFunctions.screenWidth();
 
-    contactsController.fetchMyContacts();
-
     return CRoundedContainer(
       bgColor: CColors.transparent,
       height: fieldHeight ?? 60.0,
@@ -67,7 +65,7 @@ class CCustomTypeahedField extends StatelessWidget {
               filled: true,
               fillColor:
                   fillColor ??
-                  (isDarkTheme ? CColors.transparent : CColors.lightGrey),
+                  (isDarkTheme ? CColors.transparent : CColors.white),
               focusColor: CColors.rBrown.withValues(
                 alpha: 0.3,
               ),
@@ -75,7 +73,9 @@ class CCustomTypeahedField extends StatelessWidget {
                 borderRadius: BorderRadius.circular(
                   CSizes.cardRadiusXs,
                 ),
-                borderSide: BorderSide(color: CColors.grey),
+                borderSide: BorderSide(
+                  color: CColors.grey,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
@@ -123,7 +123,9 @@ class CCustomTypeahedField extends StatelessWidget {
         ),
 
         suggestionsCallback: (pattern) {
-          return contactsController.contactSuggestionsCallBackAction(pattern, );
+          return contactsController.contactSuggestionsCallBackAction(
+            pattern,
+          );
         },
         itemBuilder: (context, suggestion) {
           if (contactsController.foundMatches.isEmpty) {

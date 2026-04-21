@@ -78,7 +78,9 @@ class CCheckoutScreen extends StatelessWidget {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(width: CHelperFunctions.screenWidth() * 0.72),
+                        SizedBox(
+                          width: CHelperFunctions.screenWidth() * 0.72,
+                        ),
                         CAnimatedTypeaheadField(
                           boxColor: CColors.transparent,
                           searchBarWidth: 30.0,

@@ -69,7 +69,7 @@ class _CCountDownWidgetState extends State<CCountDownWidget>
               ),
             ),
             Positioned(
-              right: 25.0,
+              right: 20.0,
               top: 5.0,
               child: Text(
                 counterText,

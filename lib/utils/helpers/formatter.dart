@@ -1,3 +1,4 @@
+import 'package:cri_v3/data/countries.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
 import 'package:cri_v3/features/store/controllers/txns_controller.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
@@ -207,6 +208,51 @@ class CFormatter {
       }
       rethrow;
     }
+  }
+
+  static bool phoneNumberHasDialCode(String phoneNumber) {
+    Map<String, String> foundedCountry = {};
+
+    for (var country in CCountries.allCountries) {
+      String dialCode = country["dial_code"].toString();
+
+      if (phoneNumber.contains(dialCode)) {
+        foundedCountry = country;
+      }
+    }
+
+    if (foundedCountry.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static (String, String) seperatePhoneAndDialCode(String phoneNumber) {
+    Map<String, String> foundedCountry = {};
+    var newPhoneNumber = '';
+    var dialCode = '';
+
+    for (var country in CCountries.allCountries) {
+      var countryDialCode = country["dial_code"].toString();
+
+      if (phoneNumber.contains(countryDialCode)) {
+        foundedCountry = country;
+      }
+    }
+
+    if (foundedCountry.isNotEmpty) {
+      dialCode = phoneNumber.substring(
+        0,
+        foundedCountry["dial_code"]!.length,
+      );
+      newPhoneNumber = phoneNumber.substring(
+        foundedCountry["dial_code"]!.length,
+      );
+    } else {
+      dialCode = '';
+    }
+    return (dialCode, newPhoneNumber);
   }
 
   // seperatePhoneAndDialCode() {

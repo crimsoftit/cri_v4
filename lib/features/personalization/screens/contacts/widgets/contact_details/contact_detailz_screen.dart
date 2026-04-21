@@ -191,7 +191,7 @@ class CContactDetailsScreen extends StatelessWidget {
                                         contactItem,
                                       )
                                     : contactsController.launchWhatsappChat(
-                                        '+${contactItem.contactDialCode}${contactItem.contactPhone}',
+                                        '(${contactItem.contactDialCode}) ${contactItem.contactPhone}',
                                       );
                               },
                         width: 55.0,
@@ -293,7 +293,7 @@ class CContactDetailsScreen extends StatelessWidget {
                   title:
                       contactItem.contactPhone != '' &&
                           contactItem.contactDialCode != ''
-                      ? '+${contactItem.contactDialCode} ${contactItem.contactPhone}'
+                      ? '${contactItem.contactDialCode} ${contactItem.contactPhone}'
                       : contactItem.contactPhone != '' &&
                             contactItem.contactDialCode == ''
                       ? contactItem.contactPhone
@@ -405,8 +405,10 @@ class CContactDetailsScreen extends StatelessWidget {
                 //   height: CSizes.spaceBtnItems,
                 // ),
                 Padding(
-                  padding: const EdgeInsets.all(
-                    20.0,
+                  padding: const EdgeInsets.only(
+                    bottom: 5.0,
+                    left: 20.0,
+                    top: 20.0,
                   ),
                   child: const CSectionHeading(
                     btnTitle: '',

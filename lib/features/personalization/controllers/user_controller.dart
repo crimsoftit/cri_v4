@@ -10,6 +10,7 @@ import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:cri_v3/utils/popups/full_screen_loader.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,8 +23,10 @@ class CUserController extends GetxController {
   Rx<CUserModel> user = CUserModel.empty().obs;
 
   final hidePassword = true.obs;
+
   final verifyEmail = TextEditingController();
   final verifyPassword = TextEditingController();
+
   final userRepo = Get.put(CUserRepo());
   GlobalKey<FormState> reAuthFormKey = GlobalKey<FormState>();
 
@@ -235,12 +238,28 @@ class CUserController extends GetxController {
         );
       }
     } catch (e) {
-      CPopupSnackBar.errorSnackBar(
-        title: 'Oh Snap!',
-        message: 'an unknown error occurred: $e',
-      );
-    } finally {
-      imgUploading.value = false;
+      if (kDebugMode) {
+        print('an unknown error occurred while uploading profile picture: $e');
+        CPopupSnackBar.errorSnackBar(
+          title: 'Error uploading profile picture1',
+          message:
+              'an unknown error occurred while uploading profile picture: $e',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'Error uploading profile picture1',
+          message:
+              'An unknown error occurred while uploading profile picture! Please try again later',
+        );
+      }
+      rethrow;
     }
+  }
+
+  @override
+  void dispose() {
+    verifyEmail.dispose();
+    verifyPassword.dispose();
+    super.dispose();
   }
 }
