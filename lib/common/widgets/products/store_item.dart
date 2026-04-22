@@ -41,7 +41,9 @@ class CStoreItemWidget extends StatelessWidget {
               : CColors.white,
           bgColor: isDarkTheme ? CColors.white : CColors.rBrown,
         ),
-        SizedBox(width: CSizes.spaceBtnInputFields),
+        SizedBox(
+          width: CSizes.spaceBtnInputFields,
+        ),
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -54,11 +56,10 @@ class CStoreItemWidget extends StatelessWidget {
                       smallSize: true,
                       txtColor: isDarkTheme ? CColors.white : CColors.rBrown,
                     )
-                  : SizedBox(),
+                  : SizedBox.shrink(),
 
               CProductTitleText(
-                title:
-                    '${cartItem.pName.toUpperCase()} (${cartItem.itemMetrics == 'units' ? cartItem.availableStockQty.toStringAsFixed(0) : cartItem.availableStockQty} ${CFormatter.formatInventoryMetrics(cartItem.productId)}(s) stocked)',
+                title: cartItem.pName.toUpperCase(),
                 maxLines: 2,
                 smallSize: false,
                 txtColor: invItem.quantity < invItem.lowStockNotifierLimit
@@ -68,31 +69,38 @@ class CStoreItemWidget extends StatelessWidget {
                     : CColors.rBrown,
               ),
 
-              // -- item attributes --
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'usp:${invItem.unitSellingPrice}; ',
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                    TextSpan(
-                      text: 'code:${invItem.pCode}; ',
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-
-                    // TextSpan(
-                    //   text: '${cartItem.availableStockQty} stocked ',
-                    //   style: Theme.of(context).textTheme.labelSmall,
-                    // ),
-                    TextSpan(
-                      text:
-                          'low-stock alert: ${invItem.calibration == 'units' ? invItem.lowStockNotifierLimit.toStringAsFixed(0) : invItem.lowStockNotifierLimit} ${CFormatter.formatInventoryMetrics(cartItem.productId)}(s)',
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                  ],
-                ),
+              // Text(
+              //   '${cartItem.itemMetrics == 'units' ? cartItem.availableStockQty.toStringAsFixed(0) : cartItem.availableStockQty} ${CFormatter.formatInventoryMetrics(cartItem.productId)}(s) stocked',
+              // ),
+              Text(
+                '${CFormatter.formatItemQtyDisplays(cartItem.availableStockQty, cartItem.itemMetrics)} ${CFormatter.formatItemMetrics(cartItem.itemMetrics, cartItem.availableStockQty)} stocked',
               ),
+
+              // -- item attributes --
+              // Text.rich(
+              //   TextSpan(
+              //     children: [
+              //       TextSpan(
+              //         text: 'usp: ${invItem.unitSellingPrice}; ',
+              //         style: Theme.of(context).textTheme.labelSmall,
+              //       ),
+              //       TextSpan(
+              //         text: 'code: ${invItem.pCode}; ',
+              //         style: Theme.of(context).textTheme.labelSmall,
+              //       ),
+
+              //       // TextSpan(
+              //       //   text: '${cartItem.availableStockQty} stocked ',
+              //       //   style: Theme.of(context).textTheme.labelSmall,
+              //       // ),
+              //       TextSpan(
+              //         text:
+              //             '\nlow-stock alert: ${invItem.calibration == 'units' ? invItem.lowStockNotifierLimit.toStringAsFixed(0) : invItem.lowStockNotifierLimit} ${CFormatter.formatInventoryMetrics(cartItem.productId)}(s)',
+              //         style: Theme.of(context).textTheme.labelSmall,
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ),

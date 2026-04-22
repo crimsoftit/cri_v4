@@ -4,6 +4,7 @@ import 'package:cri_v3/features/store/models/cart_item_model.dart';
 import 'package:cri_v3/features/store/models/inv_model.dart';
 import 'package:cri_v3/features/store/screens/store_items_tings/checkout/checkout_screen.dart';
 import 'package:cri_v3/utils/computations/date_time_computations.dart';
+import 'package:cri_v3/utils/helpers/formatter.dart';
 import 'package:cri_v3/utils/local_storage/storage_utility.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:flutter/foundation.dart';
@@ -152,12 +153,15 @@ class CCartController extends GetxController {
       qtyFieldControllers[userCartItemIndex].text =
           cartItems[userCartItemIndex].itemMetrics == 'units'
           ? cartItems[userCartItemIndex].quantity.toStringAsFixed(0)
-          : cartItems[userCartItemIndex].quantity.toStringAsFixed(1);
+          : cartItems[userCartItemIndex].quantity.toStringAsFixed(2);
     } else {
       cartItems.add(selectedCartItem);
       qtyFieldControllers.add(
         TextEditingController(
-          text: selectedCartItem.quantity.toString(),
+          text: CFormatter.formatItemQtyDisplays(
+            selectedCartItem.availableStockQty,
+            selectedCartItem.itemMetrics,
+          ),
         ),
       );
       updateCart();
@@ -226,7 +230,7 @@ class CCartController extends GetxController {
                 qtyFieldControllers[itemIndex].text =
                     cartItems[itemIndex].itemMetrics == 'units'
                     ? cartItems[itemIndex].quantity.toInt().toString()
-                    : cartItems[itemIndex].quantity.toString();
+                    : cartItems[itemIndex].quantity.toStringAsFixed(2);
               },
             );
           } else {

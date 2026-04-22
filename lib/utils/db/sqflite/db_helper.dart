@@ -34,6 +34,7 @@ class DbHelper extends GetxController {
   final userController = Get.put(CUserController());
 
   final contactsTable = 'contactsTable';
+  final contactDelsForSyncTable = 'contactDelsForSyncTable';
   final invDelsForSyncTable = 'invDelsForSyncTable';
   final invTable = 'inventory';
   final notificationsTable = 'notifications';
@@ -169,6 +170,22 @@ class DbHelper extends GetxController {
             FOREIGN KEY(productId) REFERENCES inventory(productId)
           )
         ''');
+
+        database.execute('''
+          CREATE TABLE IF NOT EXISTS $contactDelsForSyncTable(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            contactId INTEGER NOT NULL,
+            contactEmail TEXT NOT NULL,
+            contactName TEXT NOT NULL,
+            contactPhone TEXT NOT NULL,
+            deletedBy TEXT NOT NULL,
+            deleteDate TEXT NOT NULL,
+            isSynced INTEGER NOT NULL,
+            syncAction TEXT NOT NULL,
+
+            FOREIGN KEY(contactId) REFERENCES contactsTable(contactId)
+          )
+        ''');
       },
       version: version,
     );
@@ -252,7 +269,7 @@ class DbHelper extends GetxController {
 
     // Query the table for inventory list
     final result = await db!.rawQuery(
-      'SELECT * FROM $invTable WHERE userEmail = ? ORDER BY quantity ASC',
+      'SELECT * FROM $invTable WHERE userEmail = ? ORDER BY qtySold DESC',
       [email],
     );
 

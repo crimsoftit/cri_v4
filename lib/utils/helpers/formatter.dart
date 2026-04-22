@@ -246,11 +246,13 @@ class CFormatter {
         0,
         foundedCountry["dial_code"]!.length,
       );
-      newPhoneNumber = phoneNumber.substring(
-        foundedCountry["dial_code"]!.length,
-      );
+      newPhoneNumber =
+          '0${phoneNumber.substring(
+            foundedCountry["dial_code"]!.length,
+          )}';
     } else {
       dialCode = '';
+      newPhoneNumber = phoneNumber;
     }
     return (dialCode, newPhoneNumber);
   }

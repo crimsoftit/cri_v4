@@ -121,14 +121,6 @@ class CInventoryController extends GetxController {
     super.onInit();
   }
 
-  @override
-  void dispose() {
-    // -- clean up the controller when the widget is removed from the widget tree --
-    txtNameController.dispose();
-    txtExpiryDatePicker.dispose();
-    super.dispose();
-  }
-
   /// -- initialize cloud sync --
   initInvSync() async {
     if (localStorage.read('SyncInvDataWithCloud') == true) {
@@ -717,14 +709,14 @@ class CInventoryController extends GetxController {
                 ? 'update'
                 : 'append';
 
-            final updateItem = CInvDelsModel(
+            final deleteItem = CInvDelsModel(
               inventoryItem.productId!,
               inventoryItem.name,
               'inventory',
               inventoryItem.isSynced,
               inventoryItem.syncAction,
             );
-            await dbHelper.saveInvDelsForSync(updateItem);
+            await dbHelper.saveInvDelsForSync(deleteItem);
             CPopupSnackBar.customToast(
               message:
                   'While this works offline, consider using an internet connection to back up your data online!',
@@ -1463,5 +1455,24 @@ class CInventoryController extends GetxController {
         fromHomeScreen,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: dispose controllers --
+    // -- clean up the controller when the widget is removed from the widget tree --
+    txtBP.dispose();
+    txtCode.dispose();
+    txtExpiryDatePicker.dispose();
+    txtId.dispose();
+    txtNameController.dispose();
+    txtQty.dispose();
+    txtStockNotifierLimit.dispose();
+    txtSupplierContacts.dispose();
+    txtSupplierName.dispose();
+    txtSyncAction.dispose();
+    txtUnitSP.dispose();
+
+    super.dispose();
   }
 }

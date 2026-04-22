@@ -105,7 +105,7 @@ class CCustomTypeahedField extends StatelessWidget {
             focusNode: focusNode,
             onChanged: onFieldValueChanged,
             scrollPadding: const EdgeInsets.only(
-              bottom: 600,
+              bottom: 100,
             ),
             style: const TextStyle(
               fontWeight: FontWeight.normal,
@@ -119,7 +119,7 @@ class CCustomTypeahedField extends StatelessWidget {
         hideOnEmpty: true,
         offset: Offset(
           0,
-          10.0,
+          5.0,
         ),
 
         suggestionsCallback: (pattern) {
@@ -132,7 +132,7 @@ class CCustomTypeahedField extends StatelessWidget {
             return SizedBox.shrink();
           } else {
             return CRoundedContainer(
-              bgColor: CColors.transparent,
+              bgColor: CColors.white,
               borderRadius: 5.0,
               padding: const EdgeInsets.only(
                 bottom: 4.0,
@@ -151,8 +151,15 @@ class CCustomTypeahedField extends StatelessWidget {
                   ),
                 ),
 
-                tileColor: CColors.rBrown.withValues(
-                  alpha: .3,
+                // tileColor: isDarkTheme
+                //     ? CColors.rBrown.withValues(
+                //         alpha: .3,
+                //       )
+                //     : CColors.white.withValues(
+                //         alpha: .3,
+                //       ),
+                tileColor: CColors.white.withValues(
+                  alpha: .9,
                 ),
                 title: Column(
                   //mainAxisAlignment: MainAxisAlignment.start,

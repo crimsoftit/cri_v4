@@ -1,3 +1,4 @@
+import 'package:cri_v3/common/widgets/buttons/icon_buttons/circular_icon_btn.dart';
 import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/common/widgets/dividers/custom_divider.dart';
 import 'package:cri_v3/common/widgets/loaders/animated_loader.dart';
@@ -219,140 +220,158 @@ class CCheckoutScreen extends StatelessWidget {
                                       );
 
                                       return Column(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
                                           CStoreItemWidget(
                                             cartItem:
                                                 cartController.cartItems[index],
                                             includeDate: false,
                                           ),
-                                          SizedBox(
-                                            height: CSizes.spaceBtnItems / 4,
-                                          ),
+
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Row(
+                                                //mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   // -- some extra space --
                                                   SizedBox(
-                                                    height: 10.0,
+                                                    //height: 10.0,
                                                     width: 45.0,
                                                   ),
                                                   // -- buttons to increment, decrement qty --
                                                   CRoundedContainer(
+                                                    bgColor: isDarkTheme
+                                                        ? CColors.dark
+                                                        : CColors.white,
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                          bottom: 13.0,
+                                                          top: 5.0,
+                                                        ),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          top: 0,
+                                                          bottom: 0,
+                                                          left: 3.0,
+                                                          right:
+                                                              3.0, //CSizes.sm,
+                                                        ),
                                                     showBorder: isDarkTheme
                                                         ? false
                                                         : true,
-                                                    bgColor:
-                                                        CColors.transparent,
-                                                    // bgColor: isDarkTheme
-                                                    //     ? CColors.dark
-                                                    //     : CColors.white,
-                                                    padding: EdgeInsets.only(
-                                                      top: 0,
-                                                      bottom: 0,
-                                                      right: CSizes.sm,
-                                                      left: CSizes.sm,
-                                                    ),
                                                     child: Row(
                                                       mainAxisSize:
                                                           MainAxisSize.min,
                                                       children: [
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets.only(
-                                                                top: 8.0,
-                                                              ),
-                                                          child: Text(
-                                                            'qty:',
-                                                          ),
-                                                        ),
-                                                        // CCircularIconBtn(
-                                                        //   icon: Iconsax.minus,
-                                                        //   width: 32.0,
-                                                        //   height: 32.0,
-                                                        //   iconBorderRadius: 100,
-                                                        //   iconSize: CSizes.md,
-                                                        //   iconColor: isDarkTheme
-                                                        //       ? CColors.white
-                                                        //       : CColors.rBrown,
-                                                        //   bgColor: isDarkTheme
-                                                        //       ? CColors
-                                                        //             .darkerGrey
-                                                        //       : CColors.light,
-                                                        //   onPressed: () {
-                                                        //     if (cartController
-                                                        //             .qtyFieldControllers[index]
-                                                        //             .text !=
-                                                        //         '') {
-                                                        //       invController
-                                                        //           .fetchUserInventoryItems();
-                                                        //       cartController
-                                                        //           .fetchCartItems();
-                                                        //       var invItem = invController.inventoryItems.firstWhere(
-                                                        //         (item) =>
-                                                        //             item.productId
-                                                        //                 .toString() ==
-                                                        //             cartController
-                                                        //                 .cartItems[index]
-                                                        //                 .productId
-                                                        //                 .toString()
-                                                        //                 .toLowerCase(),
-                                                        //       );
-                                                        //       final thisCartItem =
-                                                        //           cartController.convertInvToCartItem(
-                                                        //             invItem,
-                                                        //             double.parse(
-                                                        //               cartController
-                                                        //                   .qtyFieldControllers[index]
-                                                        //                   .text.trim(),
-                                                        //             ),
-                                                        //           );
-                                                        //       cartController
-                                                        //           .removeSingleItemFromCart(
-                                                        //             thisCartItem,
-                                                        //             true,
-                                                        //           );
-                                                        //       cartController
-                                                        //           .fetchCartItems();
+                                                        CCircularIconBtn(
+                                                          icon: Iconsax.minus,
+                                                          width: 32.0,
+                                                          height: 32.0,
+                                                          iconBorderRadius: 100,
+                                                          iconSize: CSizes.md,
+                                                          iconColor: isDarkTheme
+                                                              ? CColors.white
+                                                              : CColors.rBrown,
+                                                          bgColor:
+                                                              (cartController
+                                                                              .cartItems[index]
+                                                                              .quantity ==
+                                                                          1 &&
+                                                                      cartController
+                                                                              .cartItems[index]
+                                                                              .itemMetrics ==
+                                                                          'units') ||
+                                                                  cartController
+                                                                              .cartItems[index]
+                                                                              .quantity ==
+                                                                          .1 &&
+                                                                      cartController
+                                                                              .cartItems[index]
+                                                                              .itemMetrics !=
+                                                                          'units'
+                                                              ? CColors.error
+                                                              : isDarkTheme
+                                                              ? CColors
+                                                                    .darkerGrey
+                                                              : CColors.light,
+                                                          onPressed: () {
+                                                            if (cartController
+                                                                    .qtyFieldControllers[index]
+                                                                    .text !=
+                                                                '') {
+                                                              invController
+                                                                  .fetchUserInventoryItems();
+                                                              cartController
+                                                                  .fetchCartItems();
+                                                              var invItem = invController.inventoryItems.firstWhere(
+                                                                (item) =>
+                                                                    item.productId
+                                                                        .toString() ==
+                                                                    cartController
+                                                                        .cartItems[index]
+                                                                        .productId
+                                                                        .toString()
+                                                                        .toLowerCase(),
+                                                              );
+                                                              final thisCartItem =
+                                                                  cartController.convertInvToCartItem(
+                                                                    invItem,
+                                                                    double.parse(
+                                                                      cartController
+                                                                          .qtyFieldControllers[index]
+                                                                          .text
+                                                                          .trim(),
+                                                                    ),
+                                                                  );
+                                                              cartController
+                                                                  .removeSingleItemFromCart(
+                                                                    thisCartItem,
+                                                                    true,
+                                                                  );
+                                                              cartController
+                                                                  .fetchCartItems();
 
-                                                        //       cartController
-                                                        //               .qtyFieldControllers[index]
-                                                        //               .text =
-                                                        //           cartController
-                                                        //                   .cartItems[index]
-                                                        //                   .itemMetrics ==
-                                                        //               'units'
-                                                        //           ? cartController
-                                                        //                 .cartItems[index]
-                                                        //                 .quantity
-                                                        //                 .toStringAsFixed(
-                                                        //                   0,
-                                                        //                 )
-                                                        //           : cartController
-                                                        //                 .cartItems[index]
-                                                        //                 .quantity
-                                                        //                 .toString();
-                                                        //       if (checkoutController
-                                                        //               .amtIssuedFieldController
-                                                        //               .text !=
-                                                        //           '') {
-                                                        //         checkoutController.computeCustomerBal(
-                                                        //           cartController
-                                                        //               .totalCartPrice
-                                                        //               .value,
-                                                        //           double.parse(
-                                                        //             checkoutController
-                                                        //                 .amtIssuedFieldController
-                                                        //                 .text
-                                                        //                 .trim(),
-                                                        //           ),
-                                                        //         );
-                                                        //       }
-                                                        //     }
-                                                        //   },
-                                                        // ),
+                                                              cartController
+                                                                      .qtyFieldControllers[index]
+                                                                      .text =
+                                                                  cartController
+                                                                          .cartItems[index]
+                                                                          .itemMetrics ==
+                                                                      'units'
+                                                                  ? cartController
+                                                                        .cartItems[index]
+                                                                        .quantity
+                                                                        .toStringAsFixed(
+                                                                          0,
+                                                                        )
+                                                                  : cartController
+                                                                        .cartItems[index]
+                                                                        .quantity
+                                                                        .toStringAsFixed(
+                                                                          2,
+                                                                        );
+                                                              if (checkoutController
+                                                                      .amtIssuedFieldController
+                                                                      .text !=
+                                                                  '') {
+                                                                checkoutController.computeCustomerBal(
+                                                                  cartController
+                                                                      .totalCartPrice
+                                                                      .value,
+                                                                  double.parse(
+                                                                    checkoutController
+                                                                        .amtIssuedFieldController
+                                                                        .text
+                                                                        .trim(),
+                                                                  ),
+                                                                );
+                                                              }
+                                                            }
+                                                          },
+                                                        ),
+
                                                         // SizedBox(
                                                         //   width: CSizes
                                                         //       .spaceBtnItems,
@@ -362,7 +381,7 @@ class CCheckoutScreen extends StatelessWidget {
                                                         SizedBox(
                                                           width:
                                                               CHelperFunctions.screenWidth() *
-                                                              .26,
+                                                              .21,
                                                           child: TextFormField(
                                                             controller:
                                                                 cartController
@@ -513,113 +532,114 @@ class CCheckoutScreen extends StatelessWidget {
                                                           ),
                                                         ),
 
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets.only(
-                                                                top: 10.0,
-                                                              ),
-                                                          child: Text(
-                                                            CFormatter.formatItemMetrics(
-                                                              cartController
-                                                                  .cartItems[index]
-                                                                  .itemMetrics,
-                                                              cartController
-                                                                  .cartItems[index]
-                                                                  .quantity,
-                                                            ),
-                                                          ),
-                                                        ),
-
-                                                        // CCircularIconBtn(
-                                                        //   icon: Iconsax.add,
-                                                        //   iconBorderRadius: 100,
-                                                        //   width: 32.0,
-                                                        //   height: 32.0,
-                                                        //   iconSize: CSizes.md,
-                                                        //   iconColor:
-                                                        //       CColors.white,
-                                                        //   bgColor:
-                                                        //       CColors.rBrown,
-                                                        //   onPressed: () {
-                                                        //     if (cartController
-                                                        //                 .qtyFieldControllers[index]
-                                                        //                 .text
-                                                        //                 .trim() !=
-                                                        //             '' &&
-                                                        //         double.parse(
-                                                        //               cartController
-                                                        //                   .qtyFieldControllers[index]
-                                                        //                   .text
-                                                        //                   .trim(),
-                                                        //             ) >
-                                                        //             0) {
-                                                        //       // invController
-                                                        //       //     .fetchUserInventoryItems();
-                                                        //       // cartController
-                                                        //       //     .fetchCartItems();
-                                                        //       var invItem = invController.inventoryItems.firstWhere(
-                                                        //         (item) =>
-                                                        //             item.productId
-                                                        //                 .toString() ==
-                                                        //             cartController
-                                                        //                 .cartItems[index]
-                                                        //                 .productId
-                                                        //                 .toString()
-                                                        //                 .toLowerCase(),
-                                                        //       );
-                                                        //       final thisCartItem =
-                                                        //           cartController.convertInvToCartItem(
-                                                        //             invItem,
-                                                        //             double.parse(
-                                                        //               cartController
-                                                        //                   .qtyFieldControllers[index]
-                                                        //                   .text
-                                                        //                   .trim(),
-                                                        //             ),
-                                                        //           );
+                                                        // Padding(
+                                                        //   padding:
+                                                        //       const EdgeInsets.only(
+                                                        //         top: 10.0,
+                                                        //       ),
+                                                        //   child: Text(
+                                                        //     CFormatter.formatItemMetrics(
                                                         //       cartController
-                                                        //           .addSingleItemToCart(
-                                                        //             thisCartItem,
-                                                        //             false,
-                                                        //             null,
-                                                        //           );
+                                                        //           .cartItems[index]
+                                                        //           .itemMetrics,
                                                         //       cartController
-                                                        //           .fetchCartItems();
-                                                        //       cartController
-                                                        //               .qtyFieldControllers[index]
-                                                        //               .text =
-                                                        //           cartController
-                                                        //                   .cartItems[index]
-                                                        //                   .itemMetrics ==
-                                                        //               'units'
-                                                        //           ? cartController
-                                                        //                 .cartItems[index]
-                                                        //                 .quantity
-                                                        //                 .toStringAsFixed(
-                                                        //                   0,
-                                                        //                 )
-                                                        //           : cartController
-                                                        //                 .cartItems[index]
-                                                        //                 .quantity
-                                                        //                 .toString();
-                                                        //       if (checkoutController
-                                                        //               .amtIssuedFieldController
-                                                        //               .text !=
-                                                        //           '') {
-                                                        //         checkoutController.computeCustomerBal(
-                                                        //           cartController
-                                                        //               .totalCartPrice
-                                                        //               .value,
-                                                        //           double.parse(
-                                                        //             checkoutController
-                                                        //                 .amtIssuedFieldController
-                                                        //                 .text,
-                                                        //           ),
-                                                        //         );
-                                                        //       }
-                                                        //     }
-                                                        //   },
+                                                        //           .cartItems[index]
+                                                        //           .quantity,
+                                                        //     ),
+                                                        //   ),
                                                         // ),
+                                                        CCircularIconBtn(
+                                                          icon: Iconsax.add,
+                                                          iconBorderRadius: 100,
+                                                          width: 32.0,
+                                                          height: 32.0,
+                                                          iconSize: CSizes.md,
+                                                          iconColor:
+                                                              CColors.white,
+                                                          bgColor:
+                                                              CColors.rBrown,
+                                                          onPressed: () {
+                                                            if (cartController
+                                                                        .qtyFieldControllers[index]
+                                                                        .text
+                                                                        .trim() !=
+                                                                    '' &&
+                                                                double.parse(
+                                                                      cartController
+                                                                          .qtyFieldControllers[index]
+                                                                          .text
+                                                                          .trim(),
+                                                                    ) >
+                                                                    0) {
+                                                              // invController
+                                                              //     .fetchUserInventoryItems();
+                                                              // cartController
+                                                              //     .fetchCartItems();
+                                                              var invItem = invController.inventoryItems.firstWhere(
+                                                                (item) =>
+                                                                    item.productId
+                                                                        .toString() ==
+                                                                    cartController
+                                                                        .cartItems[index]
+                                                                        .productId
+                                                                        .toString()
+                                                                        .toLowerCase(),
+                                                              );
+                                                              final thisCartItem =
+                                                                  cartController.convertInvToCartItem(
+                                                                    invItem,
+                                                                    double.parse(
+                                                                      cartController
+                                                                          .qtyFieldControllers[index]
+                                                                          .text
+                                                                          .trim(),
+                                                                    ),
+                                                                  );
+                                                              cartController
+                                                                  .addSingleItemToCart(
+                                                                    thisCartItem,
+                                                                    false,
+                                                                    null,
+                                                                  );
+                                                              cartController
+                                                                  .fetchCartItems();
+                                                              cartController
+                                                                      .qtyFieldControllers[index]
+                                                                      .text =
+                                                                  cartController
+                                                                          .cartItems[index]
+                                                                          .itemMetrics ==
+                                                                      'units'
+                                                                  ? cartController
+                                                                        .cartItems[index]
+                                                                        .quantity
+                                                                        .toStringAsFixed(
+                                                                          0,
+                                                                        )
+                                                                  : cartController
+                                                                        .cartItems[index]
+                                                                        .quantity
+                                                                        .toStringAsFixed(
+                                                                          2,
+                                                                        );
+                                                              if (checkoutController
+                                                                      .amtIssuedFieldController
+                                                                      .text !=
+                                                                  '') {
+                                                                checkoutController.computeCustomerBal(
+                                                                  cartController
+                                                                      .totalCartPrice
+                                                                      .value,
+                                                                  double.parse(
+                                                                    checkoutController
+                                                                        .amtIssuedFieldController
+                                                                        .text,
+                                                                  ),
+                                                                );
+                                                              }
+                                                            }
+                                                          },
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
@@ -735,7 +755,9 @@ class CCheckoutScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            SizedBox(height: CSizes.defaultSpace / 4),
+                            SizedBox(
+                              height: CSizes.defaultSpace / 4,
+                            ),
 
                             // -- billing section --
                             CRoundedContainer(

@@ -12,6 +12,7 @@ import 'package:cri_v3/nav_menu.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/db/sqflite/db_helper.dart';
+import 'package:cri_v3/utils/helpers/formatter.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:cri_v3/utils/validators/validation.dart';
@@ -71,18 +72,30 @@ class CContactsController extends GetxController {
         (results) {
           switch (results.isNotEmpty) {
             case true:
+              // contactMatches = myContacts
+              //     .where(
+              //       (match) =>
+              //           match.contactName.toLowerCase().contains(
+              //             contactName.toLowerCase(),
+              //           ) &&
+              //           (match.contactEmail.toLowerCase().contains(
+              //                 contactDetails.toLowerCase(),
+              //               ) ||
+              //               match.contactPhone.toLowerCase().contains(
+              //                 contactDetails.toLowerCase(),
+              //               )),
+              //     )
+              //     .toList();
+
               contactMatches = myContacts
                   .where(
                     (match) =>
-                        match.contactName.toLowerCase().contains(
-                          contactName.toLowerCase(),
-                        ) &&
-                        (match.contactEmail.toLowerCase().contains(
-                              contactDetails.toLowerCase(),
-                            ) ||
-                            match.contactPhone.toLowerCase().contains(
-                              contactDetails.toLowerCase(),
-                            )),
+                        match.contactEmail.toLowerCase().contains(
+                          contactDetails.toLowerCase(),
+                        ) ||
+                        match.contactPhone.toLowerCase().contains(
+                          contactDetails.toLowerCase(),
+                        ),
                   )
                   .toList();
               if (contactMatches.isNotEmpty) {
@@ -128,19 +141,32 @@ class CContactsController extends GetxController {
     int? productId,
   ) async {
     try {
+
+      // -- extract dial code from phone number
+      final (dialCode, mobileNumber) =
+              CValidator.isValidPhoneNumber(
+                invController.txtSupplierContacts.text.trim(),
+              )
+              ? CFormatter.seperatePhoneAndDialCode(
+                  invController.txtSupplierContacts.text.trim(),
+                )
+              : ('', '');
+      
       var contactDetails = CContactsModel(
         userController.user.value.email,
         productId,
         fromInventoryDetails
             ? invController.txtSupplierName.text.trim()
             : contact!.contactName,
+
+
         fromInventoryDetails ? '' : contact!.contactCountryCode,
-        '',
+        fromInventoryDetails ? dialCode : '',
         fromInventoryDetails &&
                 CValidator.isValidPhoneNumber(
                   invController.txtSupplierContacts.text.trim(),
                 )
-            ? invController.txtSupplierContacts.text.trim()
+            ? mobileNumber
             : fromInventoryDetails &&
                   !CValidator.isValidPhoneNumber(
                     invController.txtSupplierContacts.text.trim(),
@@ -329,7 +355,7 @@ class CContactsController extends GetxController {
 
   Future<dynamic> addUpdateContactActionModal(
     BuildContext context,
-    CContactsModel contactItem,
+    CContactsModel? contactItem,
     String updateAction,
   ) async {
     try {
@@ -346,9 +372,8 @@ class CContactsController extends GetxController {
         useSafeArea: true,
         useRootNavigator: true,
         builder: (context) {
-          resetFields();
           // -- set field values --
-          contactCountryCode.value = contactItem.contactCountryCode != ''
+          contactCountryCode.value = contactItem!.contactCountryCode != ''
               ? contactItem.contactCountryCode
               : contactCountryCode.value;
           contactDialCode.value = contactItem.contactDialCode != ''
@@ -357,7 +382,10 @@ class CContactsController extends GetxController {
           txtEmailController.text = txtEmailController.text == ''
               ? contactItem.contactEmail
               : txtEmailController.text.trim();
-          txtContactNameController.text = contactItem.contactName;
+          txtContactNameController.text =
+              txtContactNameController.text.trim() == ''
+              ? contactItem.contactName
+              : txtContactNameController.text.trim();
           txtPhoneController.text = txtPhoneController.text == ''
               ? contactItem.contactPhone
               : txtPhoneController.text.trim();
