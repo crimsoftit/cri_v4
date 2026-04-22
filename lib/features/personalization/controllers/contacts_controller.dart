@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:clock/clock.dart';
 import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/common/widgets/flushbars/flushbars.dart';
-import 'package:cri_v3/common/widgets/txt_fields/custom_typeahed_field.dart';
+import 'package:cri_v3/common/widgets/txt_fields/custom_type_ahead_field.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
@@ -496,7 +496,7 @@ class CContactsController extends GetxController {
                             ),
                           ),
 
-                          CCustomTypeahedField(
+                          CCustomTypeaheadField(
                             fieldValidator: updateAction == 'add email'
                                 ? (value) {
                                     return CValidator.validateEmail(value);

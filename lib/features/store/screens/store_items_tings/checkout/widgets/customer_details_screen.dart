@@ -1,4 +1,4 @@
-import 'package:cri_v3/common/widgets/txt_fields/custom_typeahed_field.dart';
+import 'package:cri_v3/common/widgets/txt_fields/custom_type_ahead_field.dart';
 import 'package:cri_v3/features/store/controllers/checkout_controller.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
@@ -20,7 +20,7 @@ class CustomerDetailsScreen extends StatelessWidget {
 
     return Column(
       children: [
-        CCustomTypeahedField(
+        CCustomTypeaheadField(
           contentPadding: const EdgeInsets.all(
             5.0,
           ),
@@ -71,7 +71,7 @@ class CustomerDetailsScreen extends StatelessWidget {
           height: 2.6,
         ),
         // -- contacts field --
-        CCustomTypeahedField(
+        CCustomTypeaheadField(
           fieldHeight:
               checkoutController.customerContactsFieldController.text == ''
               ? 55.0

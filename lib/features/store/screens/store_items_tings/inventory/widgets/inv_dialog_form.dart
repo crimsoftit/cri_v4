@@ -1,6 +1,7 @@
 import 'package:cri_v3/common/widgets/buttons/custom_dropdown_btn.dart';
 import 'package:cri_v3/common/widgets/login_signup/form_divider.dart';
-import 'package:cri_v3/common/widgets/txt_fields/custom_typeahed_field.dart';
+import 'package:cri_v3/common/widgets/txt_fields/custom_type_ahead_field.dart'
+    show CCustomTypeaheadField;
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/store/controllers/date_controller.dart';
@@ -554,7 +555,7 @@ class AddUpdateInventoryForm extends StatelessWidget {
                             const SizedBox(
                               height: CSizes.spaceBtnInputFields / 2.0,
                             ),
-                            CCustomTypeahedField(
+                            CCustomTypeaheadField(
                               focusedBorderColor: isDarkTheme
                                   ? CColors.grey
                                   : CColors.rBrown,
@@ -584,7 +585,7 @@ class AddUpdateInventoryForm extends StatelessWidget {
                               height: CSizes.spaceBtnInputFields / 4.0,
                             ),
 
-                            CCustomTypeahedField(
+                            CCustomTypeaheadField(
                               focusedBorderColor: isDarkTheme
                                   ? CColors.grey
                                   : CColors.rBrown,

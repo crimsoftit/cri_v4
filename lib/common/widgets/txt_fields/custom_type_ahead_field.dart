@@ -9,8 +9,8 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
-class CCustomTypeaheadFieldRow extends StatelessWidget {
-  const CCustomTypeaheadFieldRow({
+class CCustomTypeaheadField extends StatelessWidget {
+  const CCustomTypeaheadField({
     super.key,
     this.contentPadding,
     this.fieldHeight,
