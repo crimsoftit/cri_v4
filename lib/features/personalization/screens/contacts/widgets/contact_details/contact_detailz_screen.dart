@@ -85,7 +85,9 @@ class CContactDetailsScreen extends StatelessWidget {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(
+              10.0,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -96,7 +98,7 @@ class CContactDetailsScreen extends StatelessWidget {
                       top: 20.0,
                     ),
                     child: CircleAvatar(
-                      backgroundColor: CHelperFunctions.randomAstheticColor(),
+                      backgroundColor: CHelperFunctions.randomAestheticColor(),
                       radius: 40.0,
                       child:
                           CValidator.isFirstCharacterALetter(
@@ -112,7 +114,7 @@ class CContactDetailsScreen extends StatelessWidget {
                             )
                           : Icon(
                               Iconsax.user,
-                              color: CHelperFunctions.randomAstheticColor(),
+                              color: CHelperFunctions.randomAestheticColor(),
                             ),
                     ),
                   ),

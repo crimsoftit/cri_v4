@@ -180,7 +180,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
                               children: [
                                 CircleAvatar(
                                   backgroundColor:
-                                      CHelperFunctions.randomAstheticColor(),
+                                      CHelperFunctions.randomAestheticColor(),
                                   radius: 20.0,
                                   child:
                                       CValidator.isFirstCharacterALetter(
@@ -198,7 +198,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                       : Icon(
                                           Iconsax.user,
                                           color:
-                                              CHelperFunctions.randomAstheticColor(),
+                                              CHelperFunctions.randomAestheticColor(),
                                         ),
                                 ),
                                 const SizedBox(
@@ -262,21 +262,19 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                               children: [
                                                 contact.contactPhone != ''
                                                     ? Expanded(
-                                                        child: Text(
-                                                          contact.contactDialCode !=
-                                                                  ''
-                                                              ? 'Mobile (${contact.contactDialCode}) ${contact.contactPhone}'
-                                                              : contact
-                                                                    .contactPhone,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                        child: SelectableText(
+                                                          'Mobile ${contact.contactDialCode}${contact.contactPhone}',
+
                                                           style:
                                                               Theme.of(
                                                                     context,
                                                                   )
                                                                   .textTheme
                                                                   .labelMedium!
-                                                                  .apply(),
+                                                                  .apply(
+                                                                    fontSizeFactor:
+                                                                        1.2,
+                                                                  ),
                                                         ),
                                                       )
                                                     : Expanded(
@@ -335,17 +333,21 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                                       .spaceBetween,
                                               children: [
                                                 Expanded(
-                                                  child: Text(
-                                                    'Mobile ${contact.contactPhone}',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                  flex: 5,
+                                                  child: SelectableText(
+                                                    'Mobile ${contact.contactDialCode}${contact.contactPhone}',
+                                                    // overflow:
+                                                    //     TextOverflow.ellipsis,
                                                     style:
                                                         Theme.of(
                                                               context,
                                                             )
                                                             .textTheme
                                                             .labelMedium!
-                                                            .apply(),
+                                                            .apply(
+                                                              fontSizeFactor:
+                                                                  1.3,
+                                                            ),
                                                   ),
                                                 ),
                                                 Expanded(

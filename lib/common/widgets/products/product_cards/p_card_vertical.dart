@@ -285,7 +285,6 @@ class CProductCardVertical extends StatelessWidget {
 
             /// -- base buttons --
             SizedBox(
-              /// -- TODO:
               // chora cart item usp * qtyInCart
               // also catch socketexception when syncing data
               width: CHelperFunctions.screenWidth(),

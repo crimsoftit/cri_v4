@@ -141,24 +141,22 @@ class CContactsController extends GetxController {
     int? productId,
   ) async {
     try {
-
       // -- extract dial code from phone number
       final (dialCode, mobileNumber) =
-              CValidator.isValidPhoneNumber(
-                invController.txtSupplierContacts.text.trim(),
-              )
-              ? CFormatter.seperatePhoneAndDialCode(
-                  invController.txtSupplierContacts.text.trim(),
-                )
-              : ('', '');
-      
+          CValidator.isValidPhoneNumber(
+            invController.txtSupplierContacts.text.trim(),
+          )
+          ? CFormatter.seperatePhoneAndDialCode(
+              invController.txtSupplierContacts.text.trim(),
+            )
+          : ('', '');
+
       var contactDetails = CContactsModel(
         userController.user.value.email,
         productId,
         fromInventoryDetails
             ? invController.txtSupplierName.text.trim()
             : contact!.contactName,
-
 
         fromInventoryDetails ? '' : contact!.contactCountryCode,
         fromInventoryDetails ? dialCode : '',
@@ -408,7 +406,8 @@ class CContactsController extends GetxController {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircleAvatar(
-                        backgroundColor: CHelperFunctions.randomAstheticColor(),
+                        backgroundColor:
+                            CHelperFunctions.randomAestheticColor(),
                         radius: 20.0,
                         child:
                             CValidator.isFirstCharacterALetter(
@@ -423,7 +422,7 @@ class CContactsController extends GetxController {
                               )
                             : Icon(
                                 Iconsax.user,
-                                color: CHelperFunctions.randomAstheticColor(),
+                                color: CHelperFunctions.randomAestheticColor(),
                               ),
                       ),
                       const SizedBox(
@@ -741,7 +740,7 @@ class CContactsController extends GetxController {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(
-              backgroundColor: CHelperFunctions.randomAstheticColor(),
+              backgroundColor: CHelperFunctions.randomAestheticColor(),
               radius: 30.0,
               child:
                   CValidator.isFirstCharacterALetter(
@@ -757,7 +756,7 @@ class CContactsController extends GetxController {
                     )
                   : Icon(
                       Iconsax.user,
-                      color: CHelperFunctions.randomAstheticColor(),
+                      color: CHelperFunctions.randomAestheticColor(),
                     ),
             ),
             const SizedBox(
@@ -1261,6 +1260,7 @@ class CContactsController extends GetxController {
         },
         undoTextStyle: Theme.of(context).textTheme.bodyMedium!.apply(
           color: CColors.white,
+          fontSizeFactor: 1.3,
         ),
       ).show(context);
 

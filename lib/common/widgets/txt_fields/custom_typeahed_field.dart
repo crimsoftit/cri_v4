@@ -187,7 +187,7 @@ class CCustomTypeahedField extends StatelessWidget {
                     ),
                     suggestion.contactPhone != ''
                         ? Text(
-                            'Mobile: (${suggestion.contactDialCode}) ${suggestion.contactPhone}',
+                            'Mobile: ${suggestion.contactDialCode != ''}${suggestion.contactPhone}',
                             style:
                                 Theme.of(
                                   context,

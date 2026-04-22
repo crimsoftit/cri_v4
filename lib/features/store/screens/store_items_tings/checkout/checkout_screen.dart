@@ -22,7 +22,6 @@ import 'package:cri_v3/features/store/screens/store_items_tings/checkout/widgets
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/img_strings.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
-import 'package:cri_v3/utils/helpers/formatter.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:flutter/material.dart';

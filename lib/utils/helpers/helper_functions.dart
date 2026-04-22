@@ -214,7 +214,7 @@ class CHelperFunctions {
   }
 
   /// -- Using HSL for Aesthetic Colors (Modern Approach) --
-  static Color randomAstheticColor() {
+  static Color randomAestheticColor() {
     final hue = math.Random().nextDouble() * 360;
     final saturation = .6 + (math.Random().nextDouble() * .4);
     final lightness = .4 + (math.Random().nextDouble() * .2);

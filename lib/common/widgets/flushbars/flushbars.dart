@@ -32,7 +32,7 @@ class CFlushbars extends GetxController {
       mainButton: TextButton.icon(
         onPressed: onUndo,
         label: Text(
-          'undo',
+          'Undo',
           style: undoTextStyle,
         ),
       ),
