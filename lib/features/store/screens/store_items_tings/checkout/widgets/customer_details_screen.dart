@@ -36,6 +36,7 @@ class CustomerDetailsScreen extends StatelessWidget {
               ? 55.0
               : 65.0,
           fillColor: isDarkTheme ? CColors.transparent : CColors.white,
+          focusedBorderColor: isDarkTheme ? CColors.grey : CColors.rBrown,
           includePrefixIcon: false,
           labelTxt: 'Customer\'s name:',
           minHeight: 55.0,

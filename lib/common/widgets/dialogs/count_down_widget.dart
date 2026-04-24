@@ -64,7 +64,7 @@ class _CCountDownWidgetState extends State<CCountDownWidget>
               child: CircularProgressIndicator(
                 backgroundColor: CColors.transparent,
                 color: CColors.white,
-                strokeWidth: 1.2,
+                strokeWidth: .8,
                 value: animationController.value,
               ),
             ),

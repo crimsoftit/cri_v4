@@ -848,8 +848,10 @@ class DbHelper extends GetxController {
   /// -- add a contact to sqflite db --
   Future<void> addContact(CContactsModel contact) async {
     try {
-      // get a reference to the database
+      // -- get a reference to the database --
       final db = _db;
+
+      // -- insert contact details to local db --
       await db?.insert(
         contactsTable,
         contact.toMap(),
