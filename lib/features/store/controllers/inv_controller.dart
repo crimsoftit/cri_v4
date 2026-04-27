@@ -666,6 +666,28 @@ class CInventoryController extends GetxController {
     }
   }
 
+  /// -- check if update is really necessary --
+  Future<bool> updateIsNecessary(CInventoryModel forUpdateItem) async {
+    try {
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('error updating inventory item: $e');
+        CPopupSnackBar.errorSnackBar(
+          title: 'error updating inventory item',
+          message: e.toString(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'an unknown error occurred while adding/updating inventory item! please try again later.',
+          title: 'error adding/updating inventory item',
+        );
+      }
+      rethrow;
+    }
+  }
+
   /// -- add or update inventory item using sqflite
   Future<bool> addOrUpdateInventoryItem(CInventoryModel inventoryItem) async {
     try {
@@ -747,6 +769,12 @@ class CInventoryController extends GetxController {
         CPopupSnackBar.errorSnackBar(
           title: 'error adding/updating inventory item',
           message: e.toString(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'an unknown error occurred while adding/updating inventory item! please try again later.',
+          title: 'error adding/updating inventory item',
         );
       }
       rethrow;

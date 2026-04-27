@@ -668,7 +668,7 @@ class AddUpdateInventoryForm extends StatelessWidget {
                               CDateController(),
                             );
                             dateController.triggerCupertinoDatePicker(
-                              Get.overlayContext!,
+                              context,
                             );
                           },
                           readOnly: true,

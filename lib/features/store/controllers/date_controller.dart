@@ -58,7 +58,7 @@ class CDateController extends GetxController {
       builder: (_) => CRoundedContainer(
         bgColor: CupertinoColors.systemBackground.resolveFrom(context),
         height: CHelperFunctions.screenHeight() * .38,
-        width: CHelperFunctions.screenWidth() * .8,
+        width: CHelperFunctions.screenWidth() * .85,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -84,7 +84,9 @@ class CDateController extends GetxController {
                     icon: const Icon(
                       Icons.check,
                     ),
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
                   ),
                 ],
               ),
