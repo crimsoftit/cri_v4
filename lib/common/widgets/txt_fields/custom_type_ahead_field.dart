@@ -115,19 +115,21 @@ class CCustomTypeaheadField extends StatelessWidget {
         0,
         5.0,
       ),
-    
+
       listBuilder: (context, children) {
         return ListView.separated(
           itemCount: children.length,
-          separatorBuilder: (context, index) => const SizedBox(
-            height: 10.0,
-          ), // 10px space between items
+          separatorBuilder: (context, index) {
+            return const SizedBox(
+              height: 5.0,
+            );
+          }, // 10px space between items
           itemBuilder: (context, index) {
             return children[index];
           },
         );
       },
-    
+
       suggestionsCallback: (pattern) {
         return contactsController.contactSuggestionsCallBackAction(
           pattern,
@@ -139,7 +141,7 @@ class CCustomTypeaheadField extends StatelessWidget {
         } else {
           return CRoundedContainer(
             bgColor: CColors.white,
-            borderRadius: 5.0,
+            borderRadius: 10.0,
             padding: const EdgeInsets.only(
               bottom: 4.0,
               left: 4.0,
@@ -153,10 +155,10 @@ class CCustomTypeaheadField extends StatelessWidget {
                   ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(
-                  5.0,
+                  10.0,
                 ),
               ),
-    
+
               // tileColor: isDarkTheme
               //     ? CColors.rBrown.withValues(
               //         alpha: .3,
@@ -193,7 +195,7 @@ class CCustomTypeaheadField extends StatelessWidget {
                   ),
                   suggestion.contactPhone != ''
                       ? Text(
-                          'Mobile: ${suggestion.contactDialCode != ''}${suggestion.contactPhone}',
+                          'Mobile: ${suggestion.contactPhone}',
                           style:
                               Theme.of(
                                 context,

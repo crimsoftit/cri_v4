@@ -192,7 +192,7 @@ class CContactsController extends GetxController {
             ? DateFormat('yyyy-MM-dd kk:mm').format(clock.now())
             : contact!.createdAt,
         0,
-        'add',
+        'append',
         0,
       );
 
@@ -320,7 +320,7 @@ class CContactsController extends GetxController {
       // --  start loader --
       isLoading.value = true;
 
-      dbHelper.updateContact(contact);
+      await dbHelper.updateContact(contact);
 
       // CPopupSnackBar.customToast(
       //   forInternetConnectivityStatus: false,
@@ -732,6 +732,32 @@ class CContactsController extends GetxController {
     }
   }
 
+  /// -- restore trashed contact --
+  restoreTrashedContact(CContactsModel trashedItem) async {
+    try {
+      trashedItem.isTrashed = 0;
+      trashedItem.lastModified = DateFormat(
+        'yyyy-MM-dd kk:mm',
+      ).format(clock.now());
+      trashedItem.syncAction = trashedItem.isSynced == 1 ? 'update' : 'append';
+      await updateContact(trashedItem);
+    } catch (e) {
+      if (kDebugMode) {
+        print('error restoring contact: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error restoring contact from trash bin: $e',
+          title: 'error restoring contact!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error restoring contact from trash bin: $e',
+          title: 'error restoring contact!',
+        );
+      }
+      rethrow;
+    }
+  }
+
   /// -- delete contact dialog --
   onDeleteContactDialog(CContactsModel contact) async {
     try {
@@ -817,7 +843,7 @@ class CContactsController extends GetxController {
               horizontal: CSizes.lg,
             ),
             child: Text(
-              'delete',
+              'Delete anyway',
             ),
           ),
         ),

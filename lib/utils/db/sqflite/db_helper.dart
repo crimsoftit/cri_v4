@@ -1,4 +1,5 @@
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
+import 'package:cri_v3/features/personalization/models/contacts_del_model.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
 import 'package:cri_v3/features/personalization/models/notification_model.dart';
 import 'package:cri_v3/features/store/models/best_sellers_model.dart';
@@ -925,6 +926,38 @@ class DbHelper extends GetxController {
         CPopupSnackBar.errorSnackBar(
           message: 'an unknown error occurred while updating contact details!',
           title: 'error updating contact!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- add unsynced contact deletions to a temporary table --
+  Future<void> addUnsyncedDeletions(CContactsDelModel deletedContact) async {
+    try {
+      final db = _db;
+
+      // Insert the inventoryItem into the correct table. You might also specify the
+      // `conflictAlgorithm` to use in case the same inventoryItem is inserted twice.
+      //
+      // In this case, replace any previous data.
+      await db?.insert(
+        contactDelsForSyncTable,
+        deletedContact.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('error adding deleted contact for sync: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error adding deleted contact for sync: $e',
+          title: 'error adding deleted contact for sync!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'an unknown error occurred while adding deleted contact for sync!',
+          title: 'error adding deleted contact for sync!',
         );
       }
       rethrow;

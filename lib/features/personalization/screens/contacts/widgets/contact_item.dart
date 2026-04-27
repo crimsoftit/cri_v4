@@ -234,16 +234,64 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     TextButton.icon(
+                                      icon: Icon(
+                                        Icons.restore,
+                                        color: CColors.rBrown,
+                                      ),
                                       label: Text(
                                         'Restore',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.labelMedium!.apply(
+                                              color: CColors.rBrown,
+                                            ),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        contactsController
+                                            .restoreTrashedContact(contact);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            CColors.white, // background color
+                                        foregroundColor: CColors
+                                            .rBrown, // foreground (text) color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10.0,
+                                          ), // Set the desired radius here
+                                        ),
+                                      ),
                                     ),
                                     TextButton.icon(
+                                      icon: Icon(
+                                        Icons.close,
+                                        color: CColors.white,
+                                      ),
                                       label: Text(
                                         'Delete permanently',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.labelMedium!.apply(
+                                              color: CColors.white,
+                                            ),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        contactsController
+                                            .onDeleteContactDialog(contact);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            CColors.error, // background color
+                                        foregroundColor: CColors
+                                            .white, // foreground (text) color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10.0,
+                                          ), // Set the desired radius here
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 )
