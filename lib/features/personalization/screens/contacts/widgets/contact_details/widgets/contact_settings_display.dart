@@ -5,6 +5,8 @@ import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
 
+/// -- TODO: enabling trashing in favor of permanent deletion of contacts may be expensive while scaling... --
+
 class CContactSettingsDisplay extends StatelessWidget {
   const CContactSettingsDisplay({
     super.key,

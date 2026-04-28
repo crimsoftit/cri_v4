@@ -267,10 +267,10 @@ class CInventoryController extends GetxController {
           userController.user.value.id,
           userController.user.value.email,
           userController.user.value.fullName,
-          txtCode.text,
-          txtNameController.text,
+          txtCode.text.trim(),
+          txtNameController.text.trim(),
           0,
-          itemMetrics.value,
+          itemMetrics.value.trim(),
           double.parse(txtQty.text.trim()),
           0.0,
           0.0,
@@ -279,7 +279,7 @@ class CInventoryController extends GetxController {
           double.parse(txtUnitSP.text.trim()),
           txtStockNotifierLimit.text != ''
               ? double.parse(txtStockNotifierLimit.text.trim())
-              : (double.parse(txtQty.text) / 5),
+              : (double.parse(txtQty.text.trim()) / 5),
           txtSupplierName.text.trim(),
           txtSupplierContacts.text.trim(),
           DateFormat('yyyy-MM-dd @ kk:mm').format(clock.now()),
@@ -667,9 +667,75 @@ class CInventoryController extends GetxController {
   }
 
   /// -- check if update is really necessary --
-  Future<bool> updateIsNecessary(CInventoryModel forUpdateItem) async {
+  Future<bool> invUpdateIsNecessary(CInventoryModel forUpdateItem) async {
     try {
-      return true;
+      if (itemExists.value) {
+        final originalContent = CInventoryModel.withID(
+          forUpdateItem.productId,
+          forUpdateItem.userId,
+          forUpdateItem.userEmail,
+          forUpdateItem.userName,
+          forUpdateItem.pCode,
+          forUpdateItem.name,
+          forUpdateItem.markedAsFavorite,
+          forUpdateItem.calibration,
+          forUpdateItem.quantity,
+          forUpdateItem.qtySold,
+          forUpdateItem.qtyRefunded,
+          forUpdateItem.buyingPrice,
+          forUpdateItem.unitBp,
+          forUpdateItem.unitSellingPrice,
+          forUpdateItem.lowStockNotifierLimit,
+          forUpdateItem.supplierName,
+          forUpdateItem.supplierContacts,
+          forUpdateItem.dateAdded,
+          forUpdateItem.lastModified,
+          forUpdateItem.expiryDate,
+          forUpdateItem.isSynced,
+          forUpdateItem.syncAction,
+        );
+
+        final newContent = CInventoryModel.withID(
+          forUpdateItem.productId,
+          userController.user.value.id,
+          userController.user.value.email,
+          userController.user.value.fullName,
+          txtCode.text.trim(),
+          txtNameController.text.trim(),
+          forUpdateItem.markedAsFavorite,
+          itemMetrics.value.trim(),
+          double.parse(txtQty.text.trim()),
+          forUpdateItem.qtySold,
+          forUpdateItem.qtyRefunded,
+          double.parse(txtBP.text.trim()),
+          unitBP.value,
+          double.parse(txtUnitSP.text.trim()),
+          double.parse(txtStockNotifierLimit.text.trim()),
+          txtSupplierName.text.trim(),
+          txtSupplierContacts.text.trim(),
+          forUpdateItem.dateAdded,
+          forUpdateItem.lastModified,
+          txtExpiryDatePicker.text.trim(),
+          forUpdateItem.isSynced,
+          forUpdateItem.syncAction,
+        );
+
+        if (originalContent == newContent) {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'update is not necessary',
+          );
+          return false;
+        } else {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'UPDATE IS NECESSARY',
+          );
+          return true;
+        }
+      } else {
+        return true;
+      }
     } catch (e) {
       if (kDebugMode) {
         print('error updating inventory item: $e');

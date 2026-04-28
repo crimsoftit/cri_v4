@@ -100,6 +100,8 @@ class CContactsExpansionPanelView extends StatelessWidget {
                 lottieImage: CImages.pencilAnimation,
                 txt: space == 'all'
                     ? 'All your contacts appear here...'
+                    : space == 'trashed'
+                    ? 'Your trashed contacts appear here...'
                     : 'Your $space\' contacts appear here...',
               ),
             );

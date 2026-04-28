@@ -832,34 +832,37 @@ class CCheckoutScreen extends StatelessWidget {
                                             )
                                           : Row(
                                               children: [
-                                                checkoutController
-                                                            .selectedPaymentMethod
-                                                            .value
-                                                            .platformName ==
-                                                        "mPesa online"
-                                                    ? SizedBox.shrink()
-                                                    : const SizedBox(
-                                                        width:
-                                                            CSizes
-                                                                .spaceBtnItems *
-                                                            1.1,
-                                                        height: 38.0,
-                                                      ),
+                                                // checkoutController
+                                                //             .selectedPaymentMethod
+                                                //             .value
+                                                //             .platformName ==
+                                                //         "mPesa online"
+                                                //     ? SizedBox.shrink()
+                                                //     : const SizedBox(
+                                                //         width:
+                                                //             CSizes
+                                                //                 .spaceBtnItems *
+                                                //             1.1,
+                                                //         height: 38.0,
+                                                //       ),
                                                 CRoundedContainer(
                                                   bgColor: CColors.transparent,
 
+                                                  // width:
+                                                  //     checkoutController
+                                                  //             .selectedPaymentMethod
+                                                  //             .value
+                                                  //             .platformName
+                                                  //             .toLowerCase() ==
+                                                  //         "mPesa online"
+                                                  //             .toLowerCase()
+                                                  //     ? CHelperFunctions.screenWidth() *
+                                                  //           .75
+                                                  //     : CHelperFunctions.screenWidth() *
+                                                  //           0.56,
                                                   width:
-                                                      checkoutController
-                                                              .selectedPaymentMethod
-                                                              .value
-                                                              .platformName
-                                                              .toLowerCase() ==
-                                                          "mPesa online"
-                                                              .toLowerCase()
-                                                      ? CHelperFunctions.screenWidth() *
-                                                            .75
-                                                      : CHelperFunctions.screenWidth() *
-                                                            0.56,
+                                                      CHelperFunctions.screenWidth() *
+                                                      .7,
 
                                                   child:
                                                       checkoutController

@@ -1,3 +1,4 @@
+import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/common/widgets/txt_fields/custom_type_ahead_field.dart';
 import 'package:cri_v3/features/store/controllers/checkout_controller.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
@@ -20,37 +21,42 @@ class CustomerDetailsScreen extends StatelessWidget {
 
     return Column(
       children: [
-        CCustomTypeaheadField(
-          contentPadding: const EdgeInsets.all(
-            5.0,
+        CRoundedContainer(
+          bgColor: CColors.transparent,
+          width: CHelperFunctions.screenWidth() * .69,
+          child: CCustomTypeaheadField(
+            contentPadding: const EdgeInsets.all(
+              5.0,
+            ),
+            fieldHeight:
+                checkoutController.customerContactsFieldController.text == ''
+                ? 55.0
+                : CValidator.isValidPhoneNumber(
+                        checkoutController.customerContactsFieldController.text,
+                      ) ||
+                      CValidator.isValidEmail(
+                        checkoutController.customerContactsFieldController.text,
+                      )
+                ? 55.0
+                : 65.0,
+            fillColor: isDarkTheme ? CColors.transparent : CColors.white,
+            focusedBorderColor: isDarkTheme ? CColors.grey : CColors.rBrown,
+            includeAvatarOnSuggestion: true,
+            includePrefixIcon: false,
+            labelTxt: 'Customer\'s name:',
+            minHeight: 55.0,
+            onItemSelected: (suggestion) {
+              checkoutController.customerNameFieldController.text =
+                  suggestion.contactName;
+              checkoutController.customerContactsFieldController.text =
+                  suggestion.contactPhone != ''
+                  ? suggestion.contactPhone
+                  : suggestion.contactEmail;
+            },
+            prefixIcon: SizedBox.shrink(),
+            typeAheadFieldController:
+                checkoutController.customerNameFieldController,
           ),
-          fieldHeight:
-              checkoutController.customerContactsFieldController.text == ''
-              ? 55.0
-              : CValidator.isValidPhoneNumber(
-                      checkoutController.customerContactsFieldController.text,
-                    ) ||
-                    CValidator.isValidEmail(
-                      checkoutController.customerContactsFieldController.text,
-                    )
-              ? 55.0
-              : 65.0,
-          fillColor: isDarkTheme ? CColors.transparent : CColors.white,
-          focusedBorderColor: isDarkTheme ? CColors.grey : CColors.rBrown,
-          includePrefixIcon: false,
-          labelTxt: 'Customer\'s name:',
-          minHeight: 55.0,
-          onItemSelected: (suggestion) {
-            checkoutController.customerNameFieldController.text =
-                suggestion.contactName;
-            checkoutController.customerContactsFieldController.text =
-                suggestion.contactPhone != ''
-                ? suggestion.contactPhone
-                : suggestion.contactEmail;
-          },
-          prefixIcon: SizedBox.shrink(),
-          typeAheadFieldController:
-              checkoutController.customerNameFieldController,
         ),
         // CCustomTxtField(
         //   labelTxt: 'Customer name',
@@ -72,46 +78,52 @@ class CustomerDetailsScreen extends StatelessWidget {
           height: 2.6,
         ),
         // -- contacts field --
-        CCustomTypeaheadField(
-          fieldHeight:
-              checkoutController.customerContactsFieldController.text == ''
-              ? 55.0
-              : CValidator.isValidPhoneNumber(
-                      checkoutController.customerContactsFieldController.text,
-                    ) ||
-                    CValidator.isValidEmail(
-                      checkoutController.customerContactsFieldController.text,
-                    )
-              ? 55.0
-              : 65.0,
-          // fillColor: isDarkTheme ? CColors.transparent : CColors.white,
-          fillColor: CColors.transparent,
-          includePrefixIcon: false,
-          labelTxt: 'Phone no. or e-mail:',
-          minHeight: 55.0,
-          onItemSelected: (suggestion) {
-            invController.txtSupplierName.text = suggestion.contactName;
-            invController.txtSupplierContacts.text =
-                suggestion.contactPhone != ''
-                ? suggestion.contactPhone
-                : suggestion.contactEmail;
-          },
-          prefixIcon: SizedBox.shrink(),
-          typeAheadFieldController:
-              checkoutController.customerContactsFieldController,
-          fieldValidator: (value) {
-            if (value == null ||
-                value == '' ||
-                (!CValidator.isValidEmail(
-                      value.trim(),
-                    ) &&
-                    !CValidator.isValidPhoneNumber(
-                      value.trim(),
-                    ))) {
-              return 'Please enter a valid phone no. e-mail address!';
-            }
-            return null;
-          },
+        CRoundedContainer(
+          bgColor: CColors.transparent,
+          width: CHelperFunctions.screenWidth() * .69,
+          child: CCustomTypeaheadField(
+            fieldHeight:
+                checkoutController.customerContactsFieldController.text == ''
+                ? 55.0
+                : CValidator.isValidPhoneNumber(
+                        checkoutController.customerContactsFieldController.text,
+                      ) ||
+                      CValidator.isValidEmail(
+                        checkoutController.customerContactsFieldController.text,
+                      )
+                ? 55.0
+                : 65.0,
+            // fillColor: isDarkTheme ? CColors.transparent : CColors.white,
+            fillColor: CColors.transparent,
+            focusedBorderColor: isDarkTheme ? CColors.grey : CColors.rBrown,
+            includeAvatarOnSuggestion: true,
+            includePrefixIcon: false,
+            labelTxt: 'Phone no. or e-mail:',
+            minHeight: 55.0,
+            onItemSelected: (suggestion) {
+              invController.txtSupplierName.text = suggestion.contactName;
+              invController.txtSupplierContacts.text =
+                  suggestion.contactPhone != ''
+                  ? suggestion.contactPhone
+                  : suggestion.contactEmail;
+            },
+            prefixIcon: SizedBox.shrink(),
+            typeAheadFieldController:
+                checkoutController.customerContactsFieldController,
+            fieldValidator: (value) {
+              if (value == null ||
+                  value == '' ||
+                  (!CValidator.isValidEmail(
+                        value.trim(),
+                      ) &&
+                      !CValidator.isValidPhoneNumber(
+                        value.trim(),
+                      ))) {
+                return 'Please enter a valid phone no. e-mail address!';
+              }
+              return null;
+            },
+          ),
         ),
         // CCustomTxtField(
         //   txtFieldController:

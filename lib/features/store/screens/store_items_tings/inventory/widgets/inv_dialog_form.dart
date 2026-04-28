@@ -559,6 +559,7 @@ class AddUpdateInventoryForm extends StatelessWidget {
                               focusedBorderColor: isDarkTheme
                                   ? CColors.grey
                                   : CColors.rBrown,
+                              includeAvatarOnSuggestion: true,
                               includePrefixIcon: true,
                               labelTxt: 'Supplier\'s name:',
                               onItemSelected: (suggestion) {
@@ -589,6 +590,7 @@ class AddUpdateInventoryForm extends StatelessWidget {
                               focusedBorderColor: isDarkTheme
                                   ? CColors.grey
                                   : CColors.rBrown,
+                              includeAvatarOnSuggestion: true,
                               includePrefixIcon: true,
                               labelTxt: 'Supplier\'s phone no. or e-mail:',
                               onItemSelected: (suggestion) {
@@ -776,28 +778,36 @@ class AddUpdateInventoryForm extends StatelessWidget {
                               );
                             }
 
-                            if (await invController.addOrUpdateInventoryItem(
+                            if (await invController.invUpdateIsNecessary(
                               inventoryItem,
                             )) {
-                              // -- check if contact already exists and add if it does not --
+                              if (await invController.addOrUpdateInventoryItem(
+                                inventoryItem,
+                              )) {
+                                // -- check if contact already exists and add if it does not --
 
-                              switch (fromHomeScreen) {
-                                case true:
-                                  navController.selectedIndex.value = 1;
-                                  Navigator.pop(Get.overlayContext!, true);
+                                switch (fromHomeScreen) {
+                                  case true:
+                                    navController.selectedIndex.value = 1;
+                                    Navigator.pop(Get.overlayContext!, true);
 
-                                  Get.to(const NavMenu());
+                                    Get.to(const NavMenu());
 
-                                  break;
-                                default:
-                                  Navigator.pop(Get.overlayContext!, true);
-                                  break;
+                                    break;
+                                  default:
+                                    Navigator.pop(Get.overlayContext!, true);
+                                    break;
+                                }
+                              } else {
+                                CPopupSnackBar.errorSnackBar(
+                                  title:
+                                      'Error adding/updating inventory item ',
+                                );
+                                return;
                               }
                             } else {
-                              CPopupSnackBar.errorSnackBar(
-                                title: 'Error adding/updating inventory item ',
-                              );
-                              return;
+                              invController.resetInvFields();
+                              Navigator.pop(Get.overlayContext!, true);
                             }
                           },
                         ),

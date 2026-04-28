@@ -124,8 +124,10 @@ dependencies:
   #awesome_notifications: ^0.7.4+1
 
   # -- utility packages
+  collection: ^1.19.1
   country_picker: any
   csv: any
+  equatable: ^2.0.8
   file_picker: ^10.3.7
   flutter_native_splash: any
   # flutter_typeahead: any

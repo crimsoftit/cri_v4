@@ -87,7 +87,13 @@ class AuthRepo extends GetxController {
           CFullScreenLoader.openLoadingDialog(
             'Redirecting...',
             CImages.docerAnimation,
-            null,
+            CNetworkManager.instance.hasConnection.value
+                ? CColors.rBrown.withValues(
+                    alpha: .8,
+                  )
+                : CColors.dark.withValues(
+                    alpha: .8,
+                  ),
             CColors.white,
           );
 

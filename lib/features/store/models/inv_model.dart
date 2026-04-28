@@ -3,8 +3,9 @@
 import 'dart:convert';
 
 import 'package:cri_v3/features/store/models/gsheet_models/inv_sheet_fields.dart';
+import 'package:equatable/equatable.dart';
 
-class CInventoryModel {
+class CInventoryModel extends Equatable {
   int? _productId;
 
   String _userId = "";
@@ -320,4 +321,32 @@ class CInventoryModel {
       json[InvSheetFields.syncAction],
     );
   }
+
+  @override
+  // TODO: implement props
+  // List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [
+    productId,
+    userId,
+    userEmail,
+    userName,
+    pCode,
+    name,
+    markedAsFavorite,
+    calibration,
+    quantity,
+    qtySold,
+    qtyRefunded,
+    buyingPrice,
+    unitBp,
+    unitSellingPrice,
+    lowStockNotifierLimit,
+    supplierName,
+    supplierContacts,
+    dateAdded,
+    lastModified,
+    expiryDate,
+    isSynced,
+    syncAction,
+  ];
 }

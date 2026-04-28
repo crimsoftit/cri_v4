@@ -25,63 +25,68 @@ class CPaymentMethodSection extends StatelessWidget {
 
     return Column(
       children: [
-        CSectionHeading(
-          showActionBtn: true,
-          title: 'Payment method',
-          btnTitle: 'Change',
-          btnTxtColor: CColors.darkerGrey,
-          editFontSize: true,
-          fSize: 13.0,
-          onPressed: () {
-            checkoutController.amtIssuedFieldController.text = '';
-            checkoutController.customerBal.value = 0.0;
-            checkoutController.selectPaymentMethod(context);
+        Obx(
+          () {
+            return CSectionHeading(
+              showActionBtn: true,
+              title:
+                  'Paid via - ${checkoutController.selectedPaymentMethod.value.platformName.toUpperCase()}',
+              btnTitle: 'Change',
+              btnTxtColor: CColors.darkerGrey,
+              editFontSize: true,
+              fSize: 16.0,
+              onPressed: () {
+                checkoutController.amtIssuedFieldController.text = '';
+                checkoutController.customerBal.value = 0.0;
+                checkoutController.selectPaymentMethod(context);
+              },
+              txtColor: CColors.rOrange,
+            );
           },
         ),
-        SizedBox(height: CSizes.spaceBtnItems / 8),
+        SizedBox(
+          height: CSizes.spaceBtnItems / 2.0,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Align(
-              alignment: Alignment.center,
-              child: Obx(() {
-                return CRoundedContainer(
+            Expanded(
+              flex: 1,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: CRoundedContainer(
                   width: 50.0,
                   height: 50.0,
                   //bgColor: isDarkTheme ? CColors.light : CColors.white,
                   bgColor: CColors.transparent,
                   padding: const EdgeInsets.all(CSizes.sm / 4),
-                  child:
-                      checkoutController
-                              .selectedPaymentMethod
-                              .value
-                              .platformName ==
-                          'mPesa online'
-                      ? SizedBox.shrink()
-                      : Image(
-                          image: AssetImage(
-                            platformLogo,
-                            //checkoutController.selectedPaymentMethod.value.platformLogo,
-                          ),
-                          fit: BoxFit.contain,
-                        ),
-                );
-              }),
-            ),
-            // const SizedBox(
-            //   width: CSizes.spaceBtnItems / 4,
-            // ),
-            if (platformName != '')
-              Expanded(
-                flex: 3,
-                child: Text(
-                  //checkoutController.selectedPaymentMethod.value.platformName,
-                  platformName,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  child: Image(
+                    image: AssetImage(
+                      platformLogo,
+                      //checkoutController.selectedPaymentMethod.value.platformLogo,
+                    ),
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
-            txtFieldSpace,
+            ),
+            const SizedBox(
+              width: CSizes.spaceBtnItems / 4,
+            ),
+            // if (platformName != '')
+            //   Expanded(
+            //     flex: 3,
+            //     child: Text(
+            //       //checkoutController.selectedPaymentMethod.value.platformName,
+            //       platformName,
+            //       style: Theme.of(context).textTheme.bodyLarge,
+            //     ),
+            //   ),
+            Expanded(
+              flex: 5,
+              child: txtFieldSpace,
+            ),
             //Expanded(flex: 4, child: txtFieldSpace),
           ],
         ),

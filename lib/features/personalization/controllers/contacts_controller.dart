@@ -508,6 +508,7 @@ class CContactsController extends GetxController {
                             focusedBorderColor: isDarkTheme
                                 ? CColors.white
                                 : CColors.rBrown,
+                            includeAvatarOnSuggestion: true,
                             includePrefixIcon: true,
                             labelTxt: 'E-mail address',
                             onFieldValueChanged: (value) {
