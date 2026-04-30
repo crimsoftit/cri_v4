@@ -720,16 +720,16 @@ class CInventoryController extends GetxController {
         );
 
         if (originalContent == newContent) {
-          CPopupSnackBar.customToast(
-            forInternetConnectivityStatus: false,
-            message: 'update is not necessary',
-          );
+          // CPopupSnackBar.customToast(
+          //   forInternetConnectivityStatus: false,
+          //   message: 'update is not necessary',
+          // );
           return false;
         } else {
-          CPopupSnackBar.customToast(
-            forInternetConnectivityStatus: false,
-            message: 'UPDATE IS NECESSARY',
-          );
+          // CPopupSnackBar.customToast(
+          //   forInternetConnectivityStatus: false,
+          //   message: 'UPDATE IS NECESSARY',
+          // );
           return true;
         }
       } else {

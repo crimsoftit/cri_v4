@@ -870,6 +870,7 @@ class CCheckoutController extends GetxController {
             0,
             'append',
             0,
+            0,
           );
 
           contactsController
@@ -878,9 +879,11 @@ class CCheckoutController extends GetxController {
                 customerDetails,
                 null,
               )
-              .then((_) {
-                contactsController.fetchMyContacts();
-              });
+              .then(
+                (_) {
+                  contactsController.fetchMyContacts();
+                },
+              );
         }
       }
     } catch (e) {

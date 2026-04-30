@@ -103,4 +103,11 @@ class ForgotPasswordController extends GetxController {
       CPopupSnackBar.errorSnackBar(title: 'Oh Snap!', message: e.toString());
     }
   }
+
+  /// -- dispose text editing controllers --
+  @override
+  void dispose() {
+    email.dispose();
+    super.dispose();
+  }
 }

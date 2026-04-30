@@ -113,7 +113,8 @@ class AuthRepo extends GetxController {
           deviceStorage.write('SyncContactsWithCloud', true);
 
           if (await userController.fetchUserDetails()) {
-            if (CNetworkManager.instance.hasConnection.value) {
+            if (CNetworkManager.instance.hasConnection.value &&
+                CNetworkManager.instance.connectionIsStable.value) {
               await contactsController.initContactsSync();
               await invController.initInvSync();
               await txnsController.initTxnsSync();

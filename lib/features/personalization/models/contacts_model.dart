@@ -19,6 +19,7 @@ class CContactsModel {
   String _createdAt = '';
   int _isSynced = 0;
   String _syncAction = '';
+  int _isStarred = 0;
   int _isTrashed = 0;
 
   CContactsModel(
@@ -34,6 +35,7 @@ class CContactsModel {
     this._createdAt,
     this._isSynced,
     this._syncAction,
+    this._isStarred,
     this._isTrashed,
   );
 
@@ -51,6 +53,7 @@ class CContactsModel {
     this._createdAt,
     this._isSynced,
     this._syncAction,
+    this._isStarred,
     this._isTrashed,
   );
 
@@ -70,6 +73,7 @@ class CContactsModel {
       0,
       '',
       0,
+      0,
     );
   }
 
@@ -87,6 +91,7 @@ class CContactsModel {
   int get isSynced => _isSynced;
   String get syncAction => _syncAction;
   int get isTrashed => _isTrashed;
+  int get isStarred => _isStarred;
 
   set contactId(int? newContactId) {
     _contactId = newContactId;
@@ -140,6 +145,10 @@ class CContactsModel {
     _syncAction = newSyncAction;
   }
 
+  set isStarred(int newStar) {
+    _isStarred = newStar;
+  }
+
   set isTrashed(int trashStatus) {
     _isTrashed = trashStatus;
   }
@@ -158,6 +167,7 @@ class CContactsModel {
       'createdAt': _createdAt,
       'isSynced': _isSynced,
       'syncAction': _syncAction,
+      'isStarred': _isStarred,
       'isTrashed': _isTrashed,
     };
     if (contactId != null) {
@@ -184,6 +194,7 @@ class CContactsModel {
     _createdAt = map['createdAt'];
     _isSynced = map['isSynced'];
     _syncAction = map['syncAction'];
+    _isStarred = map['isStarred'];
     _isTrashed = map['isTrashed'];
   }
 
@@ -203,6 +214,7 @@ class CContactsModel {
       json[GsheetsContactModel.createdAt],
       jsonDecode(json[GsheetsContactModel.isSynced]),
       json[GsheetsContactModel.syncAction],
+      jsonDecode(json[GsheetsContactModel.isStarred]),
       jsonDecode(json[GsheetsContactModel.isTrashed]),
     );
   }

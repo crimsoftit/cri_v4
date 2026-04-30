@@ -76,7 +76,7 @@ class CContactsController extends GetxController {
   /// -- initialize cloud sync --
   initContactsSync() async {
     if (localStorage.read('SyncContactsWithCloud') == true) {
-      await importContacts();
+      //await importContacts();
       if (await importContacts()) {
         localStorage.write('SyncContactsWithCloud', false);
       } else {
@@ -97,21 +97,6 @@ class CContactsController extends GetxController {
         (results) {
           switch (results.isNotEmpty) {
             case true:
-              // contactMatches = myContacts
-              //     .where(
-              //       (match) =>
-              //           match.contactName.toLowerCase().contains(
-              //             contactName.toLowerCase(),
-              //           ) &&
-              //           (match.contactEmail.toLowerCase().contains(
-              //                 contactDetails.toLowerCase(),
-              //               ) ||
-              //               match.contactPhone.toLowerCase().contains(
-              //                 contactDetails.toLowerCase(),
-              //               )),
-              //     )
-              //     .toList();
-
               contactMatches = myContacts
                   .where(
                     (match) =>
@@ -125,16 +110,8 @@ class CContactsController extends GetxController {
                   .toList();
               if (contactMatches.isNotEmpty) {
                 addContact = false;
-                // CPopupSnackBar.customToast(
-                //   forInternetConnectivityStatus: false,
-                //   message: 'contact exists!',
-                // );
               } else {
                 addContact = true;
-                // CPopupSnackBar.customToast(
-                //   forInternetConnectivityStatus: false,
-                //   message: 'add contact!',
-                // );
               }
               break;
 
@@ -218,6 +195,7 @@ class CContactsController extends GetxController {
             : contact!.createdAt,
         0,
         'append',
+        0,
         0,
       );
 
@@ -355,10 +333,6 @@ class CContactsController extends GetxController {
 
       await dbHelper.updateContact(contact);
 
-      // CPopupSnackBar.customToast(
-      //   forInternetConnectivityStatus: false,
-      //   message: 'contact updated successfully',
-      // );
       fetchMyContacts();
 
       // -- stop loader --
@@ -1353,7 +1327,7 @@ class CContactsController extends GetxController {
       ),
       () {
         if (undoTrashBtnPressed.value == false) {
-          Get.to(
+          Get.offAll(
             () {
               final navController = Get.put(CNavMenuController());
               navController.selectedIndex.value = 2;
@@ -1431,6 +1405,7 @@ class CContactsController extends GetxController {
               'createdAt': element.createdAt,
               'isSynced': 1,
               'syncAction': 'none',
+              'isStarred': element.isStarred,
               'isTrashed': element.isTrashed,
             };
           },
@@ -1534,7 +1509,6 @@ class CContactsController extends GetxController {
                 contact.addedBy,
                 contact.contactName,
                 contact.contactCountryCode,
-
                 contact.contactDialCode,
                 contact.contactPhone,
                 contact.contactEmail,
@@ -1543,6 +1517,7 @@ class CContactsController extends GetxController {
                 contact.createdAt,
                 contact.isSynced,
                 contact.syncAction,
+                contact.isStarred,
                 contact.isTrashed,
               );
 

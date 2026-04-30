@@ -167,6 +167,7 @@ class DbHelper extends GetxController {
             createdAt TEXT NOT NULL,
             isSynced INTEGER NOT NULL,
             syncAction TEXT NOT NULL,
+            isStarred INTEGER NOT NULL,
             isTrashed INTEGER NOT NULL,
             FOREIGN KEY(productId) REFERENCES inventory(productId)
           )

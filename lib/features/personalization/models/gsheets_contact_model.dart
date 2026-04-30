@@ -12,6 +12,7 @@ class GsheetsContactModel {
   static const String createdAt = 'createdAt';
   static const String isSynced = 'isSynced';
   static const String syncAction = 'syncAction';
+  static const String isStarred = 'isStarred';
   static const String isTrashed = 'isTrashed';
 
   static List<String> getContactsSheetHeaders() {
@@ -29,6 +30,7 @@ class GsheetsContactModel {
       createdAt,
       isSynced,
       syncAction,
+      isStarred,
       isTrashed,
     ];
   }
