@@ -30,7 +30,6 @@ class CInventoryController extends GetxController {
     return Get.find();
   }
 
-  /// -- TODO: avoid cloud sync if dialog's update btn is pressed yet there aer no changes
 
   /// -- variables --
   final localStorage = GetStorage();

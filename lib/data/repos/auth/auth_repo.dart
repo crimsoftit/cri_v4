@@ -4,6 +4,7 @@ import 'package:cri_v3/features/authentication/controllers/signup/signup_control
 import 'package:cri_v3/features/authentication/screens/login/login.dart';
 import 'package:cri_v3/features/authentication/screens/onboarding/onboarding_screen.dart';
 import 'package:cri_v3/features/authentication/screens/signup/verify_email.dart';
+import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/personalization/screens/profile/widgets/update_business_name.dart';
 import 'package:cri_v3/features/personalization/screens/settings/app_settings_screen.dart';
@@ -103,14 +104,17 @@ class AuthRepo extends GetxController {
             await StoreSheetsApi.initSpreadSheets();
           }
 
+          final contactsController = Get.put(CContactsController());
           final invController = Get.put(CInventoryController());
           final txnsController = Get.put(CTxnsController());
           // check data sync status
           deviceStorage.writeIfNull('SyncInvDataWithCloud', true);
           deviceStorage.writeIfNull('SyncTxnsDataWithCloud', true);
+          deviceStorage.write('SyncContactsWithCloud', true);
 
           if (await userController.fetchUserDetails()) {
             if (CNetworkManager.instance.hasConnection.value) {
+              await contactsController.initContactsSync();
               await invController.initInvSync();
               await txnsController.initTxnsSync();
             }
@@ -121,6 +125,7 @@ class AuthRepo extends GetxController {
             //         'Stable internet connection is required to import your data from the cloud',
             //   );
             // }
+            await contactsController.fetchMyContacts();
 
             await invController.fetchUserInventoryItems();
 
@@ -421,6 +426,7 @@ class AuthRepo extends GetxController {
       deviceStorage.write('SyncInvDataWithCloud', true);
 
       deviceStorage.write('SyncTxnsDataWithCloud', true);
+      deviceStorage.write('SyncContactsWithCloud', true);
 
       final cartController = Get.put(CCartController());
 

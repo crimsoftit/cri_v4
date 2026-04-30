@@ -1,5 +1,9 @@
 // ignore_for_file: unnecessary_getters_setters
 
+import 'dart:convert';
+
+import 'package:cri_v3/features/personalization/models/gsheets_contact_model.dart';
+
 class CContactsModel {
   int? _contactId;
   int? _productId;
@@ -34,9 +38,9 @@ class CContactsModel {
   );
 
   CContactsModel.withId(
-    this._addedBy,
-    this._productId,
     this._contactId,
+    this._productId,
+    this._addedBy,
     this._contactName,
     this._contactCountryCode,
     this._contactDialCode,
@@ -52,9 +56,9 @@ class CContactsModel {
 
   CContactsModel empty() {
     return CContactsModel.withId(
+      0,
+      0,
       '',
-      0,
-      0,
       '',
       '',
       '',
@@ -181,5 +185,25 @@ class CContactsModel {
     _isSynced = map['isSynced'];
     _syncAction = map['syncAction'];
     _isTrashed = map['isTrashed'];
+  }
+
+  /// -- extract a CContactsModel object from a Gsheet Map object --
+  static CContactsModel gSheetsFromJson(Map<String, dynamic> json) {
+    return CContactsModel.withId(
+      jsonDecode(json[GsheetsContactModel.contactId]),
+      jsonDecode(json[GsheetsContactModel.productId]),
+      json[GsheetsContactModel.addedBy],
+      json[GsheetsContactModel.contactName],
+      json[GsheetsContactModel.contactCountryCode],
+      json[GsheetsContactModel.contactDialCode],
+      json[GsheetsContactModel.contactPhone],
+      json[GsheetsContactModel.contactEmail],
+      json[GsheetsContactModel.contactCategory],
+      json[GsheetsContactModel.lastModified],
+      json[GsheetsContactModel.createdAt],
+      jsonDecode(json[GsheetsContactModel.isSynced]),
+      json[GsheetsContactModel.syncAction],
+      jsonDecode(json[GsheetsContactModel.isTrashed]),
+    );
   }
 }

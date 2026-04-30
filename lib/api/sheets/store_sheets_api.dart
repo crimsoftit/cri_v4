@@ -1,4 +1,5 @@
 import 'package:cri_v3/api/sheets/creds/gsheets_creds.dart';
+import 'package:cri_v3/features/personalization/models/contacts_model.dart';
 import 'package:cri_v3/features/personalization/models/gsheets_contact_model.dart';
 import 'package:cri_v3/features/store/models/gsheet_models/inv_sheet_fields.dart';
 import 'package:cri_v3/features/store/models/inv_model.dart';
@@ -121,7 +122,7 @@ class StoreSheetsApi extends GetxController {
     return CInventoryModel.gSheetFromJson(invMap!);
   }
 
-  /// -- fetch all inventory items from google sheets --
+  /// -- fetch all inventory items from the cloud --
   static Future<List<CInventoryModel?>?> fetchAllGsheetInvItems() async {
     if (invSheet == null) return null;
 
@@ -400,6 +401,43 @@ class StoreSheetsApi extends GetxController {
               'An unknown error encountered while adding unsynced contacts to cloud! Please try again later.',
         );
       }
+
+      rethrow;
+    }
+  }
+
+  /// -- fetch contacts from cloud --
+  static Future<List<CContactsModel?>?> fetchContactsFromCloud() async {
+    try {
+      if (contactsSheet == null) return null;
+
+      final cloudContacts = await contactsSheet!.values.map.allRows();
+
+      if (kDebugMode) {
+        print(
+          cloudContacts == null
+              ? <CContactsModel>[]
+              : cloudContacts.map(CContactsModel.gSheetsFromJson).toList(),
+        );
+      }
+      return cloudContacts == null
+          ? <CContactsModel>[]
+          : cloudContacts.map(CContactsModel.gSheetsFromJson).toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+        CPopupSnackBar.errorSnackBar(
+          title: 'error fetching all contacts from cloud!',
+          message: e.toString(),
+        );
+      }
+      // else {
+      //   CPopupSnackBar.errorSnackBar(
+      //     title: 'error fetching all contacts from cloud!',
+      //     message:
+      //         'An unknown error encountered while fetching contacts from cloud! Please try again later.',
+      //   );
+      // }
 
       rethrow;
     }

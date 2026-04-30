@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -37,6 +38,9 @@ class CContactsController extends GetxController {
   /// -- variables --
   DbHelper dbHelper = DbHelper.instance;
   final invController = Get.put(CInventoryController());
+
+  final localStorage = GetStorage();
+
   final updateContactItemFormKey = GlobalKey<FormState>();
   final userController = Get.put(CUserController());
 
@@ -48,6 +52,8 @@ class CContactsController extends GetxController {
   final RxBool processingContactsSync = false.obs;
   final RxBool undoTrashBtnPressed = false.obs;
 
+  final RxList<CContactsModel> allCloudContacts = <CContactsModel>[].obs;
+  final RxList<CContactsModel> userCloudContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> foundMatches = <CContactsModel>[].obs;
   final RxList<CContactsModel> myContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> trashedContacts = <CContactsModel>[].obs;
@@ -63,7 +69,20 @@ class CContactsController extends GetxController {
     processingContactsSync.value = false;
     undoTrashBtnPressed.value = false;
     await fetchMyContacts();
+    await initContactsSync();
     super.onInit();
+  }
+
+  /// -- initialize cloud sync --
+  initContactsSync() async {
+    if (localStorage.read('SyncContactsWithCloud') == true) {
+      await importContacts();
+      if (await importContacts()) {
+        localStorage.write('SyncContactsWithCloud', false);
+      } else {
+        localStorage.write('SyncContactsWithCloud', true);
+      }
+    }
   }
 
   /// -- check if contact details exist in the database --
@@ -1362,7 +1381,6 @@ class CContactsController extends GetxController {
 
       // -- stop loader --
       processingContactsSync.value = false;
-      
     } catch (e) {
       // -- stop loader --
       processingContactsSync.value = false;
@@ -1494,6 +1512,112 @@ class CContactsController extends GetxController {
           message:
               'Unable to update contacts\' sync status on your devices! Please try again later...',
           title: 'error updating contacts\' sync status!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- import contacts from cloud to local storage --
+  Future<bool> importContacts() async {
+    try {
+      // -- start loader --
+      processingContactsSync.value = true;
+
+      await fetchUserCloudContacts().then(
+        (result) async {
+          if (userCloudContacts.isNotEmpty) {
+            for (var contact in userCloudContacts) {
+              var forImportContacts = CContactsModel.withId(
+                contact.contactId,
+                contact.productId,
+                contact.addedBy,
+                contact.contactName,
+                contact.contactCountryCode,
+
+                contact.contactDialCode,
+                contact.contactPhone,
+                contact.contactEmail,
+                contact.contactCategory,
+                contact.lastModified,
+                contact.createdAt,
+                contact.isSynced,
+                contact.syncAction,
+                contact.isTrashed,
+              );
+
+              // -- save imported data to local sqflite database --
+              await dbHelper.addContact(forImportContacts);
+            }
+          }
+        },
+      );
+
+      // -- refresh myContacts list --
+      Future.delayed(
+        Duration.zero,
+        () {
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) async {
+              await fetchMyContacts();
+            },
+          );
+        },
+      );
+
+      // -- stop loader --
+      processingContactsSync.value = false;
+
+      return true;
+    } catch (e) {
+      // -- stop loader --
+      processingContactsSync.value = false;
+      if (kDebugMode) {
+        print('error importing contacts from cloud: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error importing contacts from cloud: $e',
+          title: 'error importing contacts from cloud!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to import your contacts from cloud! Please try again later...',
+          title: 'error importing contacts from cloud!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- fetch all contacts from cloud --
+  Future fetchUserCloudContacts() async {
+    try {
+      var cloudContacts = await StoreSheetsApi.fetchContactsFromCloud();
+
+      allCloudContacts.assignAll(cloudContacts as Iterable<CContactsModel>);
+
+      userCloudContacts.value = allCloudContacts
+          .where(
+            (contact) => contact.addedBy.toLowerCase().contains(
+              userController.user.value.email.toLowerCase(),
+            ),
+          )
+          .toList();
+
+      return userCloudContacts;
+    } catch (e) {
+      isLoading.value = false;
+      if (kDebugMode) {
+        print('error fetching all contacts from cloud: $e');
+        CPopupSnackBar.errorSnackBar(
+          title: 'error fetching all contacts from cloud!',
+          message: e.toString(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error fetching all contacts from cloud!',
+          message:
+              'an unknown error occurred whil fetching all contacts from cloud! Please try again later.',
         );
       }
       rethrow;
