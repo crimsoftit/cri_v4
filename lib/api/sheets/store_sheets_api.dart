@@ -1,4 +1,5 @@
 import 'package:cri_v3/api/sheets/creds/gsheets_creds.dart';
+import 'package:cri_v3/features/personalization/models/gsheets_contact_model.dart';
 import 'package:cri_v3/features/store/models/gsheet_models/inv_sheet_fields.dart';
 import 'package:cri_v3/features/store/models/inv_model.dart';
 import 'package:cri_v3/features/store/models/txns_model.dart';
@@ -12,7 +13,7 @@ class StoreSheetsApi extends GetxController {
   static const gsheetCredentials = GsheetsCreds.credentials;
   static const spreadsheetId = GsheetsCreds.spreadSheetId;
   static final gsheets = GSheets(gsheetCredentials);
-  static Worksheet? invSheet, txnsSheet;
+  static Worksheet? contactsSheet, invSheet, txnsSheet;
 
   static final RxBool deletingInvItems = false.obs;
 
@@ -29,18 +30,39 @@ class StoreSheetsApi extends GetxController {
     try {
       final spreadsheet = await gsheets.spreadsheet(spreadsheetId);
 
-      invSheet = await getWorkSheet(spreadsheet, title: 'InventorySheet');
+      contactsSheet = await getWorkSheet(
+        spreadsheet,
+        title: "ContactsSheet",
+      );
 
-      txnsSheet = await getWorkSheet(spreadsheet, title: "TxnsSheet");
+      invSheet = await getWorkSheet(
+        spreadsheet,
+        title: 'InventorySheet',
+      );
+
+      txnsSheet = await getWorkSheet(
+        spreadsheet,
+        title: "TxnsSheet",
+      );
+
+      final contactsSheetHeaders =
+          GsheetsContactModel.getContactsSheetHeaders();
+      contactsSheet!.values.insertRow(
+        1,
+        contactsSheetHeaders,
+      );
 
       final invSheetHeaders = InvSheetFields.getInvSheetHeaders();
-      invSheet!.values.insertRow(1, invSheetHeaders);
+      invSheet!.values.insertRow(
+        1,
+        invSheetHeaders,
+      );
 
       final txnsHeaders = CTxnsModel.getHeaders();
-      // if (txnsSheet != null) {
-      //   txnsSheet!.values.insertRow(1, txnsHeaders);
-      // }
-      txnsSheet!.values.insertRow(1, txnsHeaders);
+      txnsSheet!.values.insertRow(
+        1,
+        txnsHeaders,
+      );
     } catch (e) {
       if (kDebugMode) {
         print('gsheet api init error: $e');
@@ -64,11 +86,30 @@ class StoreSheetsApi extends GetxController {
     }
   }
 
+  /// -- save unsynced inventory items to google sheets --
   static Future saveInvItemsToGSheets(
     List<Map<String, dynamic>> rowItems,
   ) async {
-    if (invSheet == null) return;
-    invSheet!.values.map.appendRows(rowItems);
+    try {
+      if (invSheet == null) return;
+      invSheet!.values.map.appendRows(rowItems);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+        CPopupSnackBar.errorSnackBar(
+          title: 'error adding inventory data in cloud',
+          message: e.toString(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error adding inventory data in cloud',
+          message:
+              'an unknown error occurred while adding inventory data in cloud! please try again later.',
+        );
+      }
+
+      rethrow;
+    }
   }
 
   /// -- fetch inventory item by its id from google sheets --
@@ -142,7 +183,7 @@ class StoreSheetsApi extends GetxController {
         );
       }
 
-      throw e.toString();
+      rethrow;
     }
   }
 
@@ -165,6 +206,12 @@ class StoreSheetsApi extends GetxController {
         CPopupSnackBar.errorSnackBar(
           title: 'error updating sales count data in cloud',
           message: e.toString(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error updating sales count data in cloud!',
+          message:
+              'an unknown error occurred while updating sales count data in cloud! please try again later.',
         );
       }
 
@@ -320,9 +367,41 @@ class StoreSheetsApi extends GetxController {
           title: 'error updating receipt item\'s cloud data',
           message: e.toString(),
         );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error updating receipt item\'s cloud data',
+          message:
+              'An unknown error encountered while updating receipt item\'s cloud data! Please try again later.',
+        );
       }
 
-      throw e.toString();
+      rethrow;
+    }
+  }
+
+  /// -- save unsynced inventory items to google sheets --
+  static Future addLocalContactsToCloud(
+    List<Map<String, dynamic>> contacts,
+  ) async {
+    try {
+      if (contactsSheet == null) return;
+      contactsSheet!.values.map.appendRows(contacts);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+        CPopupSnackBar.errorSnackBar(
+          title: 'error adding unsynced contacts to cloud!',
+          message: e.toString(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error adding unsynced contacts to cloud!',
+          message:
+              'An unknown error encountered while adding unsynced contacts to cloud! Please try again later.',
+        );
+      }
+
+      rethrow;
     }
   }
 }

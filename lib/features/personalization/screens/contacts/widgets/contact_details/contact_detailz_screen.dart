@@ -503,6 +503,19 @@ class CContactDetailsScreen extends StatelessWidget {
                   ),
                 ),
 
+                Text(
+                  'is synced: ${contactItem.isSynced}',
+                  style: Theme.of(context).textTheme.labelLarge!.apply(
+                    fontSizeFactor: 1.0,
+                  ),
+                ),
+                Text(
+                  'sync action: ${contactItem.syncAction}',
+                  style: Theme.of(context).textTheme.labelLarge!.apply(
+                    fontSizeFactor: 1.0,
+                  ),
+                ),
+
                 const SizedBox(
                   height: CSizes.spaceBtnItems / 3.0,
                 ),

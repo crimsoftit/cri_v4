@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:clock/clock.dart';
+import 'package:cri_v3/api/sheets/store_sheets_api.dart';
 import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/common/widgets/flushbars/flushbars.dart';
 import 'package:cri_v3/common/widgets/txt_fields/custom_type_ahead_field.dart';
@@ -14,6 +15,7 @@ import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/db/sqflite/db_helper.dart';
 import 'package:cri_v3/utils/helpers/formatter.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
+import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:cri_v3/utils/validators/validation.dart';
 import 'package:flutter/foundation.dart';
@@ -43,11 +45,13 @@ class CContactsController extends GetxController {
   final txtPhoneController = TextEditingController();
 
   final RxBool isLoading = false.obs;
+  final RxBool processingContactsSync = false.obs;
   final RxBool undoTrashBtnPressed = false.obs;
 
   final RxList<CContactsModel> foundMatches = <CContactsModel>[].obs;
   final RxList<CContactsModel> myContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> trashedContacts = <CContactsModel>[].obs;
+  final RxList<CContactsModel> unsyncedContactAppends = <CContactsModel>[].obs;
 
   final RxString contactCountryCode = 'KE'.obs;
   final RxString contactDialCode = '254'.obs;
@@ -55,6 +59,8 @@ class CContactsController extends GetxController {
   @override
   void onInit() async {
     foundMatches.value = [];
+    isLoading.value = false;
+    processingContactsSync.value = false;
     undoTrashBtnPressed.value = false;
     await fetchMyContacts();
     super.onInit();
@@ -233,6 +239,14 @@ class CContactsController extends GetxController {
         userController.user.value.email,
       );
       myContacts.assignAll(fetchedContacts);
+
+      unsyncedContactAppends.assignAll(
+        fetchedContacts.where(
+          (unsyncedAppend) =>
+              unsyncedAppend.isSynced == 0 &&
+              unsyncedAppend.syncAction == 'append',
+        ),
+      );
 
       List<CContactsModel> returnItems;
 
@@ -1338,6 +1352,152 @@ class CContactsController extends GetxController {
     }
 
     resetFields();
+  }
+
+  /// -- process cloud sync --
+  Future<void> processContactsSync() async {
+    try {
+      processingContactsSync.value = true;
+      await addUnsyncedContactsToCloud();
+
+      // -- stop loader --
+      processingContactsSync.value = false;
+      
+    } catch (e) {
+      // -- stop loader --
+      processingContactsSync.value = false;
+      if (kDebugMode) {
+        print('error adding contact to cloud: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error processing contacts\' cloud sync: $e',
+          title: 'error processing contacts\' cloud sync',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to process contacts\' cloud sync! Please try again later..',
+          title: 'error processing contacts\' cloud sync',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- add unsynced contacts to cloud --
+  Future<bool> addUnsyncedContactsToCloud() async {
+    try {
+      // -- start loader --
+      isLoading.value = true;
+
+      await fetchMyContacts();
+
+      // -- check internet connectivity
+      final isConnectedToInternet = await CNetworkManager.instance
+          .isConnected();
+
+      if (isConnectedToInternet &&
+          CNetworkManager.instance.connectionIsStable.value) {
+        var cloudContactAppends = unsyncedContactAppends.map(
+          (element) {
+            return {
+              'contactId': element.contactId,
+              'productId': element.productId,
+              'addedBy': element.addedBy,
+              'contactName': element.contactName,
+              'contactCountryCode': element.contactCountryCode,
+              'contactDialCode': element.contactDialCode,
+              'contactPhone': element.contactPhone,
+              'contactEmail': element.contactEmail,
+              'contactCategory': element.contactCategory,
+              'lastModified': element.lastModified,
+              'createdAt': element.createdAt,
+              'isSynced': 1,
+              'syncAction': 'none',
+              'isTrashed': element.isTrashed,
+            };
+          },
+        ).toList();
+
+        if (cloudContactAppends.isNotEmpty ||
+            unsyncedContactAppends.isNotEmpty) {
+          await StoreSheetsApi.addLocalContactsToCloud(
+            cloudContactAppends,
+          ).then((_) {
+            updateSyncedContactsLocally();
+          });
+        } else {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'rada safi nani...',
+          );
+        }
+        // -- stop loader --
+        isLoading.value = false;
+        fetchMyContacts();
+        return true;
+      } else {
+        CPopupSnackBar.customToast(
+          forInternetConnectivityStatus: false,
+          message:
+              "Your internet connection is not stable enough for cloud sync!",
+        );
+        // -- stop loader --
+        isLoading.value = false;
+        return false;
+      }
+    } catch (e) {
+      // -- stop loader --
+      isLoading.value = false;
+      if (kDebugMode) {
+        print('error adding contact to cloud: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error adding contact to cloud: $e',
+          title: 'error adding contact to cloud',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to add unsynced contacts to cloud! Please try again later..',
+          title: 'error adding contact to cloud',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- update synced contacts locally --
+  Future<void> updateSyncedContactsLocally() async {
+    try {
+      if (unsyncedContactAppends.isNotEmpty) {
+        for (var contactAppend in unsyncedContactAppends) {
+          contactAppend.isSynced = 1;
+          contactAppend.syncAction = 'none';
+
+          await dbHelper.updateContact(contactAppend);
+        }
+      } else {
+        CPopupSnackBar.customToast(
+          forInternetConnectivityStatus: false,
+          message: 'rada safi nani...',
+        );
+      }
+      fetchMyContacts();
+    } catch (e) {
+      if (kDebugMode) {
+        print('error updating contacts\' sync status locally: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error updating contacts\' sync status locally: $e',
+          title: 'error updating contacts\' sync status!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to update contacts\' sync status on your devices! Please try again later...',
+          title: 'error updating contacts\' sync status!',
+        );
+      }
+      rethrow;
+    }
   }
 
   resetFields() {

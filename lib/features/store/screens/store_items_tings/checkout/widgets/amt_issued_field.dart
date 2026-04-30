@@ -43,19 +43,29 @@ class CAmountIssuedTxtField extends StatelessWidget {
         autofocus: false,
         controller: checkoutController.amtIssuedFieldController,
         decoration: InputDecoration(
-          focusColor: CColors.rBrown.withValues(alpha: 0.3),
+          focusColor: CColors.rBrown.withValues(
+            alpha: 0.3,
+          ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(CSizes.cardRadiusLg),
-            borderSide: BorderSide(color: CColors.grey),
+            borderRadius: BorderRadius.circular(
+              CSizes.cardRadiusLg,
+            ),
+            borderSide: BorderSide(
+              color: CColors.grey,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: CColors.rBrown.withValues(alpha: 0.3),
+              color: CColors.rBrown.withValues(
+                alpha: 0.3,
+              ),
             ),
-            borderRadius: BorderRadius.circular(CSizes.cardRadiusLg),
+            borderRadius: BorderRadius.circular(
+              CSizes.cardRadiusLg,
+            ),
           ),
           //border: InputBorder.none,
-          labelText: 'amount issued by customer',
+          labelText: 'Enter amount issued by customer',
         ),
         style: const TextStyle(fontWeight: FontWeight.normal),
         onChanged: (value) {

@@ -53,12 +53,14 @@ class CNetworkManager extends GetxController {
       //final connectionSawa = await _connectivity.checkConnectivity();
 
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        checkConnectionStability(2);
-        if (await checkConnectionStability(2)) {
+        internetConnectionIsStable(3);
+        if (await internetConnectionIsStable(3)) {
           hasConnection.value = true;
+          connectionIsStable.value = true;
           return true;
         } else {
           hasConnection.value = false;
+          connectionIsStable.value = false;
           return false;
         }
         // hasConnection.value = true;
@@ -92,10 +94,12 @@ class CNetworkManager extends GetxController {
   }
 
   /// -- check if internet connection is weak --
-  Future<bool> checkConnectionStability(int durationInSeconds) async {
+  Future<bool> internetConnectionIsStable(int durationInSeconds) async {
     try {
       final customChecker = InternetConnectionChecker.createInstance(
-        checkTimeout: Duration(seconds: durationInSeconds),
+        checkTimeout: Duration(
+          seconds: durationInSeconds,
+        ),
       );
 
       if (await customChecker.hasConnection) {

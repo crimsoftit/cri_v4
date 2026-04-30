@@ -818,33 +818,22 @@ class CCheckoutScreen extends StatelessWidget {
                                           ? Row(
                                               children: [
                                                 const SizedBox(
-                                                  width:
-                                                      CSizes.spaceBtnItems *
-                                                      1.3,
+                                                  width: CSizes.spaceBtnItems,
                                                   height: 40.0,
                                                 ),
                                                 CAmountIssuedTxtField(
                                                   txtFieldWidth:
                                                       CHelperFunctions.screenWidth() *
-                                                      0.5,
+                                                      0.69,
                                                 ),
                                               ],
                                             )
                                           : Row(
                                               children: [
-                                                // checkoutController
-                                                //             .selectedPaymentMethod
-                                                //             .value
-                                                //             .platformName ==
-                                                //         "mPesa online"
-                                                //     ? SizedBox.shrink()
-                                                //     : const SizedBox(
-                                                //         width:
-                                                //             CSizes
-                                                //                 .spaceBtnItems *
-                                                //             1.1,
-                                                //         height: 38.0,
-                                                //       ),
+                                                const SizedBox(
+                                                  width: CSizes.spaceBtnItems,
+                                                  height: 40.0,
+                                                ),
                                                 CRoundedContainer(
                                                   bgColor: CColors.transparent,
 
@@ -862,7 +851,7 @@ class CCheckoutScreen extends StatelessWidget {
                                                   //           0.56,
                                                   width:
                                                       CHelperFunctions.screenWidth() *
-                                                      .7,
+                                                      .69,
 
                                                   child:
                                                       checkoutController
