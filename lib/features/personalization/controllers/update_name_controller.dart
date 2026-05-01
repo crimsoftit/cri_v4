@@ -88,4 +88,10 @@ class CUpdateNameController extends GetxController {
       rethrow;
     }
   }
+
+  @override
+  void dispose() {
+    fullName.dispose();
+    super.dispose();
+  }
 }

@@ -30,10 +30,10 @@ class _CCountDownWidgetState extends State<CCountDownWidget>
   void initState() {
     animationController = AnimationController(
       duration: Duration(
-        seconds: 11,
+        seconds: 6,
       ),
       reverseDuration: Duration(
-        seconds: 11,
+        seconds: 6,
       ),
       vsync: this,
     );

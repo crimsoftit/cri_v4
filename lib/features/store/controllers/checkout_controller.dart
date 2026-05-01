@@ -166,14 +166,17 @@ class CCheckoutController extends GetxController {
         }
 
         // -- separate phone number and dial code --
-        final (dialCode, mobileNumber) =
+        final (dialCode, customerContacts) =
             CValidator.isValidPhoneNumber(
               customerContactsFieldController.text.trim().removeAllWhitespace,
             )
             ? CFormatter.seperatePhoneAndDialCode(
                 customerContactsFieldController.text.trim().removeAllWhitespace,
               )
-            : ('', '');
+            : (
+                '',
+                customerContactsFieldController.text.trim().removeAllWhitespace,
+              );
 
         for (var cartItem in itemsInCart) {
           var saleItemUnitBP = invController.inventoryItems
@@ -207,7 +210,7 @@ class CCheckoutController extends GetxController {
             0.00,
             selectedPaymentMethod.value.platformName,
             customerNameFieldController.text.trim(),
-            mobileNumber, // data from customerContactsFieldController
+            customerContacts, // data from customerContactsFieldController
             locationController.uAddress.value != ''
                 ? locationController.uAddress.value
                 : userController.user.value.userAddress,

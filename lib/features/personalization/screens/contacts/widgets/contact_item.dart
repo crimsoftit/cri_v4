@@ -75,11 +75,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
             case 'trashed':
               demContacts.assignAll(
                 contactsController.myContacts.where(
-                  (contact) =>
-                      contact.contactCategory.toLowerCase().contains(
-                        'supplier'.toLowerCase(),
-                      ) &&
-                      contact.isTrashed == 1,
+                  (contact) => contact.isTrashed == 1,
                 ),
               );
               break;

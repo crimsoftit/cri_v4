@@ -248,6 +248,10 @@ class CContactsController extends GetxController {
             .toList(),
       );
 
+      trashedContacts.value = myContacts
+          .where((trashedContact) => trashedContact.isTrashed == 1)
+          .toList();
+
       unsyncedContactUpdates.assignAll(
         fetchedContacts
             .where(
@@ -1288,7 +1292,7 @@ class CContactsController extends GetxController {
     try {
       CFlushbars.undo(
         duration: const Duration(
-          seconds: 11,
+          seconds: 6,
         ),
         message: 'You can still undo this action!!',
         onUndo: () {
@@ -1323,29 +1327,26 @@ class CContactsController extends GetxController {
   /// -- restore contact from trash --
 
   void delayedTrashAction(CContactsModel trashItem) async {
-    // Wait for 2 seconds
+    // Wait for 7 seconds
     await Future.delayed(
       const Duration(
-        seconds: 13,
+        seconds: 7,
       ),
       () {
-        if (undoTrashBtnPressed.value == false) {
+        if (undoTrashBtnPressed.value == false || !undoTrashBtnPressed.value) {
           trashItem.isTrashed = 1;
           trashItem.lastModified = DateFormat(
             'yyyy-MM-dd kk:mm',
           ).format(clock.now());
           trashItem.syncAction = trashItem.isSynced == 0 ? 'append' : 'update';
 
-          updateContact(trashItem).then(
-            (_) {
-              Get.offAll(
-                () {
-                  final navController = Get.put(CNavMenuController());
-                  navController.selectedIndex.value = 2;
-                  undoTrashBtnPressed.value = false;
-                  return const NavMenu();
-                },
-              );
+          updateContact(trashItem);
+          Get.offAll(
+            () {
+              final navController = Get.put(CNavMenuController());
+              navController.selectedIndex.value = 2;
+              undoTrashBtnPressed.value = false;
+              return const NavMenu();
             },
           );
         }

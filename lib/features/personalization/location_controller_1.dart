@@ -46,9 +46,6 @@ class CLocationController1 extends GetxController {
   final RxBool isLoading = false.obs;
   Position? currentPosition;
 
-  final selectCountryFormKey = GlobalKey<FormState>();
-  final countryField = TextEditingController();
-
   final LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high,
     distanceFilter: 100,
@@ -186,7 +183,7 @@ class CLocationController1 extends GetxController {
     // );
   }
 
-  countryPickerOnInit(String value) {
+  countryPickerOnIni(String value) {
     userCountry.value = value;
   }
 

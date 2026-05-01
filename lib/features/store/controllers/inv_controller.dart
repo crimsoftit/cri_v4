@@ -257,14 +257,14 @@ class CInventoryController extends GetxController {
           : inventoryItem.productId;
 
       // -- separate phone number and dial code --
-      final (dialCode, mobileNumber) =
+      final (dialCode, customerContacts) =
           CValidator.isValidPhoneNumber(
             txtSupplierContacts.text.trim().removeAllWhitespace,
           )
           ? CFormatter.seperatePhoneAndDialCode(
               txtSupplierContacts.text.trim().removeAllWhitespace,
             )
-          : ('', '');
+          : ('', txtSupplierContacts.text.trim().removeAllWhitespace);
 
       // -- check internet connectivity
 
@@ -291,7 +291,7 @@ class CInventoryController extends GetxController {
               : (double.parse(txtQty.text.trim()) / 5),
           txtSupplierName.text.trim(),
 
-          mobileNumber, // data from txtSupplierContacts,
+          customerContacts, // data from txtSupplierContacts,
           DateFormat('yyyy-MM-dd @ kk:mm').format(clock.now()),
           DateFormat('yyyy-MM-dd @ kk:mm').format(clock.now()),
           txtExpiryDatePicker.text.trim(),
@@ -768,14 +768,14 @@ class CInventoryController extends GetxController {
   Future<bool> addOrUpdateInventoryItem(CInventoryModel inventoryItem) async {
     try {
       // -- separate phone number and dial code --
-      final (dialCode, mobileNumber) =
+      final (dialCode, customerContacts) =
           CValidator.isValidPhoneNumber(
             txtSupplierContacts.text.trim().removeAllWhitespace,
           )
           ? CFormatter.seperatePhoneAndDialCode(
               txtSupplierContacts.text.trim().removeAllWhitespace,
             )
-          : ('', '');
+          : ('', txtSupplierContacts.text.trim().removeAllWhitespace);
 
       // Validate returns true if the form is valid, or false otherwise.
       if (addInvItemFormKey.currentState!.validate()) {
@@ -796,7 +796,7 @@ class CInventoryController extends GetxController {
 
         inventoryItem.supplierName = txtSupplierName.text.trim();
         // inventoryItem.supplierContacts = txtSupplierContacts.text.trim()
-        inventoryItem.supplierContacts = mobileNumber;
+        inventoryItem.supplierContacts = customerContacts;
         inventoryItem.lastModified = DateFormat(
           'yyyy-MM-dd @ kk:mm',
         ).format(clock.now());
