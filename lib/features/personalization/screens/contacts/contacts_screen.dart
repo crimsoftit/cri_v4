@@ -117,18 +117,23 @@ class CContactsScreen extends StatelessWidget {
                                         : IconButton(
                                             onPressed:
                                                 contactsController
-                                                    .unsyncedContactAppends
-                                                    .isEmpty
+                                                        .unsyncedContactAppends
+                                                        .isEmpty &&
+                                                    contactsController
+                                                        .unsyncedContactUpdates
+                                                        .isEmpty
                                                 ? null
                                                 : () async {
-                                                    
                                                     contactsController
                                                         .processContactsSync();
                                                   },
                                             icon: Icon(
                                               contactsController
                                                       .unsyncedContactAppends
-                                                      .isEmpty
+                                                      .isEmpty &&
+                                                    contactsController
+                                                        .unsyncedContactUpdates
+                                                        .isEmpty
                                                   ? Iconsax.cloud_add
                                                   : Iconsax.cloud_change,
                                               color:

@@ -124,6 +124,7 @@ dependencies:
   #awesome_notifications: ^0.7.4+1
 
   # -- utility packages
+  azlistview: ^2.0.0
   collection: ^1.19.1
   country_picker: any
   csv: any
@@ -145,6 +146,8 @@ dependencies:
   syncfusion_flutter_datepicker: ^31.2.18
   timezone: any
   url_launcher: any
+  flutter_slidable: ^4.0.3
+
 
   # messages manenozzz
   send_message: ^1.0.2

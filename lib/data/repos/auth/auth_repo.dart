@@ -110,7 +110,7 @@ class AuthRepo extends GetxController {
           // check data sync status
           deviceStorage.writeIfNull('SyncInvDataWithCloud', true);
           deviceStorage.writeIfNull('SyncTxnsDataWithCloud', true);
-          deviceStorage.write('SyncContactsWithCloud', true);
+          deviceStorage.writeIfNull('SyncContactsWithCloud', true);
 
           if (await userController.fetchUserDetails()) {
             if (CNetworkManager.instance.hasConnection.value &&
@@ -424,10 +424,9 @@ class AuthRepo extends GetxController {
   Future<void> logout() async {
     try {
       // -- reset cloud sync keys --
-      deviceStorage.write('SyncInvDataWithCloud', true);
-
-      deviceStorage.write('SyncTxnsDataWithCloud', true);
       deviceStorage.write('SyncContactsWithCloud', true);
+      deviceStorage.write('SyncInvDataWithCloud', true);
+      deviceStorage.write('SyncTxnsDataWithCloud', true);
 
       final cartController = Get.put(CCartController());
 

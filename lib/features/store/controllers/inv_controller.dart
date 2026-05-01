@@ -16,6 +16,7 @@ import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:cri_v3/utils/popups/snackbars.dart';
 import 'package:clock/clock.dart';
+import 'package:cri_v3/utils/validators/validation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,7 +30,6 @@ class CInventoryController extends GetxController {
   static CInventoryController get instance {
     return Get.find();
   }
-
 
   /// -- variables --
   final localStorage = GetStorage();
@@ -256,6 +256,16 @@ class CInventoryController extends GetxController {
           ? CHelperFunctions.generateInvId()
           : inventoryItem.productId;
 
+      // -- separate phone number and dial code --
+      final (dialCode, mobileNumber) =
+          CValidator.isValidPhoneNumber(
+            txtSupplierContacts.text.trim().removeAllWhitespace,
+          )
+          ? CFormatter.seperatePhoneAndDialCode(
+              txtSupplierContacts.text.trim().removeAllWhitespace,
+            )
+          : ('', '');
+
       // -- check internet connectivity
 
       if (await CNetworkManager.instance.isConnected() ||
@@ -280,7 +290,8 @@ class CInventoryController extends GetxController {
               ? double.parse(txtStockNotifierLimit.text.trim())
               : (double.parse(txtQty.text.trim()) / 5),
           txtSupplierName.text.trim(),
-          txtSupplierContacts.text.trim(),
+
+          mobileNumber, // data from txtSupplierContacts,
           DateFormat('yyyy-MM-dd @ kk:mm').format(clock.now()),
           DateFormat('yyyy-MM-dd @ kk:mm').format(clock.now()),
           txtExpiryDatePicker.text.trim(),
@@ -756,6 +767,16 @@ class CInventoryController extends GetxController {
   /// -- add or update inventory item using sqflite
   Future<bool> addOrUpdateInventoryItem(CInventoryModel inventoryItem) async {
     try {
+      // -- separate phone number and dial code --
+      final (dialCode, mobileNumber) =
+          CValidator.isValidPhoneNumber(
+            txtSupplierContacts.text.trim().removeAllWhitespace,
+          )
+          ? CFormatter.seperatePhoneAndDialCode(
+              txtSupplierContacts.text.trim().removeAllWhitespace,
+            )
+          : ('', '');
+
       // Validate returns true if the form is valid, or false otherwise.
       if (addInvItemFormKey.currentState!.validate()) {
         inventoryItem.userId = userController.user.value.id;
@@ -774,7 +795,8 @@ class CInventoryController extends GetxController {
             : (double.parse(txtQty.text.trim()) / 5) + 1;
 
         inventoryItem.supplierName = txtSupplierName.text.trim();
-        inventoryItem.supplierContacts = txtSupplierContacts.text.trim();
+        // inventoryItem.supplierContacts = txtSupplierContacts.text.trim()
+        inventoryItem.supplierContacts = mobileNumber;
         inventoryItem.lastModified = DateFormat(
           'yyyy-MM-dd @ kk:mm',
         ).format(clock.now());
@@ -1552,7 +1574,7 @@ class CInventoryController extends GetxController {
 
   @override
   void dispose() {
-    // TODO: dispose controllers --
+    // TODO: dispose text editing controllers --
     // -- clean up the controller when the widget is removed from the widget tree --
     txtBP.dispose();
     txtCode.dispose();

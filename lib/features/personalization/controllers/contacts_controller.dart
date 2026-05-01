@@ -58,6 +58,7 @@ class CContactsController extends GetxController {
   final RxList<CContactsModel> myContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> trashedContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> unsyncedContactAppends = <CContactsModel>[].obs;
+  final RxList<CContactsModel> unsyncedContactUpdates = <CContactsModel>[].obs;
 
   final RxString contactCountryCode = 'KE'.obs;
   final RxString contactDialCode = '254'.obs;
@@ -76,7 +77,7 @@ class CContactsController extends GetxController {
   /// -- initialize cloud sync --
   initContactsSync() async {
     if (localStorage.read('SyncContactsWithCloud') == true) {
-      //await importContacts();
+      await importContacts();
       if (await importContacts()) {
         localStorage.write('SyncContactsWithCloud', false);
       } else {
@@ -238,11 +239,25 @@ class CContactsController extends GetxController {
       myContacts.assignAll(fetchedContacts);
 
       unsyncedContactAppends.assignAll(
-        fetchedContacts.where(
-          (unsyncedAppend) =>
-              unsyncedAppend.isSynced == 0 &&
-              unsyncedAppend.syncAction == 'append',
-        ),
+        fetchedContacts
+            .where(
+              (unsyncedAppend) =>
+                  unsyncedAppend.isSynced == 0 &&
+                  unsyncedAppend.syncAction == 'append',
+            )
+            .toList(),
+      );
+
+      unsyncedContactUpdates.assignAll(
+        fetchedContacts
+            .where(
+              (unsyncedUpdate) =>
+                  unsyncedUpdate.isSynced == 1 &&
+                  unsyncedUpdate.syncAction.toLowerCase().contains(
+                    'update'.toLowerCase(),
+                  ),
+            )
+            .toList(),
       );
 
       List<CContactsModel> returnItems;
@@ -1209,7 +1224,7 @@ class CContactsController extends GetxController {
                                 fetchMyContacts().then(
                                   (_) {
                                     launchWhatsappChat(
-                                      '+${contactItem.contactDialCode}${contactItem.contactPhone}',
+                                      '${contactItem.contactDialCode}${contactItem.contactPhone}',
                                     );
                                   },
                                 );
@@ -1271,13 +1286,6 @@ class CContactsController extends GetxController {
     CContactsModel trashItem,
   ) async {
     try {
-      trashItem.isTrashed = 1;
-      trashItem.lastModified = DateFormat(
-        'yyyy-MM-dd kk:mm',
-      ).format(clock.now());
-
-      updateContact(trashItem);
-
       CFlushbars.undo(
         duration: const Duration(
           seconds: 11,
@@ -1285,11 +1293,6 @@ class CContactsController extends GetxController {
         message: 'You can still undo this action!!',
         onUndo: () {
           undoTrashBtnPressed.value = true;
-          trashItem.isTrashed = 0;
-          trashItem.lastModified = trashItem.lastModified;
-          updateContact(trashItem);
-          fetchMyContacts();
-          fetchMyContacts();
           Navigator.pop(context, true);
         },
         undoTextStyle: Theme.of(context).textTheme.bodyMedium!.apply(
@@ -1298,7 +1301,7 @@ class CContactsController extends GetxController {
         ),
       ).show(context);
 
-      delayedTrashAction();
+      delayedTrashAction(trashItem);
     } catch (e) {
       if (kDebugMode) {
         print('error trashing contact: $e');
@@ -1319,7 +1322,7 @@ class CContactsController extends GetxController {
 
   /// -- restore contact from trash --
 
-  void delayedTrashAction() async {
+  void delayedTrashAction(CContactsModel trashItem) async {
     // Wait for 2 seconds
     await Future.delayed(
       const Duration(
@@ -1327,12 +1330,22 @@ class CContactsController extends GetxController {
       ),
       () {
         if (undoTrashBtnPressed.value == false) {
-          Get.offAll(
-            () {
-              final navController = Get.put(CNavMenuController());
-              navController.selectedIndex.value = 2;
-              undoTrashBtnPressed.value = false;
-              return const NavMenu();
+          trashItem.isTrashed = 1;
+          trashItem.lastModified = DateFormat(
+            'yyyy-MM-dd kk:mm',
+          ).format(clock.now());
+          trashItem.syncAction = trashItem.isSynced == 0 ? 'append' : 'update';
+
+          updateContact(trashItem).then(
+            (_) {
+              Get.offAll(
+                () {
+                  final navController = Get.put(CNavMenuController());
+                  navController.selectedIndex.value = 2;
+                  undoTrashBtnPressed.value = false;
+                  return const NavMenu();
+                },
+              );
             },
           );
         }
