@@ -31,8 +31,6 @@ class CAlphabetScrollPage extends StatelessWidget {
       () {
         var demContacts = <CContactsModel>[];
 
-        int itemCount = 0;
-
         switch (space) {
           case 'all':
             demContacts.clear();
@@ -43,7 +41,6 @@ class CAlphabetScrollPage extends StatelessWidget {
                 )
                 .toList();
 
-            itemCount = demContacts.length;
             break;
           case 'customers':
             demContacts.clear();
@@ -56,7 +53,6 @@ class CAlphabetScrollPage extends StatelessWidget {
                     contact.isTrashed == 0,
               ),
             );
-            itemCount = demContacts.length;
             break;
           case 'friends':
             demContacts.clear();
@@ -69,7 +65,6 @@ class CAlphabetScrollPage extends StatelessWidget {
                     contact.isTrashed == 0,
               ),
             );
-            itemCount = demContacts.length;
             break;
           case 'suppliers':
             demContacts.clear();
@@ -82,7 +77,6 @@ class CAlphabetScrollPage extends StatelessWidget {
                     contact.isTrashed == 0,
               ),
             );
-            itemCount = demContacts.length;
             break;
           case 'trashed':
             demContacts.clear();
@@ -91,11 +85,9 @@ class CAlphabetScrollPage extends StatelessWidget {
                 (contact) => contact.isTrashed == 1,
               ),
             );
-            itemCount = demContacts.length;
             break;
           default:
             demContacts.clear();
-            itemCount = 0;
 
             if (kDebugMode) {
               CPopupSnackBar.errorSnackBar(

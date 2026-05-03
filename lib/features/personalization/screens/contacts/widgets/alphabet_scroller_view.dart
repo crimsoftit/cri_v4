@@ -3,7 +3,6 @@ import 'package:cri_v3/common/widgets/appbar/v2_app_bar.dart';
 import 'package:cri_v3/common/widgets/shimmers/shimmer_effects.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/screens/contacts/widgets/alphabet_scroll_page.dart';
-import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_item.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
