@@ -124,13 +124,6 @@ class CLocationController1 extends GetxController {
       return;
     }
 
-    // await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-    //     .then((Position position) {
-    //   setState(() => currentPosition = position);
-    // }).catchError((e) {
-    //   debugPrint(e);
-    // });
-
     await Geolocator.getCurrentPosition(locationSettings: locationSettings)
         .then((Position position) {
           currentPosition = position;

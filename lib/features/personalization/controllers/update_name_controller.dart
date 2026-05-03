@@ -77,13 +77,15 @@ class CUpdateNameController extends GetxController {
     } catch (e) {
       CFullScreenLoader.stopLoading();
       if (kDebugMode) {
-        print('error updating name: ${e.toString()}');
-        CPopupSnackBar.errorSnackBar(title: 'Oh Snap!', message: e.toString());
+        CPopupSnackBar.errorSnackBar(
+          message: e.toString(),
+          title: 'Oh Snap!',
+        );
       }
       CPopupSnackBar.errorSnackBar(
-        title: 'Oh Snap!',
         message:
-            'an error occurred while updating your name! please try again later.',
+            'An error occurred while updating your name! please try again later.',
+        title: 'Oh Snap!',
       );
       rethrow;
     }

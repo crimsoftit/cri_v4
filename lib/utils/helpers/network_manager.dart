@@ -111,10 +111,17 @@ class CNetworkManager extends GetxController {
       }
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
-        CPopupSnackBar.errorSnackBar(title: 'internet connection error');
+        CPopupSnackBar.errorSnackBar(
+          message: 'internet connection error: $e',
+          title: 'internet connection error',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message: 'internet connection error!',
+          title: 'internet connection error',
+        );
       }
-      return false;
+      rethrow;
     }
   }
 

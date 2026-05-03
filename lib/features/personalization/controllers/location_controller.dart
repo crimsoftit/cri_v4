@@ -103,7 +103,6 @@ class CLocationController extends GetxController {
     } catch (e) {
       updateLoading.value = false;
       if (kDebugMode) {
-        print('$e');
         CPopupSnackBar.errorSnackBar(
           title: "error updating user currency & location details",
           message: e.toString(),

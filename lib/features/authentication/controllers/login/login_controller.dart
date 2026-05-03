@@ -80,16 +80,15 @@ class CLoginController extends GetxController {
     } catch (e) {
       CFullScreenLoader.stopLoading();
       if (kDebugMode) {
-        print('sign in error: $e');
+        CPopupSnackBar.errorSnackBar(
+          title: 'Oh Snap!',
+          message: e.toString(),
+        );
+      } else {
         CPopupSnackBar.errorSnackBar(
           title: 'Oh Snap! Signin error!',
           message:
               'An unknown error occurred while signing you in! please try again later',
-        );
-      } else {
-        CPopupSnackBar.errorSnackBar(
-          title: 'Oh Snap!',
-          message: e.toString(),
         );
       }
       rethrow;
@@ -98,44 +97,4 @@ class CLoginController extends GetxController {
 
   /// -- handles registration of an admin user --
   Future<void> registerAdmin() async {}
-
-  /// -- Google signIn Authentication --
-  // Future<void> googleSignIn() async {
-  //   try {
-  //     // -- start the loader
-  //     CFullScreenLoader.openLoadingDialog(
-  //       'logging you in...',
-  //       CImages.docerAnimation,
-  //     );
-
-  //     // -- check internet connectivity
-  //     final isConnected = await CNetworkManager.instance.isConnected();
-  //     if (!isConnected) {
-  //       CFullScreenLoader.stopLoading();
-
-  //       return;
-  //     }
-
-  //     // -- google authentication
-  //     final userCredentials = await AuthRepo.instance.loginInWithGoogle();
-
-  //     // -- save user details
-  //     await userController.saveUserDetails(userCredentials);
-
-  //     // -- remove the loader
-  //     CFullScreenLoader.stopLoading();
-
-  //     // -- redirect to the relevant screen
-  //     AuthRepo.instance.screenRedirect();
-  //   } on FirebaseAuthException catch (error) {
-  //     if (kDebugMode) print(error.message);
-  //     CPopupSnackBar.errorSnackBar(
-  //       title: 'Oh Snap!',
-  //       message: error.toString(),
-  //     );
-  //   } catch (e) {
-  //     if (kDebugMode) print(e.toString());
-  //     CPopupSnackBar.errorSnackBar(title: 'Oh Snap!', message: e.toString());
-  //   }
-  // }
 }

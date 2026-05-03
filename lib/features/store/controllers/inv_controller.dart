@@ -233,7 +233,6 @@ class CInventoryController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('error fetching inventory items: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching inventory items!',
           message: e.toString(),
@@ -325,7 +324,6 @@ class CInventoryController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('error adding inventory item: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error adding inventory item!',
           message: e.toString(),
@@ -377,10 +375,6 @@ class CInventoryController extends GetxController {
           .toList();
 
       if (unSyncedAppends.isNotEmpty) {
-        if (kDebugMode) {
-          print(gSheetAppendItems);
-        }
-
         await StoreSheetsApi.saveInvItemsToGSheets(gSheetAppendItems);
 
         await updateSyncedInvAppends();
@@ -442,7 +436,6 @@ class CInventoryController extends GetxController {
       isLoading.value = false;
 
       if (kDebugMode) {
-        print('error updating inventory appends: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error updating inventory appends!',
           message: e.toString(),
@@ -525,7 +518,6 @@ class CInventoryController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('error fetching item by code and email: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching item by code and email!',
           message: e.toString(),
@@ -601,7 +593,6 @@ class CInventoryController extends GetxController {
       // -- stop loader
       isLoading.value = false;
       if (kDebugMode) {
-        print('error updating inventory item: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error updating inventory item!',
           message: 'error updating inventory item: $e',
@@ -627,7 +618,6 @@ class CInventoryController extends GetxController {
       );
 
       if (kDebugMode) {
-        print(forDeleteCartItemIndex);
         CPopupSnackBar.customToast(
           message: '$forDeleteCartItemIndex',
           forInternetConnectivityStatus: false,
@@ -660,7 +650,6 @@ class CInventoryController extends GetxController {
       isLoading.value = false;
 
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error deleting data',
           message: e.toString(),
@@ -748,7 +737,6 @@ class CInventoryController extends GetxController {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('error updating inventory item: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error updating inventory item',
           message: e.toString(),
@@ -756,7 +744,7 @@ class CInventoryController extends GetxController {
       } else {
         CPopupSnackBar.errorSnackBar(
           message:
-              'an unknown error occurred while adding/updating inventory item! please try again later.',
+              'An unknown error occurred while adding/updating inventory item! please try again later.',
           title: 'error adding/updating inventory item',
         );
       }
@@ -795,8 +783,8 @@ class CInventoryController extends GetxController {
             : (double.parse(txtQty.text.trim()) / 5) + 1;
 
         inventoryItem.supplierName = txtSupplierName.text.trim();
-        // inventoryItem.supplierContacts = txtSupplierContacts.text.trim()
-        inventoryItem.supplierContacts = customerContacts;
+        inventoryItem.supplierContacts =
+            customerContacts; // data from txtSupplierContacts
         inventoryItem.lastModified = DateFormat(
           'yyyy-MM-dd @ kk:mm',
         ).format(clock.now());
@@ -852,7 +840,6 @@ class CInventoryController extends GetxController {
       return true;
     } catch (e) {
       if (kDebugMode) {
-        print('error adding/updating inventory item: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error adding/updating inventory item',
           message: e.toString(),
@@ -957,7 +944,6 @@ class CInventoryController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('error fetching all inventory sheet items: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching all inventory sheet items!',
           message: e.toString(),
@@ -974,7 +960,6 @@ class CInventoryController extends GetxController {
       await StoreSheetsApi.updateInvDataNoDeletions(id, itemModel.toMap());
     } catch (e) {
       if (kDebugMode) {
-        print('error updating inventory cloud data: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error updating inventory cloud data',
           message: e.toString(),
@@ -997,7 +982,6 @@ class CInventoryController extends GetxController {
       await StoreSheetsApi.deleteInvItemByIdAndNotForUpdates(id);
     } catch (e) {
       if (kDebugMode) {
-        print('error deleting inventory cloud data: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error deleting inventory cloud data',
           message: e.toString(),
@@ -1028,7 +1012,6 @@ class CInventoryController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('ERROR FETCHING USER GSHEET INV DATA');
         CPopupSnackBar.errorSnackBar(
           title: 'Oh Snap! ERROR FETCHING USER GSHEET INV DATA',
           message: e.toString(),
@@ -1037,7 +1020,7 @@ class CInventoryController extends GetxController {
         CPopupSnackBar.errorSnackBar(
           title: 'Oh Snap! ',
           message:
-              'an unknown error occurred while importing inventory data from cloud!',
+              'An unknown error occurred while importing inventory data from cloud!',
         );
       }
 
@@ -1092,15 +1075,11 @@ class CInventoryController extends GetxController {
         });
       });
 
-      if (kDebugMode) {
-        print("----------\n\n $userGSheetData \n\n ----------");
-      }
       isImportingInvCloudData.value = false;
       return true;
     } catch (e) {
       isImportingInvCloudData.value = false;
       if (kDebugMode) {
-        print('ERROR IMPORTING inventory DATA FROM CLOUD: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'ERROR IMPORTING inventory DATA FROM CLOUD!',
           message: e.toString(),
@@ -1124,7 +1103,6 @@ class CInventoryController extends GetxController {
       return dItems.toList();
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'DELS ERROR',
           message: e.toString(),
@@ -1168,7 +1146,6 @@ class CInventoryController extends GetxController {
     } catch (e) {
       syncingInvDeletions.value = false;
       if (kDebugMode) {
-        print('$e : error syncing local inventory deletions!!');
         CPopupSnackBar.errorSnackBar(
           title: 'error syncing local inventory deletions!!',
           message: e.toString(),
@@ -1187,7 +1164,6 @@ class CInventoryController extends GetxController {
       return pendingUpdates;
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'DELS ERROR',
           message: e.toString(),
@@ -1242,10 +1218,6 @@ class CInventoryController extends GetxController {
             }
           });
         }
-      } else {
-        if (kDebugMode) {
-          print('/n/n ----- /n all updates rada safi \n -----');
-        }
       }
     }
   }
@@ -1281,7 +1253,6 @@ class CInventoryController extends GetxController {
       // stop loader
       syncIsLoading.value = false;
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'inventory cloud sync ERROR!',
           message: 'inventory sync error: $e',
@@ -1294,35 +1265,6 @@ class CInventoryController extends GetxController {
     //   syncIsLoading.value = false;
     // }
   }
-
-  /// -- fetch top sellers --
-  // Future<List<CInventoryModel>> fetchTopSellersFromInventory() async {
-  //   try {
-  //     // start loader while products are fetched
-  //     isLoading.value = true;
-
-  //     await dbHelper.openDb();
-
-  //     final topSellers = await dbHelper.fetchTopSellers(
-  //       userController.user.value.email,
-  //     );
-
-  //     // assign top sold items to a list
-  //     //.assignAll(topSellers);
-
-  //     // stop loader
-  //     isLoading.value = false;
-
-  //     return invTopSellers;
-  //   } catch (e) {
-  //     isLoading.value = false;
-  //     if (kDebugMode) {
-  //       print(e.toString());
-  //       CPopupSnackBar.errorSnackBar(title: 'Oh Snap!', message: e.toString());
-  //     }
-  //     return [];
-  //   }
-  // }
 
   /// -- compute low stock threshold for alerts --
   computeLowStockThreshold(double qty) {
@@ -1453,7 +1395,6 @@ class CInventoryController extends GetxController {
       // -- stop loader
       isLoading.value = false;
       if (kDebugMode) {
-        print('error toggling favorite status: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error toggling favorite status',
           message: e.toString(),
@@ -1492,7 +1433,6 @@ class CInventoryController extends GetxController {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('error initializing inventory summary: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error initializing inventory summary: $e',
           title: 'inventory summary init error!',
@@ -1517,7 +1457,6 @@ class CInventoryController extends GetxController {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('error scheduling notifications: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'scheduling notifications!',
           message: 'error scheduling notifications: $e',

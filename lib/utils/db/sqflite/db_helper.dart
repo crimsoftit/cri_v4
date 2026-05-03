@@ -239,13 +239,6 @@ class DbHelper extends GetxController {
       DateFormat('yyyy-MM-dd @ kk:mm').format(clock.now()),
     );
     await _db!.execute('INSERT INTO $notificationsTable VALUES ($alertItem)');
-
-    List inventory = await _db!.rawQuery('select * from inventory');
-    List sales = await _db!.rawQuery('select * from sales');
-    if (kDebugMode) {
-      print(inventory[0].toString());
-      print(sales[0].toString());
-    }
   }
 
   /// --- ### CRUD OPERATIONS ON INVENTORY TABLE ### ---
@@ -336,11 +329,13 @@ class DbHelper extends GetxController {
       return updateResult;
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
-        CPopupSnackBar.errorSnackBar(title: 'Oh Snap!', message: e.toString());
+        CPopupSnackBar.errorSnackBar(
+          title: 'Oh Snap!',
+          message: 'error updating inventory item on device storage',
+        );
       }
 
-      return 0;
+      rethrow;
     }
   }
 
@@ -356,15 +351,15 @@ class DbHelper extends GetxController {
       return result;
     } catch (e) {
       if (kDebugMode) {
-        print(' error deleting inventory item: $e ');
         CPopupSnackBar.errorSnackBar(
           title: 'error deleting inventory item',
-          message: 'an error occurred while deleting item: $e',
+          message:
+              'An unknown error occurred while deleting inventory item: $e',
         );
       } else {
         CPopupSnackBar.errorSnackBar(
           title: 'error deleting inventory item',
-          message: 'an error occurred while deleting item',
+          message: 'An unknown error occurred while deleting inventory item',
         );
       }
       rethrow;
@@ -416,13 +411,12 @@ class DbHelper extends GetxController {
       return updateResult;
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'stock count sync error!',
           message: 'error updating stock count SYNC ACTION: $e',
         );
       }
-      return 0;
+      rethrow;
     }
   }
 
@@ -529,7 +523,7 @@ class DbHelper extends GetxController {
       final db = _db;
 
       final topSellers = await db!.rawQuery(
-        'SELECT productId, productName, itemMetrics, SUM(quantity) as totalSales, unitSellingPrice, quantity FROM $txnsTable WHERE userEmail = ? GROUP BY productId ORDER BY totalSales DESC LIMIT 20',
+        'SELECT productId, productName, itemMetrics, SUM(quantity) as totalSales, unitSellingPrice, quantity FROM $txnsTable WHERE userEmail = ? GROUP BY productId ORDER BY totalSales DESC',
         [email],
       );
 
@@ -539,7 +533,6 @@ class DbHelper extends GetxController {
           .toList();
     } catch (e) {
       if (kDebugMode) {
-        print('error fetching top sellers from sales: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching top sellers from sales!',
           message: e.toString(),
@@ -637,7 +630,6 @@ class DbHelper extends GetxController {
       return txnUpdateResult;
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'Oh Snap! error updating txn details!',
           message: e.toString(),
@@ -669,14 +661,19 @@ class DbHelper extends GetxController {
       return updateResult;
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'txn sync error!',
           message: 'error updating txns SYNC LOCALLY: $e',
         );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'txn sync error!',
+          message:
+              'an unknown error occurred while updating txns SYNC LOCALLY: $e',
+        );
       }
 
-      throw e.toString();
+      rethrow;
     }
   }
 
@@ -693,22 +690,8 @@ class DbHelper extends GetxController {
       await db!.transaction((txn) async {
         // Update multiple fields for all records where the transaction_id matches the provided ID
         // The 'where' clause uses the transaction_id column and 'whereArgs' to safely pass the value
-        int count = await txn.update(
-          'txns',
-          {
-            'lastModified': date,
-            'syncAction': syncAction,
-            'txnStatus': txnStatus,
-          },
-          where:
-              'txnId = ?', // Replace 'transaction_id' with your actual column name
-          whereArgs: [transactionId], // Pass the transaction ID as a parameter
-        );
 
         // The transaction is committed if no error is thrown. 'count' will indicate how many rows were updated.
-        if (kDebugMode) {
-          print('Updated $count rows with transaction ID: $transactionId');
-        }
       });
 
       return true;
@@ -736,20 +719,17 @@ class DbHelper extends GetxController {
         notification.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      if (kDebugMode) {
-        print('*** notification item added successfully ***');
-      }
+
       return true;
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error saving notification',
           message: e.toString(),
         );
       }
       //throw e.toString();
-      return false;
+      rethrow;
     }
   }
 
@@ -771,7 +751,6 @@ class DbHelper extends GetxController {
           .toList();
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching notifications!',
           message: e.toString(),
@@ -802,7 +781,6 @@ class DbHelper extends GetxController {
       return result;
     } catch (e) {
       if (kDebugMode) {
-        print('error deleting notification: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'delete error',
           message: 'error deleting notification: $e',
@@ -830,7 +808,6 @@ class DbHelper extends GetxController {
       return result;
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error updating notification item',
           message: e.toString(),
@@ -861,7 +838,6 @@ class DbHelper extends GetxController {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('error adding contact: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'an error occurred while adding contact: $e',
           title: 'error adding contact!',
@@ -891,7 +867,6 @@ class DbHelper extends GetxController {
       return result.map((json) => CContactsModel.fromMapObject(json)).toList();
     } catch (e) {
       if (kDebugMode) {
-        print('error fetching contacts: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error fetching contacts: $e',
           title: 'error fetching contacts!',
@@ -915,10 +890,11 @@ class DbHelper extends GetxController {
         where: 'contactId = ?',
         whereArgs: [contact.contactId],
       );
+      
       return updateResult;
+      
     } catch (e) {
       if (kDebugMode) {
-        print('error updating contact: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error updating contact: $e',
           title: 'error updating contact!',
@@ -949,7 +925,6 @@ class DbHelper extends GetxController {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('error adding deleted contact for sync: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error adding deleted contact for sync: $e',
           title: 'error adding deleted contact for sync!',
@@ -978,7 +953,6 @@ class DbHelper extends GetxController {
       return result;
     } catch (e) {
       if (kDebugMode) {
-        print('error deleting notification: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'delete error',
           message: 'error deleting contact: $e',

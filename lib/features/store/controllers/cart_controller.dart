@@ -70,30 +70,18 @@ class CCartController extends GetxController {
       cartItemsLoading.value = false;
       return true;
     } catch (e) {
-      // final cartItemsStrings =
-      //     CLocalStorage.instance().readData<List<dynamic>>('cartItems');
-      // if (cartItemsStrings != null) {
-      //   cartItems.assignAll(cartItemsStrings.map(
-      //       (item) => CCartItemModel.fromJson(item as Map<String, dynamic>)));
-
-      //   updateCartTotals();
-      //   cartItemsLoading.value = false;
-      //   return true;
-      // }
-      // else {
-      //   cartItemsLoading.value = false;
-      //   if (kDebugMode) {
-      //     print('$e');
-      //     CPopupSnackBar.errorSnackBar(
-      //       title: 'error loading cart items',
-      //       message: 'an unknown error occurred while fetching cart items: $e',
-      //     );
-      //   }
-      //   //throw e.toString();
-      //   cartItemsLoading.value = false;
-      //   //return false;
-      //   //rethrow;
-      // }
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'Error fetching cart items: $e',
+          title: 'Error fetching cart items!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'an unknown error occurred while fetching cart items!  Please try again later...',
+          title: 'Error fetching cart items!',
+        );
+      }
       rethrow;
     }
     // finally {
@@ -430,13 +418,9 @@ class CCartController extends GetxController {
 
   @override
   void dispose() {
+    qtyFieldControllers.clear();
     for (var controller in qtyFieldControllers) {
       controller.dispose();
-    }
-    qtyFieldControllers.clear();
-
-    if (kDebugMode) {
-      print("----------\n\n TextEditingControllers DISPOSED \n\n ----------");
     }
 
     super.dispose();

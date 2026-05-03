@@ -178,12 +178,6 @@ class CDashboardController extends GetxController {
                   (sale.unitSellingPrice * sale.quantity);
               currentWeekSalesAmount.value +=
                   (sale.unitSellingPrice * sale.quantity);
-
-              // if (kDebugMode) {
-              //   print(
-              //     'date: $formattedDate, current week day: $currentWeekSalesStart, index: $index',
-              //   );
-              // }
             }
           }
         }
@@ -191,12 +185,6 @@ class CDashboardController extends GetxController {
         weeklySalesHighestAmount.value = thisWeekSalesList.reduce(max) > 1
             ? thisWeekSalesList.reduce(max)
             : 1000;
-
-        // if (kDebugMode) {
-        //   print('===========\n');
-        //   print('weekly sales: $thisWeekSalesList');
-        //   print('===========\n');
-        // }
       },
     );
   }
@@ -214,11 +202,6 @@ class CDashboardController extends GetxController {
     final lastWeekEnd = lastWeekStart.add(
       Duration(days: 6),
     ); // Sunday of last week
-
-    // if (kDebugMode) {
-    //   print('last week start date: $lastWeekStart \n');
-    //   print('last week end date: $lastWeekEnd \n');
-    // }
 
     // Filter sales data for the last week
     Future.delayed(

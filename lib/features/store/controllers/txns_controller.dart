@@ -134,9 +134,10 @@ class CTxnsController extends GetxController {
       StoreSheetsApi.initSpreadSheets();
     }
 
-    fetchSoldItems();
-    fetchTxns();
-    initTxnsSync();
+    await fetchSoldItems();
+    await fetchTxns();
+    await initTxnsSync();
+    await fetchTopSellersFromSales();
 
     showAmountIssuedField.value = true;
     txtRefundQty.text = '';
@@ -243,7 +244,6 @@ class CTxnsController extends GetxController {
       soldItemsFetched.value = false;
 
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching sold items!',
           message: e.toString(),
@@ -294,7 +294,6 @@ class CTxnsController extends GetxController {
       // -- stop loader --
       isLoading.value = false;
       if (kDebugMode) {
-        print('error updating sold item name: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error updating sold item name: $e',
           title: 'error updating sold item name!',
@@ -349,24 +348,21 @@ class CTxnsController extends GetxController {
         foundInvoices.assignAll(creditSales);
       }
 
-      txnsFetched.value = true;
-
-      // stop loader
-      isLoading.value = false;
-
       dashboardController.generateSalesFilterItems().then(
         (_) {
           dashboardController.setDefaultSalesFilterPeriod();
         },
       );
 
+      // stop loader
+      isLoading.value = false;
+      txnsFetched.value = true;
       return txns;
     } catch (e) {
-      txnsFetched.value = false;
       isLoading.value = false;
+      txnsFetched.value = false;
 
       if (kDebugMode) {
-        print('error fetching txns: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching txns!',
           message: e.toString(),
@@ -416,7 +412,6 @@ class CTxnsController extends GetxController {
       isLoading.value = false;
       transactionItems.clear();
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'Oh Snap! error fetching txn items',
           message: e.toString(),
@@ -477,7 +472,6 @@ class CTxnsController extends GetxController {
       );
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'sell item scan error!',
           message: e.toString(),
@@ -508,7 +502,6 @@ class CTxnsController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('error fetching top sellers from sales table: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching top sellers from sales table',
           message: e.toString(),
@@ -562,9 +555,6 @@ class CTxnsController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('****');
-        print(e.toString());
-        print('****');
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching scan item!',
           message: 'error fetching scan item for sale: $e',
@@ -878,7 +868,6 @@ class CTxnsController extends GetxController {
             });
           } else {
             if (kDebugMode) {
-              print('***** ALL TXNS RADA SAFI *****');
               CPopupSnackBar.customToast(
                 message: '***** ALL TXNS RADA SAFI *****',
                 forInternetConnectivityStatus: false,
@@ -902,9 +891,6 @@ class CTxnsController extends GetxController {
       txnsSyncIsLoading.value = false;
       isLoading.value = false;
       if (kDebugMode) {
-        print('***');
-        print('* an error occurred while uploading txns to cloud: $e *');
-        print('***');
         CPopupSnackBar.errorSnackBar(
           title: 'ERROR SYNCING TXNS TO CLOUD...',
           message: 'an error occurred while uploading txns to cloud: $e',
@@ -943,11 +929,6 @@ class CTxnsController extends GetxController {
       isLoading.value = false;
 
       if (kDebugMode) {
-        print('***');
-        print(
-          '* an error occurred while fetching user\'s cloud txn data: $e *',
-        );
-        print('***');
         CPopupSnackBar.errorSnackBar(title: 'Oh Snap!', message: e.toString());
       }
 
@@ -1006,12 +987,6 @@ class CTxnsController extends GetxController {
             await fetchSoldItems();
             isImportingTxnsFromCloud.value = false;
             isLoading.value = false;
-
-            if (kDebugMode) {
-              print(
-                "----------\n ===SYNCED TXNS=== \n ${userGsheetTxnsData.iterator} \n\n ----------",
-              );
-            }
           }
         }
       }
@@ -1020,7 +995,6 @@ class CTxnsController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('ERROR IMPORTING USER TXNS DATA FROM CLOUD!: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'ERROR IMPORTING USER DATA FROM CLOUD!',
           message: e.toString(),
@@ -1266,114 +1240,112 @@ class CTxnsController extends GetxController {
                         onPressed: () async {
                           // refund item actions - inventory & txn item updates;
 
-                          await fetchSoldItems().then((result) async {
-                            if (result.isNotEmpty) {
-                              invController.fetchUserInventoryItems();
-                              var invItemIndex = invController.inventoryItems
-                                  .indexWhere(
-                                    (item) =>
-                                        item.productId == soldItem.productId,
-                                  );
-                              if (invItemIndex == -1) {
-                                CPopupSnackBar.warningSnackBar(
-                                  message:
-                                      '${soldItem.productName} is no longer listed in your inventory',
-                                  title: 'item not found!',
-                                );
-                              } else {
-                                var inventoryItem = invController.inventoryItems
-                                    .firstWhere(
+                          await fetchSoldItems().then(
+                            (result) async {
+                              if (result.isNotEmpty) {
+                                invController.fetchUserInventoryItems();
+                                var invItemIndex = invController.inventoryItems
+                                    .indexWhere(
                                       (item) =>
                                           item.productId == soldItem.productId,
                                     );
-
-                                // -- update stock count & total sales for this inventory item --
-                                if (inventoryItem.productId! > 100 &&
-                                    soldItem.quantity >= refundQty.value) {
-                                  inventoryItem.quantity += refundQty.value;
-                                  inventoryItem.qtyRefunded += refundQty.value;
-                                  inventoryItem.qtySold -= refundQty.value;
-                                  inventoryItem.lastModified = DateFormat(
-                                    'yyyy-MM-dd @ kk:mm',
-                                  ).format(clock.now());
-                                  inventoryItem.syncAction =
-                                      inventoryItem.isSynced == 1
-                                      ? 'update'
-                                      : 'append';
-
-                                  await dbHelper
-                                      .updateInventoryItem(
-                                        inventoryItem,
-                                        inventoryItem.productId!,
-                                      )
-                                      .then(
-                                        (result) async {
-                                          /// -- update receipt item --
-                                          var txnItem = sales.firstWhere(
-                                            (txnItem) =>
-                                                txnItem.productId ==
-                                                soldItem.productId,
-                                          );
-
-                                          txnItem.refundReason = txtRefundReason
-                                              .text
-                                              .trim();
-                                          txnItem.quantity -= refundQty.value;
-                                          txnItem.qtyRefunded +=
-                                              refundQty.value;
-                                          txnItem.totalAmount -=
-                                              refundQty.value *
-                                              txnItem.unitSellingPrice;
-                                          txnItem.lastModified = DateFormat(
-                                            'yyyy-MM-dd @ kk:mm',
-                                          ).format(clock.now());
-                                          txnItem.syncAction =
-                                              txnItem.isSynced == 0
-                                              ? 'append'
-                                              : 'update';
-                                          //txnItem.txnStatus = 'refunded';
-
-                                          dbHelper
-                                              .updateReceiptItem(
-                                                txnItem,
-                                                txnItem.soldItemId!,
-                                              )
-                                              .then((_) {
-                                                fetchSoldItems();
-                                                refundDataUpdated.value = true;
-                                              });
-
-                                          Navigator.of(
-                                            Get.overlayContext!,
-                                          ).pop(true);
-                                        },
-                                      );
+                                if (invItemIndex == -1) {
+                                  CPopupSnackBar.warningSnackBar(
+                                    message:
+                                        '${soldItem.productName} is no longer listed in your inventory',
+                                    title: 'item not found!',
+                                  );
                                 } else {
-                                  if (refundQty.value > soldItem.quantity) {
-                                    CPopupSnackBar.warningSnackBar(
-                                      message:
-                                          'only ${CFormatter.formatItemQtyDisplays(soldItem.quantity, soldItem.itemMetrics)} of ${CFormatter.formatItemMetrics(soldItem.itemMetrics, soldItem.quantity)} were sold to this customer!',
-                                      title: 'refund qty is invalid!',
-                                    );
-                                  }
-                                  if (kDebugMode) {
-                                    print('ERROR: INVENTORY ITEM IS NULL');
-                                    CPopupSnackBar.errorSnackBar(
-                                      title: 'inv item error!!',
-                                      message:
-                                          'ERROR: INVENTORY ITEM productId IS NULL!!',
-                                    );
+                                  var inventoryItem = invController
+                                      .inventoryItems
+                                      .firstWhere(
+                                        (item) =>
+                                            item.productId ==
+                                            soldItem.productId,
+                                      );
+
+                                  // -- update stock count & total sales for this inventory item --
+                                  if (inventoryItem.productId! > 100 &&
+                                      soldItem.quantity >= refundQty.value) {
+                                    inventoryItem.quantity += refundQty.value;
+                                    inventoryItem.qtyRefunded +=
+                                        refundQty.value;
+                                    inventoryItem.qtySold -= refundQty.value;
+                                    inventoryItem.lastModified = DateFormat(
+                                      'yyyy-MM-dd @ kk:mm',
+                                    ).format(clock.now());
+                                    inventoryItem.syncAction =
+                                        inventoryItem.isSynced == 1
+                                        ? 'update'
+                                        : 'append';
+
+                                    await dbHelper
+                                        .updateInventoryItem(
+                                          inventoryItem,
+                                          inventoryItem.productId!,
+                                        )
+                                        .then(
+                                          (result) async {
+                                            /// -- update receipt item --
+                                            var txnItem = sales.firstWhere(
+                                              (txnItem) =>
+                                                  txnItem.productId ==
+                                                  soldItem.productId,
+                                            );
+
+                                            txnItem.refundReason =
+                                                txtRefundReason.text.trim();
+                                            txnItem.quantity -= refundQty.value;
+                                            txnItem.qtyRefunded +=
+                                                refundQty.value;
+                                            txnItem.totalAmount -=
+                                                refundQty.value *
+                                                txnItem.unitSellingPrice;
+                                            txnItem.lastModified = DateFormat(
+                                              'yyyy-MM-dd @ kk:mm',
+                                            ).format(clock.now());
+                                            txnItem.syncAction =
+                                                txnItem.isSynced == 0
+                                                ? 'append'
+                                                : 'update';
+                                            //txnItem.txnStatus = 'refunded';
+
+                                            dbHelper
+                                                .updateReceiptItem(
+                                                  txnItem,
+                                                  txnItem.soldItemId!,
+                                                )
+                                                .then((_) {
+                                                  fetchSoldItems();
+                                                  refundDataUpdated.value =
+                                                      true;
+                                                });
+
+                                            Navigator.of(
+                                              Get.overlayContext!,
+                                            ).pop(true);
+                                          },
+                                        );
+                                  } else {
+                                    if (refundQty.value > soldItem.quantity) {
+                                      CPopupSnackBar.warningSnackBar(
+                                        message:
+                                            'only ${CFormatter.formatItemQtyDisplays(soldItem.quantity, soldItem.itemMetrics)} of ${CFormatter.formatItemMetrics(soldItem.itemMetrics, soldItem.quantity)} were sold to this customer!',
+                                        title: 'refund qty is invalid!',
+                                      );
+                                    }
+                                    if (kDebugMode) {
+                                      CPopupSnackBar.errorSnackBar(
+                                        title: 'inv item error!!',
+                                        message:
+                                            'ERROR: INVENTORY ITEM productId IS NULL!!',
+                                      );
+                                    }
                                   }
                                 }
                               }
-                            } else {
-                              if (kDebugMode) {
-                                print("** ========== **\n");
-                                print("ERROR UPDATING DATA AFTER REFUND");
-                                print("** ========== **\n");
-                              }
-                            }
-                          });
+                            },
+                          );
                         },
                         label: Text(
                           'REFUND',
@@ -1449,19 +1421,7 @@ class CTxnsController extends GetxController {
               await syncController.processSync();
             }
           }
-          // else {
-          //   if (kDebugMode) {
-          //     print('error processing cloud sync');
-          //     CPopupSnackBar.errorSnackBar(
-          //       title: 'error processing cloud sync',
-          //       message: 'error processing cloud sync',
-          //     );
-          //   }
-          // }
         } else {
-          if (kDebugMode) {
-            print('internet connection required for txns cloud sync!');
-          }
           CPopupSnackBar.customToast(
             message: 'internet connection required for txns cloud sync!',
             forInternetConnectivityStatus: true,
@@ -1471,18 +1431,9 @@ class CTxnsController extends GetxController {
 
       resetSalesFields();
 
-      if (kDebugMode) {
-        print('------------------\n');
-        print('refundQty: ${refundQty.value} \n');
-        print('------------------\n');
-        print('bottomSheet closed');
-      }
       CDashboardController.instance.onInit();
     } catch (e) {
       if (kDebugMode) {
-        print('### error syncing refund item ###\n');
-        print('$e\n');
-        print('### error syncing refund item ###\n');
         CPopupSnackBar.errorSnackBar(
           title: 'error syncing refund item!',
           message: e.toString(),
@@ -1529,7 +1480,6 @@ class CTxnsController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('error checking inventory item by name: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error checking inventory item by name',
           message: e.toString(),
@@ -1590,7 +1540,6 @@ class CTxnsController extends GetxController {
       // -- stop loader
       isLoading.value = false;
       if (kDebugMode) {
-        print('error summarizing sales: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error summarizing sales: $e',
           title: 'sales summary error',
@@ -1676,7 +1625,6 @@ class CTxnsController extends GetxController {
       // -- stop loader --
       isLoading.value = false;
       if (kDebugMode) {
-        print('error computing summary sales: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error fetching sales summary: $e',
           title: 'error fetching sales summary!',
@@ -1937,7 +1885,6 @@ class CTxnsController extends GetxController {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('error displaying partial payment dialog: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error displaying partial payment dialog: $e',
           title: 'error popping dialog!',

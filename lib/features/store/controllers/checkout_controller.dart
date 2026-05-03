@@ -243,10 +243,6 @@ class CCheckoutController extends GetxController {
 
               await dbHelper.updateInventoryItem(invItem, cartItem.productId);
 
-              if (kDebugMode) {
-                print('** inventory stock update successful **');
-              }
-
               // -- update sync status/action for this inventory item --
               var sAction = invItem.isSynced == 1 ? 'update' : 'append';
               dbHelper.updateInvOfflineSyncAfterStockUpdate(
@@ -376,7 +372,6 @@ class CCheckoutController extends GetxController {
       }
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error processing txn..',
           message: '$e',
@@ -546,7 +541,6 @@ class CCheckoutController extends GetxController {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('scan error: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'scan error!',
           message: e.toString(),
@@ -672,7 +666,6 @@ class CCheckoutController extends GetxController {
       isLoading.value = false;
       itemExists.value = false;
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'Oh Snap! error fetching for sale item by code!',
           message: e.toString(),
@@ -823,7 +816,6 @@ class CCheckoutController extends GetxController {
       processTxn(txnType);
     } catch (e) {
       if (kDebugMode) {
-        print('checkout error: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'an error occurred while checking out: $e',
           title: 'checkout error!',
@@ -902,7 +894,6 @@ class CCheckoutController extends GetxController {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('error adding customer details: $e');
         CPopupSnackBar.errorSnackBar(
           message: '$e',
           title: 'error adding customer details!',
@@ -929,7 +920,6 @@ class CCheckoutController extends GetxController {
           // -- check internet connectivity --
           if (txnsController.transactionItems.isEmpty) {
             if (kDebugMode) {
-              print('receipt items cleared!!');
               CPopupSnackBar.customToast(
                 message: 'receipt items cleared!!',
                 forInternetConnectivityStatus: false,
@@ -981,7 +971,6 @@ class CCheckoutController extends GetxController {
       await StoreSheetsApi.updateCloudTxnItems(txnId, itemModel.toMap());
     } catch (e) {
       if (kDebugMode) {
-        print('error updating txn #$txnId\'s cloud data');
         CPopupSnackBar.errorSnackBar(
           title: 'error updating txn #$txnId\'s cloud data',
           message: e.toString(),
@@ -1022,11 +1011,6 @@ class CCheckoutController extends GetxController {
         passKey:
             "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919",
       );
-
-      //HashMap response = txnInit as HashMap;
-      if (kDebugMode) {
-        print("Response: $txnInit");
-      }
     } catch (e) {
       /// -- you can implement your exception handling here --
       /// -- network unreachability is a sure exception --

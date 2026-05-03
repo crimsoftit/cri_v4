@@ -66,11 +66,16 @@ class StoreSheetsApi extends GetxController {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('gsheet api init error: $e');
-        // CPopupSnackBar.errorSnackBar(
-        //   title: 'error initializing gsheets!!',
-        //   message: '$e',
-        // );
+        CPopupSnackBar.errorSnackBar(
+          message: '$e',
+          title: 'error initializing gsheets!!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while initializing cloud data! Please try again later...',
+          title: 'error initializing cloud data!!',
+        );
       }
       rethrow;
     }
@@ -96,7 +101,6 @@ class StoreSheetsApi extends GetxController {
       invSheet!.values.map.appendRows(rowItems);
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error adding inventory data in cloud',
           message: e.toString(),
@@ -128,20 +132,12 @@ class StoreSheetsApi extends GetxController {
 
     final invList = await invSheet!.values.map.allRows();
 
-    if (kDebugMode) {
-      print(
-        invList == null
-            ? <CInventoryModel>[]
-            : invList.map(CInventoryModel.gSheetFromJson).toList(),
-      );
-    }
-
     return invList == null
         ? <CInventoryModel>[]
         : invList.map(CInventoryModel.gSheetFromJson).toList();
   }
 
-  /// -- update data (entire row) in google sheets --
+  /// -- update inventory data (entire row) in google sheets --
   static Future<bool> updateInvDataNoDeletions(
     int id,
     Map<String, dynamic> itemModel,
@@ -151,7 +147,6 @@ class StoreSheetsApi extends GetxController {
       return invSheet!.values.map.insertRowByKey(id, itemModel);
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error updating cloud inventory data',
           message: e.toString(),
@@ -177,7 +172,6 @@ class StoreSheetsApi extends GetxController {
       );
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error updating stockCount data in cloud',
           message: e.toString(),
@@ -203,7 +197,6 @@ class StoreSheetsApi extends GetxController {
       );
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error updating sales count data in cloud',
           message: e.toString(),
@@ -246,7 +239,6 @@ class StoreSheetsApi extends GetxController {
       return returnCmd;
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error deleting INVENTORY data from cloud!',
           message: e.toString(),
@@ -275,14 +267,19 @@ class StoreSheetsApi extends GetxController {
       //   message: 'an error occurred while uploading txns to cloud',
       // );
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
-          title: 'error syncing txns'.toUpperCase(),
           message: '$e',
+          title: 'error syncing txns'.toUpperCase(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while syncing txns! Please try again later...',
+          title: 'error syncing txns'.toUpperCase(),
         );
       }
       // throw 'ERROR SYNCING TXNS: $e';
-      return false;
+      rethrow;
     }
   }
 
@@ -291,46 +288,10 @@ class StoreSheetsApi extends GetxController {
 
     final txnsList = await txnsSheet!.values.map.allRows();
 
-    if (kDebugMode) {
-      print(
-        txnsList == null
-            ? <CTxnsModel>[]
-            : txnsList.map(CTxnsModel.gSheetFromJson).toList(),
-      );
-    }
-
     return txnsList == null
         ? <CTxnsModel>[]
         : txnsList.map(CTxnsModel.gSheetFromJson).toList();
   }
-
-  /// -- delete txn data from cloud by it's id --
-  // static Future<bool> deleteReceiptItem(int id) async {
-  //   try {
-  //     // ignore: prefer_typing_uninitialized_variables
-  //     var returnCmd;
-
-  //     if (txnsSheet == null) return false;
-
-  //     final receiptItemIndex =
-  //         await txnsSheet!.values.rowIndexOf(id.toString().toLowerCase());
-
-  //     if (receiptItemIndex.isNegative) {
-  //       returnCmd = false;
-  //       return returnCmd;
-  //     } else {
-  //       returnCmd = txnsSheet!.deleteRow(receiptItemIndex);
-  //     }
-
-  //     return returnCmd;
-  //   } catch (e) {
-  //     CPopupSnackBar.errorSnackBar(
-  //       title: 'error deleting data in google sheet',
-  //       message: e.toString(),
-  //     );
-  //     throw e.toString();
-  //   }
-  // }
 
   /// -- update receipt item --
   static Future<bool> updateReceiptItem(
@@ -342,14 +303,19 @@ class StoreSheetsApi extends GetxController {
       return txnsSheet!.values.map.insertRowByKey(soldItemId, receiptItemModel);
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
-          title: 'error updating receipt item\'s cloud data',
           message: e.toString(),
+          title: 'error updating receipt item\'s cloud data',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while updating receipt item\'s cloud data! Please try again later...',
+          title: 'error updating receipt item\'s cloud data',
         );
       }
 
-      throw e.toString();
+      rethrow;
     }
   }
 
@@ -363,16 +329,15 @@ class StoreSheetsApi extends GetxController {
       return txnsSheet!.values.map.insertRowByKey(txnId, txnItemModel);
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
-          title: 'error updating receipt item\'s cloud data',
           message: e.toString(),
+          title: 'error updating receipt item\'s cloud data',
         );
       } else {
         CPopupSnackBar.errorSnackBar(
-          title: 'error updating receipt item\'s cloud data',
           message:
               'An unknown error encountered while updating receipt item\'s cloud data! Please try again later.',
+          title: 'error updating receipt item\'s cloud data',
         );
       }
 
@@ -380,7 +345,9 @@ class StoreSheetsApi extends GetxController {
     }
   }
 
-  /// -- save unsynced inventory items to google sheets --
+  /// -- ## CONTACTS - CRUD OPERATIONS ## --
+
+  /// -- save unsynced contacts to google sheets --
   static Future addLocalContactsToCloud(
     List<Map<String, dynamic>> contacts,
   ) async {
@@ -389,7 +356,6 @@ class StoreSheetsApi extends GetxController {
       contactsSheet!.values.map.appendRows(contacts);
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error adding unsynced contacts to cloud!',
           message: e.toString(),
@@ -413,31 +379,49 @@ class StoreSheetsApi extends GetxController {
 
       final cloudContacts = await contactsSheet!.values.map.allRows();
 
-      if (kDebugMode) {
-        print(
-          cloudContacts == null
-              ? <CContactsModel>[]
-              : cloudContacts.map(CContactsModel.gSheetsFromJson).toList(),
-        );
-      }
       return cloudContacts == null
           ? <CContactsModel>[]
           : cloudContacts.map(CContactsModel.gSheetsFromJson).toList();
     } catch (e) {
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching all contacts from cloud!',
           message: e.toString(),
         );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error fetching all contacts from cloud!',
+          message:
+              'An unknown error encountered while fetching contacts from cloud! Please try again later.',
+        );
       }
-      // else {
-      //   CPopupSnackBar.errorSnackBar(
-      //     title: 'error fetching all contacts from cloud!',
-      //     message:
-      //         'An unknown error encountered while fetching contacts from cloud! Please try again later.',
-      //   );
-      // }
+
+      rethrow;
+    }
+  }
+
+  /// -- update contact details (entire row) in google sheets --
+  static Future<bool> updateInitiallySyncedContacts(
+    int contactId,
+    Map<String, dynamic> contactItem,
+  ) async {
+    try {
+      if (contactsSheet == null) return false;
+      contactsSheet!.values.map.insertRowByKey(contactId, contactItem);
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: e.toString(),
+          title: 'error updating cloud contacts data',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while updating cloud contacts data! Please try again later...',
+          title: 'error updating cloud contacts data',
+        );
+      }
 
       rethrow;
     }

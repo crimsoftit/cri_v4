@@ -127,7 +127,6 @@ class CContactsController extends GetxController {
       return addContact;
     } catch (e) {
       if (kDebugMode) {
-        print('error checking contact existence: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error checking contact existence: $e',
           title: 'error checking contact existence!',
@@ -203,9 +202,6 @@ class CContactsController extends GetxController {
       await dbHelper.addContact(contact ?? contactDetails);
 
       if (kDebugMode) {
-        print(
-          '${contactDetails.contactName} ${contactDetails.contactPhone} ${contactDetails.contactEmail} added successfully',
-        );
         CPopupSnackBar.successSnackBar(
           message:
               '${contactDetails.contactName} ${contactDetails.contactPhone} ${contactDetails.contactEmail} added successfully',
@@ -215,9 +211,14 @@ class CContactsController extends GetxController {
       fetchMyContacts();
     } catch (e) {
       if (kDebugMode) {
-        print('error adding contact: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'an error occurred while adding contact: $e',
+          title: 'error adding contact!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while adding contact! Please try again later...',
           title: 'error adding contact!',
         );
       }
@@ -282,7 +283,6 @@ class CContactsController extends GetxController {
       // stop loader
       isLoading.value = false;
       if (kDebugMode) {
-        print('error fetching contacts: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'an error occurred while fetching contacts: $e',
           title: 'error fetching contacts!',
@@ -314,7 +314,6 @@ class CContactsController extends GetxController {
       return contactMatches;
     } catch (e) {
       if (kDebugMode) {
-        print('error fetching contact suggestions: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error fetching contact suggestions: $e',
           title: 'error fetching contact suggestions!',
@@ -362,14 +361,13 @@ class CContactsController extends GetxController {
       // -- stop loader --
       isLoading.value = false;
       if (kDebugMode) {
-        print('error updating contact: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error updating contact: $e',
           title: 'error updating contact!',
         );
       } else {
         CPopupSnackBar.errorSnackBar(
-          message: 'an unknown error occurred while updating contact details!',
+          message: 'An unknown error occurred while updating contact details!',
           title: 'error updating contact!',
         );
       }
@@ -777,7 +775,8 @@ class CContactsController extends GetxController {
         );
       } else {
         CPopupSnackBar.errorSnackBar(
-          message: 'error restoring contact from trash bin: $e',
+          message:
+              'An unknown error occurred while restoring contact from trash bin! Please try again later...',
           title: 'error restoring contact!',
         );
       }
@@ -1355,7 +1354,7 @@ class CContactsController extends GetxController {
 
     // Perform action after delay
     if (kDebugMode) {
-      print("Action performed after 2 seconds");
+      print("Action performed after 7 seconds");
     }
 
     resetFields();
@@ -1365,7 +1364,11 @@ class CContactsController extends GetxController {
   Future<void> processContactsSync() async {
     try {
       processingContactsSync.value = true;
-      await addUnsyncedContactsToCloud();
+      await addUnsyncedContactAppendsToCloud().then(
+        (_) async {
+          await updateInitiallySyncedContacts();
+        },
+      );
 
       // -- stop loader --
       processingContactsSync.value = false;
@@ -1373,7 +1376,6 @@ class CContactsController extends GetxController {
       // -- stop loader --
       processingContactsSync.value = false;
       if (kDebugMode) {
-        print('error adding contact to cloud: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error processing contacts\' cloud sync: $e',
           title: 'error processing contacts\' cloud sync',
@@ -1390,7 +1392,7 @@ class CContactsController extends GetxController {
   }
 
   /// -- add unsynced contacts to cloud --
-  Future<bool> addUnsyncedContactsToCloud() async {
+  Future<bool> addUnsyncedContactAppendsToCloud() async {
     try {
       // -- start loader --
       isLoading.value = true;
@@ -1456,7 +1458,6 @@ class CContactsController extends GetxController {
       // -- stop loader --
       isLoading.value = false;
       if (kDebugMode) {
-        print('error adding contact to cloud: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error adding contact to cloud: $e',
           title: 'error adding contact to cloud',
@@ -1491,7 +1492,6 @@ class CContactsController extends GetxController {
       fetchMyContacts();
     } catch (e) {
       if (kDebugMode) {
-        print('error updating contacts\' sync status locally: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error updating contacts\' sync status locally: $e',
           title: 'error updating contacts\' sync status!',
@@ -1562,7 +1562,6 @@ class CContactsController extends GetxController {
       // -- stop loader --
       processingContactsSync.value = false;
       if (kDebugMode) {
-        print('error importing contacts from cloud: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error importing contacts from cloud: $e',
           title: 'error importing contacts from cloud!',
@@ -1597,7 +1596,6 @@ class CContactsController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
-        print('error fetching all contacts from cloud: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching all contacts from cloud!',
           message: e.toString(),
@@ -1606,9 +1604,76 @@ class CContactsController extends GetxController {
         CPopupSnackBar.errorSnackBar(
           title: 'error fetching all contacts from cloud!',
           message:
-              'an unknown error occurred whil fetching all contacts from cloud! Please try again later.',
+              'an unknown error occurred while fetching all contacts from cloud! Please try again later.',
         );
       }
+      rethrow;
+    }
+  }
+
+  /// -- update initially synced contacts that need updating now --
+  Future updateInitiallySyncedContacts() async {
+    try {
+      // final isConnectedToInternet = await CNetworkManager.instance
+      //     .isConnected();
+
+      if (CNetworkManager.instance.hasConnection.value &&
+          CNetworkManager.instance.connectionIsStable.value) {
+        if (unsyncedContactUpdates.isNotEmpty) {
+          for (var contact in unsyncedContactUpdates) {
+            final forSyncContact = CContactsModel.withId(
+              contact.contactId,
+              contact.productId,
+              contact.addedBy,
+              contact.contactName,
+              contact.contactCountryCode,
+              contact.contactDialCode,
+              contact.contactPhone,
+              contact.contactEmail,
+              contact.contactCategory,
+              contact.lastModified,
+              contact.createdAt,
+              1,
+              'none',
+              contact.isStarred,
+              contact.isTrashed,
+            );
+            await StoreSheetsApi.updateInitiallySyncedContacts(
+              contact.contactId!,
+              forSyncContact.toMap(),
+            ).then(
+              (_) async {
+                await dbHelper.updateContact(forSyncContact);
+              },
+            );
+          }
+        } else {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'contact sync rada safi!',
+          );
+        }
+        await fetchMyContacts();
+      } else {
+        CPopupSnackBar.warningSnackBar(
+          title: 'internet connection unavailable/unstable',
+          message: 'This action requires a stable internet connection!',
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error updating contacts\'s cloud data',
+          message: e.toString(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'Error updating contacts\'s cloud data',
+          message:
+              'An unknown error occurred while updating contacts\'s cloud data. Please try again later!',
+        );
+      }
+
       rethrow;
     }
   }

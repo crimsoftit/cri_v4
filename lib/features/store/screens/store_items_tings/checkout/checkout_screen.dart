@@ -272,6 +272,15 @@ class CCheckoutScreen extends StatelessWidget {
                                                           iconSize: CSizes.md,
                                                           iconColor: isDarkTheme
                                                               ? CColors.white
+                                                              : (cartController.cartItems[index].quantity ==
+                                                                            1 &&
+                                                                        cartController.cartItems[index].itemMetrics ==
+                                                                            'units') ||
+                                                                    cartController.cartItems[index].quantity ==
+                                                                            .1 &&
+                                                                        cartController.cartItems[index].itemMetrics !=
+                                                                            'units'
+                                                              ? CColors.white
                                                               : CColors.rBrown,
                                                           bgColor:
                                                               (cartController

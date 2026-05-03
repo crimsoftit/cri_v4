@@ -25,19 +25,6 @@ class CHelperFunctions {
       0,
     );
 
-    if (kDebugMode) {
-      // print('----------\n');
-      // print('weekStart: $weekStart \n');
-      // print('----------\n');
-      // print('----------\n');
-      // print('week day: ${startOfWeek.weekday} \n');
-      // print('----------\n');
-
-      // CPopupSnackBar.customToast(
-      //   message: 'weekday: ${startOfWeek.weekday}',
-      //   forInternetConnectivityStatus: false,
-      // );
-    }
     return weekStart;
   }
 

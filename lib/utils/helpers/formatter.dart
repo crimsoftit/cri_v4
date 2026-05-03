@@ -147,7 +147,6 @@ class CFormatter {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('error formatting item metrics: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error formatting item metrics: $e',
           title: 'item metrics format error!',
@@ -173,7 +172,6 @@ class CFormatter {
       return formattedOutput;
     } catch (e) {
       if (kDebugMode) {
-        print('metrics format error: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'metrics format error: $e',
           title: 'metrics format error!',
@@ -200,7 +198,6 @@ class CFormatter {
       return output;
     } catch (e) {
       if (kDebugMode) {
-        print('error formatting qty: $e');
         CPopupSnackBar.errorSnackBar(
           message: e.toString(),
           title: 'format error',
@@ -256,25 +253,4 @@ class CFormatter {
     }
     return (dialCode, newPhoneNumber);
   }
-
-  // seperatePhoneAndDialCode() {
-  //   Map<String, String> foundedCountry = {};
-  //   for (var country in Countries.allCountries) {
-  //     String dialCode = country["dial_code"].toString();
-  //     if (phoneWithDialCode.value.contains(dialCode)) {
-  //       foundedCountry = country;
-  //     }
-  //   }
-
-  //   if (foundedCountry.isNotEmpty) {
-  //     var dialCode = phoneWithDialCode.value.substring(
-  //       0,
-  //       foundedCountry["dial_code"]!.length,
-  //     );
-  //     var newPhoneNumber = phoneWithDialCode.value.substring(
-  //       foundedCountry["dial_code"]!.length,
-  //     );
-  //     print({dialCode, newPhoneNumber});
-  //   }
-  // }
 }

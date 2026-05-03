@@ -239,7 +239,6 @@ class CUserController extends GetxController {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('an unknown error occurred while uploading profile picture: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'Error uploading profile picture1',
           message:

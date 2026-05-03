@@ -165,7 +165,6 @@ class CLocalNotificationsController extends GetxController {
 
     if (triggerDate.isBefore(DateTime.now())) {
       if (kDebugMode) {
-        print('expiry reminder date is in the past.');
         CPopupSnackBar.warningSnackBar(
           title: 'expiry date reached..',
           message: 'expiry reminder date is in the past.',
@@ -175,9 +174,6 @@ class CLocalNotificationsController extends GetxController {
     }
 
     if (kDebugMode) {
-      print("*********");
-      print("*TRIGGER DATE: $triggerDate");
-      print("*********");
       CPopupSnackBar.customToast(
         message: triggerDate,
         forInternetConnectivityStatus: false,
@@ -264,13 +260,8 @@ class CLocalNotificationsController extends GetxController {
         navController.selectedIndex.value = 4;
         Get.offAll(() => const NavMenu());
       }
-
-      if (kDebugMode) {
-        print('notification payload: ${alertResponse.payload}');
-      }
     } catch (e) {
       if (kDebugMode) {
-        print('error handling notification tap: $e');
         CPopupSnackBar.errorSnackBar(
           title: 'error handling notification tap!',
           message: 'error handling notification tap: $e',
@@ -325,8 +316,16 @@ class CLocalNotificationsController extends GetxController {
       isLoading.value = false;
 
       if (kDebugMode) {
-        print(e.toString());
-        CPopupSnackBar.errorSnackBar(title: 'Oh Snap!', message: e.toString());
+        CPopupSnackBar.errorSnackBar(
+          message: 'Error fetching user notifications: $e',
+          title: 'Oh Snap! Error fetching user notifications',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while fetching user notifications! Please try again later...',
+          title: 'Oh Snap! Error fetching user notifications',
+        );
       }
 
       rethrow;
@@ -371,7 +370,6 @@ class CLocalNotificationsController extends GetxController {
       // -- stop loader
       isLoading.value = false;
       if (kDebugMode) {
-        print(e.toString());
         CPopupSnackBar.errorSnackBar(
           title: 'error deleting notification!',
           message: e.toString(),

@@ -151,15 +151,14 @@ class AuthRepo extends GetxController {
             );
             //Get.offAll(() => const NavMenu());
           } else {
+            // stop loader
+            CFullScreenLoader.stopLoading();
             if (kDebugMode) {
-              print('error fetching user details!!');
               CPopupSnackBar.errorSnackBar(
                 title: 'error fetching user details!!',
               );
             }
           }
-          // stop loader
-          CFullScreenLoader.stopLoading();
         }
       } else {
         Get.offAll(() => VerifyEmailScreen(email: _auth.currentUser?.email));
