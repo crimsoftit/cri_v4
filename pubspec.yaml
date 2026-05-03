@@ -124,7 +124,7 @@ dependencies:
   #awesome_notifications: ^0.7.4+1
 
   # -- utility packages
-  azlistview: ^2.0.0
+  azlistview: ^2.0.0-nullsafety.0
   collection: ^1.19.1
   country_picker: any
   csv: any

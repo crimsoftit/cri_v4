@@ -13,9 +13,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
-class CContactDetailsScreen extends StatelessWidget {
+class CContactDetailsScreen extends StatefulWidget {
   const CContactDetailsScreen({super.key});
 
+  @override
+  State<CContactDetailsScreen> createState() => _CContactDetailsScreenState();
+}
+
+class _CContactDetailsScreenState extends State<CContactDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final contactsController = Get.put(CContactsController());

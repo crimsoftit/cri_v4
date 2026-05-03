@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
-class CContactsScreen extends StatelessWidget {
-  const CContactsScreen({super.key});
+class CContactsScreenRaw extends StatelessWidget {
+  const CContactsScreenRaw({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -129,11 +129,11 @@ class CContactsScreen extends StatelessWidget {
                                                   },
                                             icon: Icon(
                                               contactsController
-                                                      .unsyncedContactAppends
-                                                      .isEmpty &&
-                                                    contactsController
-                                                        .unsyncedContactUpdates
-                                                        .isEmpty
+                                                          .unsyncedContactAppends
+                                                          .isEmpty &&
+                                                      contactsController
+                                                          .unsyncedContactUpdates
+                                                          .isEmpty
                                                   ? Iconsax.cloud_add
                                                   : Iconsax.cloud_change,
                                               color:

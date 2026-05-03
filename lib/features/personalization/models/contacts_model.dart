@@ -2,9 +2,10 @@
 
 import 'dart:convert';
 
+import 'package:azlistview/azlistview.dart';
 import 'package:cri_v3/features/personalization/models/gsheets_contact_model.dart';
 
-class CContactsModel {
+class CContactsModel implements ISuspensionBean {
   int? _contactId;
   int? _productId;
 
@@ -218,4 +219,13 @@ class CContactsModel {
       jsonDecode(json[GsheetsContactModel.isTrashed]),
     );
   }
+
+  @override
+  String getSuspensionTag() {
+    // Return the first character of the name as the section tag
+    return contactName.toUpperCase().substring(0, 1);
+  }
+
+  @override
+  bool isShowSuspension = true;
 }

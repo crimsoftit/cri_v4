@@ -1,4 +1,4 @@
-import 'package:cri_v3/features/personalization/screens/contacts/contacts_screen.dart';
+import 'package:cri_v3/features/personalization/screens/contacts/widgets/alphabet_scroller_view.dart';
 import 'package:cri_v3/features/personalization/screens/settings/user_settings_screen.dart';
 import 'package:cri_v3/features/store/screens/home/home.dart';
 import 'package:cri_v3/features/personalization/screens/notifications/notifications_screen.dart';
@@ -18,12 +18,12 @@ class CNavMenuController extends GetxController {
 
     //const CTxnsScreen(),
     //const CCheckoutScreenRaw(),
-    const CContactsScreen(),
+    const CAlphabetScrollerView(),
+    //const CContactsScreen(),
     const CUserSettingsScreen(),
 
     //const SettingsScreenRaw(),
     //const CProfileScreen(),
-    
     const CNotificationsScreen(),
   ];
 }

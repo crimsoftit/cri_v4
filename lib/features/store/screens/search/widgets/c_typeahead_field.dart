@@ -336,8 +336,6 @@ class CTypeAheadSearchField extends StatelessWidget {
           // Handle when a suggestion is selected.
           searchBarController.txtTypeAheadFieldController.text =
               suggestion.name;
-
-          //print('Selected item: ${suggestion.name}');
         },
       ),
     );

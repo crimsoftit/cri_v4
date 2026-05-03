@@ -177,7 +177,6 @@ class CTxnsModel {
       _txnId = newTxnId;
     } else {
       if (kDebugMode) {
-        print('invalid value for txn ID!!!');
         CPopupSnackBar.errorSnackBar(
           title: 'invalid value',
           message: 'invalid value for txn ID!!!',

@@ -768,7 +768,6 @@ class CContactsController extends GetxController {
       await updateContact(trashedItem);
     } catch (e) {
       if (kDebugMode) {
-        print('error restoring contact: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error restoring contact from trash bin: $e',
           title: 'error restoring contact!',
@@ -885,7 +884,6 @@ class CContactsController extends GetxController {
       );
     } catch (e) {
       if (kDebugMode) {
-        print('error displaying bottom sheet modal: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'An unknown error occurred while deleting contact: $e',
           title: 'error deleting contact!',
@@ -901,23 +899,17 @@ class CContactsController extends GetxController {
     }
   }
 
-  Future<void> sendSimpleSms(List<String> recipients) async {
+  Future sendSimpleSms(List<String> recipients) async {
     String message = "hi,";
     try {
       String result = await sendSMS(
         message: message,
         recipients: recipients,
       );
-      if (kDebugMode) {
-        print("Messages launched: $result");
-        // CPopupSnackBar.successSnackBar(
-        //   message: result,
-        //   title: 'Messages launched!',
-        // );
-      }
+
+      return result;
     } catch (error) {
       if (kDebugMode) {
-        print("Error: $error");
         CPopupSnackBar.errorSnackBar(
           message: 'error sending simple sms: $error',
           title: 'error sending simple sms!',
