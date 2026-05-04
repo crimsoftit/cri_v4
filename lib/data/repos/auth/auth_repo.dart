@@ -99,7 +99,7 @@ class AuthRepo extends GetxController {
           );
 
           /// -- initialize spreadsheets --
-          if (await CNetworkManager.instance.isConnected() ||
+          if (await CNetworkManager.instance.isConnected() &&
               CNetworkManager.instance.hasConnection.value) {
             await StoreSheetsApi.initSpreadSheets();
           }
@@ -113,7 +113,8 @@ class AuthRepo extends GetxController {
           deviceStorage.writeIfNull('SyncContactsWithCloud', true);
 
           if (await userController.fetchUserDetails()) {
-            if (CNetworkManager.instance.hasConnection.value) {
+            if (CNetworkManager.instance.hasConnection.value &&
+                CNetworkManager.instance.connectionIsStable.value) {
               await txnsController.initTxnsSync();
 
               await invController.initInvSync();

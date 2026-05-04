@@ -130,7 +130,8 @@ class CTxnsController extends GetxController {
   void onInit() async {
     dateRangeFieldController.text = '';
 
-    if (await CNetworkManager.instance.isConnected()) {
+    if (await CNetworkManager.instance.isConnected() &&
+        CNetworkManager.instance.connectionIsStable.value) {
       StoreSheetsApi.initSpreadSheets();
     }
 
@@ -332,7 +333,10 @@ class CTxnsController extends GetxController {
 
       // assign complete txns to receipts list
       final completeTxns = txns
-          .where((txn) => txn.txnStatus.toLowerCase().contains('complete'.toLowerCase()))
+          .where(
+            (txn) =>
+                txn.txnStatus.toLowerCase().contains('complete'.toLowerCase()),
+          )
           .toList();
       receipts.assignAll(completeTxns);
 
@@ -950,7 +954,7 @@ class CTxnsController extends GetxController {
 
       await fetchUserTxnsSheetData();
 
-      if (userGsheetTxnsData.isNotEmpty) {
+      if (userGsheetTxnsData.isNotEmpty && sales.isEmpty) {
         for (var element in userGsheetTxnsData) {
           var dbTxnImports = CTxnsModel.withId(
             element.soldItemId,
@@ -982,8 +986,8 @@ class CTxnsController extends GetxController {
             element.txnStatus,
           );
 
-          await dbHelper.addSoldItem(dbTxnImports);
-          await fetchSoldItems();
+          dbHelper.addSoldItem(dbTxnImports);
+          fetchSoldItems();
           isImportingTxnsFromCloud.value = false;
           isLoading.value = false;
         }

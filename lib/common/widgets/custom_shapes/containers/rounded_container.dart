@@ -5,18 +5,29 @@ import 'package:flutter/material.dart';
 class CRoundedContainer extends StatelessWidget {
   const CRoundedContainer({
     super.key,
-    this.width,
-    this.height,
-    this.borderRadius = CSizes.cardRadiusLg,
-    this.child,
-    this.showBorder = false,
-    this.borderColor = CColors.borderPrimary,
+    this.alignment,
     this.bgColor = CColors.white,
+    this.borderRadius = CSizes.cardRadiusLg,
+    this.borderColor = CColors.borderPrimary,
     this.boxShadow,
-    this.padding,
+    this.child,
+    this.height,
     this.margin,
+    this.padding,
+    this.showBorder = false,
+    this.width,
+    
+    
+    
+    
+    
+    
+    
+    
+    
   });
 
+  final AlignmentGeometry? alignment;
   final double? width;
   final double? height;
   final double borderRadius;
@@ -31,10 +42,7 @@ class CRoundedContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width,
-      height: height,
-      padding: padding,
-      margin: margin,
+      alignment: alignment,
       decoration: BoxDecoration(
         // boxShadow:
         //     boxShadow ??
@@ -53,6 +61,10 @@ class CRoundedContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         border: showBorder ? Border.all(color: borderColor) : null,
       ),
+      height: height,
+      margin: margin,
+      padding: padding,
+      width: width,
       child: child,
     );
   }
