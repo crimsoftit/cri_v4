@@ -23,6 +23,8 @@ class CContactsModel implements ISuspensionBean {
   int _isStarred = 0;
   int _isTrashed = 0;
 
+  String? _tag = '';
+
   CContactsModel(
     this._addedBy,
     this._productId,
@@ -56,6 +58,11 @@ class CContactsModel implements ISuspensionBean {
     this._syncAction,
     this._isStarred,
     this._isTrashed,
+  );
+
+  CContactsModel.withTagAndTitle(
+    this._contactName,
+    this._tag,
   );
 
   CContactsModel empty() {
@@ -93,6 +100,8 @@ class CContactsModel implements ISuspensionBean {
   String get syncAction => _syncAction;
   int get isTrashed => _isTrashed;
   int get isStarred => _isStarred;
+
+  String? get tag => _tag;
 
   set contactId(int? newContactId) {
     _contactId = newContactId;
@@ -152,6 +161,10 @@ class CContactsModel implements ISuspensionBean {
 
   set isTrashed(int trashStatus) {
     _isTrashed = trashStatus;
+  }
+
+  set tag(String? newTag) {
+    _tag = newTag;
   }
 
   /// -- convert a Contact object into a Map object --

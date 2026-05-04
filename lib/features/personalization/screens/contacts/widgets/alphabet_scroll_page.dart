@@ -1,6 +1,7 @@
 import 'package:azlistview/azlistview.dart';
 import 'package:cri_v3/common/widgets/shimmers/vert_items_shimmer.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
+import 'package:cri_v3/features/personalization/models/az_item_model.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
 import 'package:cri_v3/features/personalization/screens/no_data/no_data_screen.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
@@ -114,8 +115,35 @@ class CAlphabetScrollPage extends StatelessWidget {
             itemCount: 6,
           );
         }
+
+        // void initializeList() {
+        //   demContacts = items
+        //       .map(
+        //         (item) => CContactsModel.withTagAndTitle(),
+        //       )
+        //       .toList();
+        // }
+
+        //initializeList(demContacts);
+        SuspensionUtil.sortListBySuspensionTag(demContacts);
+
         return AzListView(
           data: demContacts,
+          indexBarOptions: IndexBarOptions(
+            indexHintAlignment: Alignment.centerRight,
+            indexHintOffset: Offset(
+              -20,
+              0,
+            ),
+            needRebuild: true,
+            selectItemDecoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: isDarkTheme ? CColors.darkGrey : CColors.rBrown,
+            ),
+            selectTextStyle: Theme.of(context).textTheme.bodyLarge!.apply(
+              color: CColors.white,
+            ),
+          ),
           itemCount: 1,
           //indexBarMargin: const EdgeInsets.only( 10.0,),
           itemBuilder: (context, index) {

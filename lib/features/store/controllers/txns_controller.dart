@@ -332,7 +332,7 @@ class CTxnsController extends GetxController {
 
       // assign complete txns to receipts list
       final completeTxns = txns
-          .where((txn) => txn.txnStatus.toLowerCase().contains('complete'))
+          .where((txn) => txn.txnStatus.toLowerCase().contains('complete'.toLowerCase()))
           .toList();
       receipts.assignAll(completeTxns);
 
@@ -951,43 +951,41 @@ class CTxnsController extends GetxController {
       await fetchUserTxnsSheetData();
 
       if (userGsheetTxnsData.isNotEmpty) {
-        if (sales.isEmpty) {
-          for (var element in userGsheetTxnsData) {
-            var dbTxnImports = CTxnsModel.withId(
-              element.soldItemId,
-              element.txnId,
-              element.userId,
-              element.userEmail,
-              element.userName,
-              element.productId,
-              element.productCode,
-              element.productName,
-              element.itemMetrics,
-              element.quantity,
-              element.qtyRefunded,
-              element.refundReason,
-              element.totalAmount,
-              element.amountIssued,
-              element.customerBalance,
-              element.unitBP,
-              element.unitSellingPrice,
-              element.deposit,
-              element.paymentMethod,
-              element.customerName,
-              element.customerContacts,
-              element.txnAddress,
-              element.txnAddressCoordinates,
-              element.lastModified,
-              element.isSynced,
-              element.syncAction,
-              element.txnStatus,
-            );
+        for (var element in userGsheetTxnsData) {
+          var dbTxnImports = CTxnsModel.withId(
+            element.soldItemId,
+            element.txnId,
+            element.userId,
+            element.userEmail,
+            element.userName,
+            element.productId,
+            element.productCode,
+            element.productName,
+            element.itemMetrics,
+            element.quantity,
+            element.qtyRefunded,
+            element.refundReason,
+            element.totalAmount,
+            element.amountIssued,
+            element.customerBalance,
+            element.unitBP,
+            element.unitSellingPrice,
+            element.deposit,
+            element.paymentMethod,
+            element.customerName,
+            element.customerContacts,
+            element.txnAddress,
+            element.txnAddressCoordinates,
+            element.lastModified,
+            element.isSynced,
+            element.syncAction,
+            element.txnStatus,
+          );
 
-            await dbHelper.addSoldItem(dbTxnImports);
-            await fetchSoldItems();
-            isImportingTxnsFromCloud.value = false;
-            isLoading.value = false;
-          }
+          await dbHelper.addSoldItem(dbTxnImports);
+          await fetchSoldItems();
+          isImportingTxnsFromCloud.value = false;
+          isLoading.value = false;
         }
       }
       isImportingTxnsFromCloud.value = false;

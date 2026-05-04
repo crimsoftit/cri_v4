@@ -5,6 +5,7 @@ import 'package:cri_v3/common/widgets/search_bar/animated_search_bar.dart';
 import 'package:cri_v3/features/store/controllers/checkout_controller.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
 import 'package:cri_v3/features/store/controllers/search_bar_controller.dart';
+import 'package:cri_v3/features/store/controllers/txns_controller.dart';
 import 'package:cri_v3/features/store/screens/store_items_tings/widgets/inv_gridview_screen.dart';
 import 'package:cri_v3/features/store/screens/store_items_tings/widgets/store_screen_header.dart';
 import 'package:cri_v3/features/store/screens/store_items_tings/widgets/txn_items.dart';
@@ -27,13 +28,13 @@ class CStoreScreen extends StatelessWidget {
     final isConnectedToInternet = CNetworkManager.instance.hasConnection.value;
     final isDarkTheme = CHelperFunctions.isDarkMode(context);
     final invController = Get.put(CInventoryController());
-    //final txnsController = Get.put(CTxnsController());
+    final txnsController = Get.put(CTxnsController());
 
     final searchController = Get.put(CSearchBarController());
 
-    // if (!txnsController.isLoading.value) {
-    //   txnsController.fetchTxns();
-    // }
+    if (!txnsController.isLoading.value) {
+      txnsController.fetchTxns();
+    }
 
     //Get.put(CTxnsController());
 
