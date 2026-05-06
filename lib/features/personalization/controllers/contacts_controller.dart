@@ -202,10 +202,10 @@ class CContactsController extends GetxController {
         fromInventoryDetails
             ? DateFormat('yyyy-MM-dd kk:mm').format(clock.now())
             : contact!.createdAt,
-        contact!.isSynced,
-        contact.syncAction,
-        contact.isTrashed,
-        contact.isStarred,
+        fromInventoryDetails ? 0 : contact!.isSynced,
+        fromInventoryDetails ? 'append' : contact!.syncAction,
+        0,
+        0,
       );
 
       await dbHelper.addContact(contactDetails).then(
@@ -1759,7 +1759,9 @@ class CContactsController extends GetxController {
               forSyncContact.toMap(),
             ).then(
               (_) async {
-                await dbHelper.updateContact(forSyncContact);
+                contact.isSynced = 1;
+                contact.syncAction = 'none';
+                await dbHelper.updateContact(contact);
               },
             );
           }

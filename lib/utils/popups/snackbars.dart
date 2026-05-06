@@ -25,16 +25,26 @@ class CPopupSnackBar extends GetxController {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       SnackBar(
         elevation: 0,
-        duration: const Duration(seconds: 4),
+        duration: const Duration(
+          seconds: 4,
+        ),
         backgroundColor: Colors.transparent,
         content: CRoundedContainer(
           bgColor: isDarkTheme
-              ? CColors.darkGrey.withValues(alpha: 0.9)
-              : CColors.grey.withValues(alpha: 0.9),
+              ? CColors.darkGrey.withValues(
+                  alpha: 0.9,
+                )
+              : CColors.grey.withValues(
+                  alpha: 0.9,
+                ),
           borderRadius: 20.0,
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(
+            10.0,
+          ),
 
-          margin: const EdgeInsets.symmetric(horizontal: 20.0),
+          margin: const EdgeInsets.symmetric(
+            horizontal: 20.0,
+          ),
 
           child: Center(
             child: forInternetConnectivityStatus
@@ -72,9 +82,12 @@ class CPopupSnackBar extends GetxController {
                     // style: Theme.of(Get.context!).textTheme.labelLarge!.apply(
                     //       color: CColors.black,
                     //     ),
-                    style: Theme.of(
-                      Get.context!,
-                    ).textTheme.labelLarge!.apply(color: CColors.rBrown),
+                    style:
+                        Theme.of(
+                          Get.context!,
+                        ).textTheme.labelLarge!.apply(
+                          color: CColors.rBrown,
+                        ),
                   ),
           ),
         ),
@@ -92,12 +105,21 @@ class CPopupSnackBar extends GetxController {
       backgroundColor: Colors.green,
       snackPosition: SnackPosition.BOTTOM,
       duration: Duration(seconds: duration),
-      margin: const EdgeInsets.all(10.0),
-      icon: const Icon(Iconsax.check, color: CColors.white),
+      margin: const EdgeInsets.all(
+        10.0,
+      ),
+      icon: const Icon(
+        Iconsax.check,
+        color: CColors.white,
+      ),
     );
   }
 
-  static successSnackBar1({required title, message = '', duration = 5}) {
+  static successSnackBar1({
+    required title,
+    message = '',
+    duration = 5,
+  }) {
     Get.snackbar(
       title,
       message,
@@ -124,17 +146,24 @@ class CPopupSnackBar extends GetxController {
       message,
       messageText: Text(
         message,
-        style: Theme.of(
-          Get.context!,
-        ).textTheme.bodyMedium!.apply(color: CColors.white),
+        style:
+            Theme.of(
+              Get.context!,
+            ).textTheme.bodyMedium!.apply(
+              color: CColors.white,
+            ),
       ),
       isDismissible: true,
       shouldIconPulse: true,
       colorText: CColors.white,
       backgroundColor: Colors.orange,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 10),
-      margin: const EdgeInsets.all(20.0),
+      duration: const Duration(
+        seconds: 10,
+      ),
+      margin: const EdgeInsets.all(
+        20.0,
+      ),
       icon: const Icon(
         Iconsax.warning_2,
         color: CColors.white,
@@ -151,9 +180,16 @@ class CPopupSnackBar extends GetxController {
       colorText: CColors.white,
       backgroundColor: Colors.red.shade600,
       snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 4),
-      margin: const EdgeInsets.all(20.0),
-      icon: const Icon(Iconsax.warning_2, color: CColors.white),
+      duration: const Duration(
+        seconds: 15,
+      ),
+      margin: const EdgeInsets.all(
+        20.0,
+      ),
+      icon: const Icon(
+        Iconsax.warning_2,
+        color: CColors.white,
+      ),
     );
   }
 }

@@ -883,7 +883,7 @@ class CCheckoutController extends GetxController {
               .addContact(
                 false,
                 customerDetails,
-                null,
+                0,
               )
               .then(
                 (_) {

@@ -32,6 +32,10 @@ class CAddUpdateContactForm extends StatelessWidget {
 
     return Obx(
       () {
+        contactsController.contactDialCode.value =
+            contactsController.contactDialCode.value == ''
+            ? '+254'
+            : contactsController.contactDialCode.value;
         return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(
