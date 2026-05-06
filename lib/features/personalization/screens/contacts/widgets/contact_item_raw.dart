@@ -360,7 +360,7 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                                     ),
                                                     onPressed: () {
                                                       contactsController
-                                                          .addUpdateContactActionModal(
+                                                          .updateContactActionModal(
                                                             context,
                                                             contact,
                                                             contact.contactPhone ==

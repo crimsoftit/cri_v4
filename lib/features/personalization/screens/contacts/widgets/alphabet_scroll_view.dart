@@ -16,8 +16,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
-class CAlphabetScrollPage extends StatelessWidget {
-  const CAlphabetScrollPage({
+class CContactItem extends StatelessWidget {
+  const CContactItem({
     super.key,
     required this.space,
   });
@@ -454,7 +454,7 @@ class CAlphabetScrollPage extends StatelessWidget {
                                                             ),
                                                             onPressed: () {
                                                               contactsController
-                                                                  .addUpdateContactActionModal(
+                                                                  .updateContactActionModal(
                                                                     context,
                                                                     contact,
                                                                     contact.contactPhone ==

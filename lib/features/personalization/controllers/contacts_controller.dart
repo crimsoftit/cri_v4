@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:clock/clock.dart';
 import 'package:cri_v3/api/sheets/store_sheets_api.dart';
+import 'package:cri_v3/common/widgets/buttons/custom_dropdown_btn.dart';
 import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
 import 'package:cri_v3/common/widgets/flushbars/flushbars.dart';
 import 'package:cri_v3/common/widgets/txt_fields/custom_type_ahead_field.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
+import 'package:cri_v3/features/personalization/screens/contacts/widgets/add_update_contact_form.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
 import 'package:cri_v3/features/store/controllers/nav_menu_controller.dart';
 import 'package:cri_v3/nav_menu.dart';
@@ -41,7 +43,7 @@ class CContactsController extends GetxController {
 
   final localStorage = GetStorage();
 
-  final updateContactItemFormKey = GlobalKey<FormState>();
+  final addUpdateContactItemFormKey = GlobalKey<FormState>();
   final userController = Get.put(CUserController());
 
   final txtEmailController = TextEditingController();
@@ -59,9 +61,16 @@ class CContactsController extends GetxController {
   final RxList<CContactsModel> trashedContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> unsyncedContactAppends = <CContactsModel>[].obs;
   final RxList<CContactsModel> unsyncedContactUpdates = <CContactsModel>[].obs;
+  final RxList<String> contactCategories = [
+    'Customer',
+    'Friend',
+    'Supplier',
+  ].obs;
 
   final RxString contactCountryCode = 'KE'.obs;
   final RxString contactDialCode = '254'.obs;
+
+  final RxString selectedCategory = ''.obs;
 
   @override
   void onInit() async {
@@ -193,13 +202,17 @@ class CContactsController extends GetxController {
         fromInventoryDetails
             ? DateFormat('yyyy-MM-dd kk:mm').format(clock.now())
             : contact!.createdAt,
-        0,
-        'append',
-        0,
-        0,
+        contact!.isSynced,
+        contact.syncAction,
+        contact.isTrashed,
+        contact.isStarred,
       );
 
-      await dbHelper.addContact(contact ?? contactDetails);
+      await dbHelper.addContact(contactDetails).then(
+        (_) {
+          fetchMyContacts();
+        },
+      );
 
       if (kDebugMode) {
         CPopupSnackBar.successSnackBar(
@@ -375,7 +388,8 @@ class CContactsController extends GetxController {
     }
   }
 
-  Future<dynamic> addUpdateContactActionModal(
+  /// -- update contact details modal popup --
+  Future<dynamic> updateContactActionModal(
     BuildContext context,
     CContactsModel? contactItem,
     String updateAction,
@@ -416,15 +430,16 @@ class CContactsController extends GetxController {
             padding: MediaQuery.of(context).viewInsets,
             child: CRoundedContainer(
               bgColor: CColors.transparent,
-              height: updateAction.toLowerCase() == 'edit'.toLowerCase()
-                  ? CHelperFunctions.screenHeight() * .51
-                  : CHelperFunctions.screenHeight() * .39,
+              // height: updateAction.toLowerCase() == 'edit'.toLowerCase()
+              //     ? CHelperFunctions.screenHeight() * .51
+              //     : CHelperFunctions.screenHeight() * .39,
               //height: CHelperFunctions.screenHeight() * .49,
               padding: const EdgeInsets.all(
                 CSizes.lg / 3,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -467,7 +482,7 @@ class CContactsController extends GetxController {
                       top: 30.0,
                     ),
                     child: Form(
-                      key: updateContactItemFormKey,
+                      key: addUpdateContactItemFormKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -654,7 +669,8 @@ class CContactsController extends GetxController {
                                   ),
                                   onPressed: () async {
                                     // -- form validation
-                                    if (!updateContactItemFormKey.currentState!
+                                    if (!addUpdateContactItemFormKey
+                                        .currentState!
                                         .validate()) {
                                       return;
                                     }
@@ -750,6 +766,103 @@ class CContactsController extends GetxController {
         print('error displaying bottom sheet modal: $e');
         CPopupSnackBar.errorSnackBar(
           message: 'error displaying bottom sheet modal: $e',
+          title: 'error popping bottom sheet modal!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- add contact modal popup--
+  Future<dynamic> addContactActionModal(BuildContext context) async {
+    final isDarkTheme = CHelperFunctions.isDarkMode(context);
+
+    try {
+      return showModalBottomSheet(
+        backgroundColor: isDarkTheme
+            ? CColors.black.withValues(
+                alpha: .9,
+              )
+            : CColors.white,
+        context: context,
+        isDismissible: false,
+        isScrollControlled: true,
+        //sheetAnimationStyle: AnimationStyle(),
+        useSafeArea: true,
+        useRootNavigator: true,
+        builder: (context) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: CRoundedContainer(
+              bgColor: CColors.transparent,
+              //height: CHelperFunctions.screenHeight() * .56,
+              padding: const EdgeInsets.only(
+                left: CSizes.lg / 4,
+                right: CSizes.lg / 4,
+                top: CSizes.lg / 4,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: CSizes.defaultSpace / 4.0,
+                      right: CSizes.defaultSpace / 4.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        CircleAvatar(
+                          backgroundColor:
+                              CHelperFunctions.randomAestheticColor(),
+                          radius: 15.0,
+                          child: Icon(
+                            Iconsax.user,
+                            color: CColors.white,
+                            size: CSizes.iconSm,
+                          ),
+                        ),
+
+                        Text(
+                          'add contact',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelLarge!.apply(),
+                        ),
+
+                        Obx(
+                          () {
+                            return CCustomDropdownBtn(
+                              defaultItemColor: isDarkTheme
+                                  ? CColors.darkGrey
+                                  : CColors.rBrown,
+                              defaultItemFontSizeFactor: 1.3,
+                              dropdownItems: contactCategories,
+                              onValueChanged: (value) {
+                                selectedCategory.value = value!;
+                              },
+                              selectedValue: setDefaultContactCategory(),
+                              underlineColor: CColors.rBrown,
+                              underlineHeight: .8,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  CAddUpdateContactForm(),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error displaying add contact bottom sheet modal: $e',
           title: 'error popping bottom sheet modal!',
         );
       }
@@ -935,11 +1048,22 @@ class CContactsController extends GetxController {
         sendDirect: true, // Skips confirmation dialog (Android only)
       );
       if (kDebugMode) {
-        print("Direct SMS sent: $result");
+        CPopupSnackBar.customToast(
+          forInternetConnectivityStatus: false,
+          message: result,
+        );
       }
     } catch (error) {
       if (kDebugMode) {
-        print("Error: $error");
+        CPopupSnackBar.errorSnackBar(
+          message: error.toString(),
+          title: 'Error sending direct sms!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message: 'Unable to send direct sms! Please try again later...',
+          title: 'Error sending direct sms!',
+        );
       }
       rethrow;
     }
@@ -1668,6 +1792,13 @@ class CContactsController extends GetxController {
 
       rethrow;
     }
+  }
+
+  String setDefaultContactCategory() {
+    selectedCategory.value = selectedCategory.value != ''
+        ? selectedCategory.value
+        : contactCategories[0];
+    return selectedCategory.value;
   }
 
   resetFields() {

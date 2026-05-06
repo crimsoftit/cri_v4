@@ -2,7 +2,7 @@ import 'package:cri_v3/common/widgets/appbar/tab_bar.dart';
 import 'package:cri_v3/common/widgets/appbar/v2_app_bar.dart';
 import 'package:cri_v3/common/widgets/shimmers/shimmer_effects.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
-import 'package:cri_v3/features/personalization/screens/contacts/widgets/alphabet_scroll_page.dart';
+import 'package:cri_v3/features/personalization/screens/contacts/widgets/alphabet_scroll_view.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
@@ -32,7 +32,9 @@ class CContactsScreen extends StatelessWidget {
           appBar: CVersion2AppBar(
             autoImplyLeading: false,
           ),
-          backgroundColor: CColors.rBrown.withValues(alpha: 0.2),
+          backgroundColor: CColors.rBrown.withValues(
+            alpha: 0.2,
+          ),
           body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
@@ -106,6 +108,24 @@ class CContactsScreen extends StatelessWidget {
                                 ),
                                 Row(
                                   children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        contactsController
+                                            .addContactActionModal(
+                                              context,
+                                            );
+                                      },
+                                      icon: Icon(
+                                        Iconsax.add,
+                                        color:
+                                            CNetworkManager
+                                                .instance
+                                                .hasConnection
+                                                .value
+                                            ? CColors.rBrown
+                                            : CColors.darkGrey,
+                                      ),
+                                    ),
                                     contactsController
                                             .processingContactsSync
                                             .value
@@ -145,10 +165,11 @@ class CContactsScreen extends StatelessWidget {
                                                   : CColors.darkGrey,
                                             ),
                                           ),
+
                                     IconButton(
-                                      onPressed: () {},
+                                      onPressed: () async {},
                                       icon: Icon(
-                                        Iconsax.add,
+                                        Iconsax.trash,
                                         color:
                                             CNetworkManager
                                                 .instance
@@ -178,7 +199,7 @@ class CContactsScreen extends StatelessWidget {
             body: const TabBarView(
               physics: BouncingScrollPhysics(),
               children: [
-                CAlphabetScrollPage(
+                CContactItem(
                   space: 'all',
                 ),
                 // CContactsExpansionPanelView(
@@ -187,23 +208,23 @@ class CContactsScreen extends StatelessWidget {
                 // CContactsExpansionPanelView(
                 //   space: 'suppliers',
                 // ),
-                CAlphabetScrollPage(
+                CContactItem(
                   space: 'suppliers',
                 ),
-                CAlphabetScrollPage(
+                CContactItem(
                   space: 'customers',
                 ),
                 // CContactsExpansionPanelView(
                 //   space: 'customers',
                 // ),
-                CAlphabetScrollPage(
+                CContactItem(
                   space: 'friends',
                 ),
 
                 // CContactsExpansionPanelView(
                 //   space: 'friends',
                 // ),
-                CAlphabetScrollPage(
+                CContactItem(
                   space: 'trashed',
                 ),
               ],

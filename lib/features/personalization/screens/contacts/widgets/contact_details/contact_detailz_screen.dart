@@ -61,7 +61,7 @@ class _CContactDetailsScreenState extends State<CContactDetailsScreen> {
             ),
             IconButton(
               onPressed: () {
-                contactsController.addUpdateContactActionModal(
+                contactsController.updateContactActionModal(
                   context,
                   contactItem!,
                   'edit',
@@ -289,7 +289,7 @@ class _CContactDetailsScreenState extends State<CContactDetailsScreen> {
                   ),
                   onTap: contactItem.contactPhone == ''
                       ? () {
-                          contactsController.addUpdateContactActionModal(
+                          contactsController.updateContactActionModal(
                             context,
                             contactItem,
                             'add phone',
@@ -351,7 +351,7 @@ class _CContactDetailsScreenState extends State<CContactDetailsScreen> {
                       onTap: contactItem.contactEmail != ''
                           ? null
                           : () {
-                              contactsController.addUpdateContactActionModal(
+                              contactsController.updateContactActionModal(
                                 context,
                                 contactItem,
                                 'add email',
@@ -378,7 +378,7 @@ class _CContactDetailsScreenState extends State<CContactDetailsScreen> {
                   onTap: contactItem.contactEmail != ''
                       ? null
                       : () {
-                          contactsController.addUpdateContactActionModal(
+                          contactsController.updateContactActionModal(
                             context,
                             contactItem,
                             'add email',
