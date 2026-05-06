@@ -32,9 +32,7 @@ class CStoreScreen extends StatelessWidget {
 
     final searchController = Get.put(CSearchBarController());
 
-    if (!txnsController.isLoading.value) {
-      txnsController.fetchTxns();
-    }
+    txnsController.fetchTxns();
 
     //Get.put(CTxnsController());
 

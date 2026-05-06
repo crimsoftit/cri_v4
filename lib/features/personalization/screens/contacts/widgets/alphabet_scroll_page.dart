@@ -700,14 +700,24 @@ class CAlphabetScrollPage extends StatelessWidget {
   }
 
   Widget buildHeaders(BuildContext context, String tag) {
+    final isDarkTheme = CHelperFunctions.isDarkMode(context);
+
     return CRoundedContainer(
       alignment: Alignment.centerLeft,
+      bgColor: CColors.transparent,
       borderRadius: 5.0,
-      height: 40.0,
+      height: 30.0,
+
+      padding: const EdgeInsets.only(
+        left: 10.0,
+      ),
+      //width: 30.0,
       child: Text(
         tag,
         softWrap: true,
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: Theme.of(context).textTheme.bodyMedium!.apply(
+          color: isDarkTheme ? CColors.darkGrey : CColors.rBrown,
+        ),
       ),
     );
   }

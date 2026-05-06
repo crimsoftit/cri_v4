@@ -3,7 +3,6 @@ import 'package:cri_v3/common/widgets/dividers/c_divider.dart' show CDivider;
 import 'package:cri_v3/common/widgets/shimmers/vert_items_shimmer.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/personalization/screens/no_data/no_data_screen.dart';
-import 'package:cri_v3/features/store/controllers/checkout_controller.dart';
 import 'package:cri_v3/features/store/controllers/search_bar_controller.dart';
 import 'package:cri_v3/features/store/controllers/sync_controller.dart';
 import 'package:cri_v3/features/store/controllers/txns_controller.dart';
@@ -106,7 +105,6 @@ class CTxnItemsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final checkoutController = Get.put(CCheckoutController());
     final isDarkTheme = CHelperFunctions.isDarkMode(context);
     //final invController = Get.put(CInventoryController());
     final searchController = Get.put(CSearchBarController());
@@ -465,137 +463,122 @@ class CTxnItemsListView extends StatelessWidget {
                                         ? MainAxisAlignment.spaceBetween
                                         : MainAxisAlignment.spaceBetween,
                                     children: [
-                                      if (space == 'sales')
-                                        TextButton.icon(
-                                          label: Text(
-                                            'info',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelMedium!
-                                                .apply(
-                                                  color: isDarkTheme
-                                                      ? CColors.white
-                                                      : CColors.rBrown,
-                                                ),
-                                          ),
-                                          icon: Icon(
-                                            Iconsax.information,
-                                            color: isDarkTheme
-                                                ? CColors.white
-                                                : CColors.rBrown,
-                                          ),
-                                          onPressed: () {
-                                            Get.toNamed(
-                                              '/sales/sold_item_details',
-                                              arguments: item.soldItemId,
-                                            );
-                                          },
-                                        ),
+                                      space == 'sales'
+                                          ? TextButton.icon(
+                                              label: Text(
+                                                'info',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .labelMedium!
+                                                    .apply(
+                                                      color: isDarkTheme
+                                                          ? CColors.white
+                                                          : CColors.rBrown,
+                                                    ),
+                                              ),
+                                              icon: Icon(
+                                                Iconsax.information,
+                                                color: isDarkTheme
+                                                    ? CColors.white
+                                                    : CColors.rBrown,
+                                              ),
+                                              onPressed: () {
+                                                Get.toNamed(
+                                                  '/sales/sold_item_details',
+                                                  arguments: item.soldItemId,
+                                                );
+                                              },
+                                            )
+                                          : const SizedBox.shrink(),
 
-                                      /// -- partial invoice payment btn
-                                      if (space == 'invoices')
-                                        TextButton.icon(
-                                          icon: Icon(
-                                            Icons.monetization_on,
-                                          ),
-                                          label: Text(
-                                            'Partial payment',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelMedium!
-                                                .apply(
-                                                  color: CColors.white,
-                                                  fontSizeFactor: 1.1,
-                                                ),
-                                          ),
-                                          onPressed: () {
-                                            txnsController.takePartialPayment(
-                                              context,
-                                              item,
-                                            );
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                CNetworkManager
-                                                    .instance
-                                                    .hasConnection
-                                                    .value
-                                                ? CColors.rBrown
-                                                : CColors.black,
-                                            foregroundColor: CColors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                10.0,
-                                              ), // Set the desired radius here
-                                            ),
-                                          ),
-                                        ),
-
-                                      SizedBox(
-                                        width: space == 'invoices'
-                                            ? CHelperFunctions.screenWidth() *
-                                                  0.43
-                                            : CHelperFunctions.screenWidth() *
-                                                  0.30,
-                                        child: TextButton.icon(
-                                          onPressed: () {
-                                            switch (space) {
-                                              case 'invoices':
-                                                if (txnsController
-                                                    .transactionItems
-                                                    .isNotEmpty) {
-                                                  checkoutController
-                                                      .confirmInvoicePaymentDialog(
-                                                        item.txnId,
-                                                      );
-                                                }
-                                                break;
-                                              case 'sales':
+                                      space == 'invoices'
+                                          ?
+                                            /// -- take invoice payment btn
+                                            TextButton.icon(
+                                              icon: Icon(
+                                                Icons.monetization_on,
+                                              ),
+                                              label: Text(
+                                                'Take payment',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .labelMedium!
+                                                    .apply(
+                                                      color: CColors.white,
+                                                      fontSizeFactor: 1.1,
+                                                    ),
+                                              ),
+                                              onPressed: () {
                                                 txnsController
-                                                    .refundItemActionModal(
+                                                    .takePartialPayment(
                                                       context,
                                                       item,
                                                     );
-                                                break;
-                                              default:
-                                            }
-                                          },
-                                          icon: Icon(
-                                            space == 'invoices'
-                                                ? Iconsax.empty_wallet_tick
-                                                : CAppIcons.refundIcon,
-                                            color: CColors.white,
-                                          ),
-                                          label: Text(
-                                            space == 'invoices'
-                                                ? 'Complete txn'
-                                                : 'refund',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelMedium!
-                                                .apply(
-                                                  color: CColors.white,
-                                                  fontSizeFactor: 1.1,
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    CNetworkManager
+                                                        .instance
+                                                        .hasConnection
+                                                        .value
+                                                    ? CColors.rBrown
+                                                    : CColors.black,
+                                                foregroundColor: CColors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        10.0,
+                                                      ), // Set the desired radius here
                                                 ),
-                                          ),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: space == 'sales'
-                                                ? Colors.redAccent
-                                                : CNetworkManager
-                                                      .instance
-                                                      .hasConnection
-                                                      .value
-                                                ? CColors.rBrown
-                                                : CColors.black,
-                                            foregroundColor: CColors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                10.0,
-                                              ), // Set the desired radius here
+                                              ),
+                                            )
+                                          : SizedBox(
+                                              width:
+                                                  CHelperFunctions.screenWidth() *
+                                                  0.30,
+                                              child: TextButton.icon(
+                                                onPressed: () {
+                                                  txnsController
+                                                      .refundItemActionModal(
+                                                        context,
+                                                        item,
+                                                      );
+                                                },
+                                                icon: Icon(
+                                                  CAppIcons.refundIcon,
+                                                  color: CColors.white,
+                                                ),
+                                                label: Text(
+                                                  'Refund',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .labelMedium!
+                                                      .apply(
+                                                        color: CColors.white,
+                                                        fontSizeFactor: 1.1,
+                                                      ),
+                                                ),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      space == 'sales'
+                                                      ? Colors.redAccent
+                                                      : CNetworkManager
+                                                            .instance
+                                                            .hasConnection
+                                                            .value
+                                                      ? CColors.rBrown
+                                                      : CColors.black,
+                                                  foregroundColor:
+                                                      CColors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10.0,
+                                                        ), // Set the desired radius here
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),

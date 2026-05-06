@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
-class CAlphabetScrollerView extends StatelessWidget {
-  const CAlphabetScrollerView({super.key});
+class CContactsScreen extends StatelessWidget {
+  const CContactsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -3,7 +3,7 @@ import 'package:cri_v3/features/authentication/screens/onboarding/onboarding_scr
 import 'package:cri_v3/features/authentication/screens/pswd_config/forgot_password.dart';
 import 'package:cri_v3/features/authentication/screens/signup/signup.dart';
 import 'package:cri_v3/features/authentication/screens/signup/verify_email.dart';
-import 'package:cri_v3/features/personalization/screens/contacts/widgets/alphabet_scroller_view.dart';
+import 'package:cri_v3/features/personalization/screens/contacts/contacts_screen.dart';
 import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/contact_detailz_screen.dart';
 
 import 'package:cri_v3/features/personalization/screens/profile/profile.dart';
@@ -119,8 +119,7 @@ class CAppRoutes {
     GetPage(
       name: CRoutes.contactsScreen,
       page: () {
-        //return const CContactsScreen();
-        return const CAlphabetScrollerView();
+        return const CContactsScreen();
       },
     ),
     GetPage(
