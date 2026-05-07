@@ -234,6 +234,18 @@ class CAddUpdateContactForm extends StatelessWidget {
                                 return;
                               }
 
+                              if (!CValidator.isValidPhoneNumber(
+                                contactsController.txtPhoneController.text
+                                    .trim(),
+                              )) {
+                                CPopupSnackBar.errorSnackBar(
+                                  message:
+                                      'The supplied phone number is invalid!',
+                                  title: 'Invalid phone number!',
+                                );
+                                return;
+                              }
+
                               var contactDetails = CContactsModel(
                                 userController.user.value.email,
                                 0,

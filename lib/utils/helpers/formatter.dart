@@ -76,7 +76,7 @@ class CFormatter {
         //     '$differenceInHours hour(s) $differenceInMinutes minute(s) ago';
 
         break;
-      case >= 1:
+      case >= 1 && <= 7:
         differenceInDays = endTime.difference(startTime).inDays;
         differenceInHours = endTime.difference(startTime).inHours % 24;
         // formattedRange =
@@ -84,6 +84,44 @@ class CFormatter {
         formattedRange = differenceInDays == 1
             ? 'in $differenceInDays day'
             : 'in $differenceInDays days';
+        break;
+      case >= 7 && <= 29:
+        differenceInDays = endTime.difference(startTime).inDays;
+
+        differenceInHours = endTime.difference(startTime).inHours % 24;
+
+        int differenceInWeeks = (differenceInDays.abs() / 7).floor();
+        int remainingDays = differenceInDays.abs() % 7;
+        // formattedRange =
+        //     'in $differenceInDays day(s) $differenceInHours hour(s)';
+        formattedRange = differenceInWeeks == 1
+            ? 'in $differenceInWeeks week $remainingDays days'
+            : 'in $differenceInWeeks weeks $remainingDays days';
+        break;
+      case >= 30 && < 365:
+        differenceInDays = endTime.difference(startTime).inDays;
+
+        differenceInHours = endTime.difference(startTime).inHours % 24;
+
+        int differenceInMonths = (differenceInDays.abs() / 30).floor();
+        int remainingDays = differenceInDays.abs() % 30;
+        // formattedRange =
+        //     'in $differenceInDays day(s) $differenceInHours hour(s)';
+        formattedRange = differenceInMonths == 1
+            ? 'in $differenceInMonths month $remainingDays days'
+            : 'in $differenceInMonths months $remainingDays days';
+        break;
+      case >= 365:
+        differenceInDays = endTime.difference(startTime).inDays;
+
+        int differenceInYrs = (differenceInDays / 365).floor();
+        int remainingDays = differenceInDays.abs() % 365;
+        int remainingMonths = (differenceInDays.abs() / 30).floor() % 12;
+        // formattedRange =
+        //     'in $differenceInDays day(s) $differenceInHours hour(s)';
+        formattedRange = differenceInYrs == 1
+            ? 'in $differenceInYrs yr $remainingMonths days'
+            : 'in $differenceInYrs yrs $remainingMonths months';
         break;
       default:
         differenceInDays = 0;

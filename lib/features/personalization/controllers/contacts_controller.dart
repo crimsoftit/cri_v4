@@ -1440,7 +1440,6 @@ class CContactsController extends GetxController {
   }
 
   /// -- restore contact from trash --
-
   void delayedTrashAction(CContactsModel trashItem) async {
     // Wait for 7 seconds
     await Future.delayed(
@@ -1474,6 +1473,27 @@ class CContactsController extends GetxController {
     }
 
     resetFields();
+  }
+
+  /// -- check if contact exists --
+  Future<bool> checkIfContactExists(String suppliedDetails) async {
+    try {
+      return false;
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error processing contacts\' cloud sync: $e',
+          title: 'error processing contacts\' cloud sync',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to process contacts\' cloud sync! Please try again later..',
+          title: 'error processing contacts\' cloud sync',
+        );
+      }
+      rethrow;
+    }
   }
 
   /// -- process cloud sync --

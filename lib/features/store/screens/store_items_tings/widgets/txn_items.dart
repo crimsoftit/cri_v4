@@ -266,8 +266,15 @@ class CTxnItemsListView extends StatelessWidget {
                                           ),
                                     ),
                                     Text(
+                                      // space == 'sales'
+                                      //     ? 'amt: $userCurrency.${(item.unitSellingPrice * item.quantity)}'
+                                      //     : space == 'refunds'
+                                      //     ? 'refunded: $userCurrency.${(item.unitSellingPrice * item.qtyRefunded)}'
+                                      //     : space == 'invoices'
+                                      //     ? 'Amt owed: $userCurrency.${item.totalAmount - item.amountIssued}'
+                                      //     : 'txn Amt: $userCurrency.${item.totalAmount}',
                                       space == 'sales'
-                                          ? 'amt: $userCurrency.${(item.unitSellingPrice * item.quantity)}'
+                                          ? 'amt: $userCurrency.${(item.totalAmount)}'
                                           : space == 'refunds'
                                           ? 'refunded: $userCurrency.${(item.unitSellingPrice * item.qtyRefunded)}'
                                           : space == 'invoices'
