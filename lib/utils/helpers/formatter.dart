@@ -115,7 +115,7 @@ class CFormatter {
         differenceInDays = endTime.difference(startTime).inDays;
 
         int differenceInYrs = (differenceInDays / 365).floor();
-        int remainingDays = differenceInDays.abs() % 365;
+        //int remainingDays = differenceInDays.abs() % 365;
         int remainingMonths = (differenceInDays.abs() / 30).floor() % 12;
         // formattedRange =
         //     'in $differenceInDays day(s) $differenceInHours hour(s)';

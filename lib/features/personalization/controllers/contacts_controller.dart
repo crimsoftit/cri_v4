@@ -1475,7 +1475,7 @@ class CContactsController extends GetxController {
     resetFields();
   }
 
-  /// -- check if contact exists --
+  /// TODO: useless -> use -- contactActionIsAdd insteadcheck if contact exists --
   Future<bool> checkIfContactExists(String suppliedDetails) async {
     try {
       return false;
