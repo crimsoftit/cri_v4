@@ -260,8 +260,6 @@ flutter:
     - assets/icons/payment_methods/
     - assets/icons/payment_methods/bitcoin.jpeg
     - assets/icons/payment_methods/credit.jpeg
-    - assets/icons/payment_methods/credit.webp
-    - assets/icons/payment_methods/credit1.webp
     - assets/icons/payment_methods/deferred.jpg
     - assets/icons/payment_methods/deferred.webp
     - assets/icons/payment_methods/deferred1.webp

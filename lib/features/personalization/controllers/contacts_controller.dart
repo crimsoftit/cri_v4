@@ -535,39 +535,6 @@ class CContactsController extends GetxController {
                             ),
                           ),
 
-                          CCustomTypeaheadField(
-                            fieldValidator: updateAction == 'add email'
-                                ? (value) {
-                                    return CValidator.validateEmail(value);
-                                  }
-                                : null,
-                            fillColor: isDarkTheme
-                                ? CColors.transparent
-                                : CColors.lightGrey,
-                            focusedBorderColor: isDarkTheme
-                                ? CColors.white
-                                : CColors.rBrown,
-                            includeAvatarOnSuggestion: true,
-                            includePrefixIcon: true,
-                            labelTxt: 'E-mail address',
-                            onFieldValueChanged: (value) {
-                              txtEmailController.text = value.trim();
-                            },
-                            onItemSelected: (suggestion) {
-                              txtEmailController.text = suggestion.contactEmail;
-                            },
-                            prefixIcon: Icon(
-                              Icons.contact_mail,
-                              color: CColors.darkGrey,
-                              size: CSizes.iconXs,
-                            ),
-                            typeAheadFieldController: txtEmailController,
-                          ),
-
-                          const SizedBox(
-                            height: CSizes.spaceBtnInputFields,
-                          ),
-
                           // CInternationalPhoneNumberInput(
                           //   controller: txtPhoneController,
                           // ),
@@ -635,6 +602,37 @@ class CContactsController extends GetxController {
                           const SizedBox(
                             height: CSizes.spaceBtnInputFields,
                           ),
+                          CCustomTypeaheadField(
+                            fieldValidator: updateAction == 'add email'
+                                ? (value) {
+                                    return CValidator.validateEmail(value);
+                                  }
+                                : null,
+                            fillColor: isDarkTheme
+                                ? CColors.transparent
+                                : CColors.lightGrey,
+                            focusedBorderColor: isDarkTheme
+                                ? CColors.white
+                                : CColors.rBrown,
+                            includeAvatarOnSuggestion: true,
+                            includePrefixIcon: true,
+                            labelTxt: 'E-mail address',
+                            onFieldValueChanged: (value) {
+                              txtEmailController.text = value.trim();
+                            },
+                            onItemSelected: (suggestion) {
+                              txtEmailController.text = suggestion.contactEmail;
+                            },
+                            prefixIcon: Icon(
+                              Icons.contact_mail,
+                              color: CColors.darkGrey,
+                              size: CSizes.iconXs,
+                            ),
+                            typeAheadFieldController: txtEmailController,
+                          ),
+                          const SizedBox(
+                            height: CSizes.spaceBtnInputFields,
+                          ),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -675,11 +673,6 @@ class CContactsController extends GetxController {
                                       return;
                                     }
 
-                                    if (kDebugMode) {
-                                      print('<<< safi >>>\n');
-                                      print('radaree kaka...');
-                                      print('<<< safi >>>\n');
-                                    }
                                     contactItem.contactCountryCode =
                                         contactItem.contactCountryCode == ''
                                         ? contactCountryCode.value
@@ -702,12 +695,18 @@ class CContactsController extends GetxController {
                                       'yyyy-MM-dd kk:mm',
                                     ).format(clock.now());
 
+                                    contactItem.syncAction =
+                                        contactItem.isSynced == 0
+                                        ? 'append'
+                                        : 'update';
+                                    await updateContact(contactItem);
                                     if (await updateContact(contactItem)) {
-                                      resetFields();
                                       Navigator.pop(
                                         Get.overlayContext!,
                                         true,
                                       );
+
+                                      resetFields();
                                     }
                                   },
                                 ),
@@ -1475,34 +1474,13 @@ class CContactsController extends GetxController {
     resetFields();
   }
 
-  /// TODO: useless -> use -- contactActionIsAdd insteadcheck if contact exists --
-  Future<bool> checkIfContactExists(String suppliedDetails) async {
-    try {
-      return false;
-    } catch (e) {
-      if (kDebugMode) {
-        CPopupSnackBar.errorSnackBar(
-          message: 'error processing contacts\' cloud sync: $e',
-          title: 'error processing contacts\' cloud sync',
-        );
-      } else {
-        CPopupSnackBar.errorSnackBar(
-          message:
-              'Unable to process contacts\' cloud sync! Please try again later..',
-          title: 'error processing contacts\' cloud sync',
-        );
-      }
-      rethrow;
-    }
-  }
-
   /// -- process cloud sync --
   Future<void> processContactsSync() async {
     try {
       processingContactsSync.value = true;
       await addUnsyncedContactAppendsToCloud().then(
-        (_) async {
-          await updateInitiallySyncedContacts();
+        (_) {
+          updateInitiallySyncedContacts();
         },
       );
 

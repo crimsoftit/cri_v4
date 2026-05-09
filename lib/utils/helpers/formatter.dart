@@ -120,7 +120,7 @@ class CFormatter {
         // formattedRange =
         //     'in $differenceInDays day(s) $differenceInHours hour(s)';
         formattedRange = differenceInYrs == 1
-            ? 'in $differenceInYrs yr $remainingMonths days'
+            ? 'in $differenceInYrs yr $remainingMonths months'
             : 'in $differenceInYrs yrs $remainingMonths months';
         break;
       default:

@@ -114,10 +114,12 @@ class CImages {
   static const String cash5 = "assets/icons/payment_methods/cash_5.png";
   static const String cash6 = "assets/icons/payment_methods/cash_6.png";
   static const String cash7 = "assets/icons/payment_methods/cash_7.png";
+  static const String credit = "assets/icons/payment_methods/deferred.webp";
   static const String credit1 = "assets/icons/payment_methods/credit1.webp";
   static const String credit2 = "assets/icons/payment_methods/credit.jpeg";
-  //static const String deferred = "assets/icons/payment_methods/deferred.jpg";
-  static const String deferred = "assets/icons/payment_methods/deferred.webp";
+  static const String deferred =
+      "assets/icons/payment_methods/deferred.jpg";
+  //static const String deferred = "assets/icons/payment_methods/deferred.webp";
   static const String deferred1 = "assets/icons/payment_methods/deferred1.webp";
 
   static const String googlePayLogo =
@@ -127,6 +129,7 @@ class CImages {
   static const String mPesaLogo = "assets/icons/payment_methods/mpesa.png";
   static const String mpesaExpressLogo =
       "assets/icons/payment_methods/mpesa_xpress.png";
+  static const String onTheHauz = "assets/icons/payment_methods/on_d_hauz.jpg";
   static const String paypalLogo = "assets/icons/payment_methods/paypal.png";
   static const String visaLogo = "assets/icons/payment_methods/visa.png";
 

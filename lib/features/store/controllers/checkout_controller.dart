@@ -285,12 +285,12 @@ class CCheckoutController extends GetxController {
                       ).format(clock.now()),
                       'notification_body': alertBody,
                       'notification_id': thisAlertId.toString(),
-                      'notification_title': 'restocking is due!',
+                      'notification_title': 'Restocking is due!',
                       'product_id': invItem.productId.toString(),
                     };
 
                     await CLocalNotificationsController.displaySimpleAlert(
-                      title: 'restocking is due!',
+                      title: 'Restocking is due!',
                       body: alertBody,
                       payload: jsonEncode(payloadData),
                     );
@@ -298,7 +298,7 @@ class CCheckoutController extends GetxController {
                     // TODO: -- add notification details to sqflite db --
                     var notificationItem = CNotificationsModel(
                       1,
-                      'restocking is due!',
+                      'Restocking is due!',
                       alertBody,
                       0,
                       invItem.productId,
@@ -389,31 +389,48 @@ class CCheckoutController extends GetxController {
       builder: (_) {
         return SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.all(CSizes.lg / 3),
+            padding: const EdgeInsets.all(
+              CSizes.lg / 3,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const CSectionHeading(
                   showActionBtn: false,
-                  title: 'select payment method...',
+                  title: 'Select payment method...',
                   btnTitle: '',
                   editFontSize: true,
                 ),
-                const SizedBox(height: CSizes.spaceBtnSections / 4),
+                const SizedBox(
+                  height: CSizes.spaceBtnSections / 4,
+                ),
                 CPaymentMethodsTile(
                   paymentMethod: CPaymentMethodModel(
-                    platformLogo: CImages.deferred1,
+                    platformLogo: CImages.onTheHauz,
+                    platformName: 'On the house',
+                  ),
+                ),
+                const SizedBox(
+                  height: CSizes.spaceBtnSections / 4,
+                ),
+                CPaymentMethodsTile(
+                  paymentMethod: CPaymentMethodModel(
+                    platformLogo: CImages.deferred,
                     platformName: 'credit',
                   ),
                 ),
-                const SizedBox(height: CSizes.spaceBtnSections / 4),
+                const SizedBox(
+                  height: CSizes.spaceBtnSections / 4,
+                ),
                 CPaymentMethodsTile(
                   paymentMethod: CPaymentMethodModel(
                     platformLogo: CImages.cash6,
                     platformName: 'cash',
                   ),
                 ),
-                const SizedBox(height: CSizes.spaceBtnSections / 4),
+                const SizedBox(
+                  height: CSizes.spaceBtnSections / 4,
+                ),
                 CPaymentMethodsTile(
                   paymentMethod: CPaymentMethodModel(
                     platformLogo: CImages.mpesaExpressLogo,

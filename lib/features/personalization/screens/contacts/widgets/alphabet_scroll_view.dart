@@ -706,7 +706,7 @@ class CContactItem extends StatelessWidget {
       alignment: Alignment.centerLeft,
       bgColor: CColors.transparent,
       borderRadius: 5.0,
-      height: 30.0,
+      height: 15.0,
 
       padding: const EdgeInsets.only(
         left: 10.0,

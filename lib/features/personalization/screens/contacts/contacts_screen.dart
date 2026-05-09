@@ -109,8 +109,8 @@ class CContactsScreen extends StatelessWidget {
                                 Row(
                                   children: [
                                     IconButton(
-                                      onPressed: () {
-                                        contactsController
+                                      onPressed: () async {
+                                        await contactsController
                                             .addContactActionModal(
                                               context,
                                             );
