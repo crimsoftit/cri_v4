@@ -890,9 +890,8 @@ class DbHelper extends GetxController {
         where: 'contactId = ?',
         whereArgs: [contact.contactId],
       );
-      
+
       return updateResult;
-      
     } catch (e) {
       if (kDebugMode) {
         CPopupSnackBar.errorSnackBar(
@@ -910,7 +909,9 @@ class DbHelper extends GetxController {
   }
 
   /// -- add unsynced contact deletions to a temporary table --
-  Future<void> addUnsyncedDeletions(CContactsDelModel deletedContact) async {
+  Future<void> addUnsyncedContactDeletions(
+    CContactsDelModel deletedContact,
+  ) async {
     try {
       final db = _db;
 
@@ -961,6 +962,38 @@ class DbHelper extends GetxController {
         CPopupSnackBar.errorSnackBar(
           title: 'delete error',
           message: 'error deleting contact!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<CContactsDelModel>> fetchContactDels() async {
+    try {
+      final db = _db;
+      final contactDels = await db!.rawQuery(
+        'SELECT * FROM $contactDelsForSyncTable',
+      );
+
+      if (contactDels.isEmpty) {
+        return [];
+      } else {
+        final result = contactDels
+            .map((json) => CContactsDelModel.fromMapObject(json))
+            .toList();
+        return result;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error fetching cloud deletion contacts: $e',
+          title: 'error fetching cloud deletion contacts! ',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while fetching cloud deletion contacts! Please try again later...',
+          title: 'error fetching cloud deletion contacts!',
         );
       }
       rethrow;

@@ -11,6 +11,7 @@ import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/constants/sizes.dart';
 import 'package:cri_v3/utils/helpers/formatter.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
+import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -319,7 +320,16 @@ class CProductCardVertical extends StatelessWidget {
                               radius: 8.0,
                             )
                           : CAddToCartBtn(
-                              boxColor: avatarColor,
+                              boxColor:
+                                  avatarColor == CColors.warning ||
+                                      avatarColor == CColors.error
+                                  ? avatarColor
+                                  : CNetworkManager
+                                        .instance
+                                        .connectionIsStable
+                                        .value
+                                  ? CColors.rBrown
+                                  : CColors.darkGrey,
                               pId: pId,
                             ),
                     ),

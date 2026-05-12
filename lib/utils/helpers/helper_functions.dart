@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:cri_v3/utils/computations/date_time_computations.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
+import 'package:cri_v3/utils/helpers/network_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -241,7 +242,11 @@ class CHelperFunctions {
 
         break;
       default:
-        displayColor = defaultDisplayColor ?? CColors.rBrown;
+        displayColor =
+            defaultDisplayColor ??
+            (CNetworkManager.instance.hasConnection.value
+                ? CColors.rBrown
+                : CColors.darkerGrey);
         break;
     }
     return displayColor;

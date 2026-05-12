@@ -275,8 +275,8 @@ class CContactsExpansionPanelView extends StatelessWidget {
                                               color: CColors.white,
                                             ),
                                       ),
-                                      onPressed: () {
-                                        contactsController
+                                      onPressed: () async {
+                                        await contactsController
                                             .onDeleteContactDialog(contact);
                                       },
                                       style: ElevatedButton.styleFrom(

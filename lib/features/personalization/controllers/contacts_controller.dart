@@ -7,6 +7,7 @@ import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container
 import 'package:cri_v3/common/widgets/flushbars/flushbars.dart';
 import 'package:cri_v3/common/widgets/txt_fields/custom_type_ahead_field.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
+import 'package:cri_v3/features/personalization/models/contacts_del_model.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
 import 'package:cri_v3/features/personalization/screens/contacts/widgets/add_update_contact_form.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
@@ -54,6 +55,8 @@ class CContactsController extends GetxController {
   final RxBool processingContactsSync = false.obs;
   final RxBool undoTrashBtnPressed = false.obs;
 
+  final RxList<CContactsDelModel> cloudDelContacts = <CContactsDelModel>[].obs;
+
   final RxList<CContactsModel> allCloudContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> userCloudContacts = <CContactsModel>[].obs;
   final RxList<CContactsModel> foundMatches = <CContactsModel>[].obs;
@@ -79,6 +82,7 @@ class CContactsController extends GetxController {
     processingContactsSync.value = false;
     undoTrashBtnPressed.value = false;
     await fetchMyContacts();
+    await fetchContactsForCloudDeletion();
     await initContactsSync();
     super.onInit();
   }
@@ -896,7 +900,7 @@ class CContactsController extends GetxController {
   }
 
   /// -- delete contact dialog --
-  onDeleteContactDialog(CContactsModel contact) async {
+  Future onDeleteContactDialog(CContactsModel contact) async {
     try {
       Get.defaultDialog(
         content: Column(
@@ -962,12 +966,38 @@ class CContactsController extends GetxController {
 
         confirm: ElevatedButton(
           onPressed: () async {
-            // -- check internet connectivity
-            // final isConnected = CNetworkManager.instance.hasConnection.value;
+            if (contact.isSynced == 1) {
+              // -- check internet connectivity
+              //final isConnected = await CNetworkManager.instance.isConnected();
+              var forCloudDeleteItem = CContactsDelModel(
+                contact.contactId!,
+                contact.contactEmail,
+                contact.contactName,
+                contact.contactPhone,
+                userController.user.value.email,
+                DateFormat('yyyy-MM-dd kk:mm').format(clock.now()),
+                contact.isSynced,
+                contact.syncAction,
+              );
 
-            // await dbHelper.deleteContact(contact);
+              dbHelper.addUnsyncedContactDeletions(forCloudDeleteItem).then(
+                (_) async {
+                  await dbHelper.deleteContact(contact);
+                },
+              );
+            } else {
+              await dbHelper.deleteContact(contact);
+            }
 
-            // Navigator.of(Get.overlayContext!).pop();
+            await fetchContactsForCloudDeletion();
+
+            Get.offAll(
+              () {
+                final navController = Get.put(CNavMenuController());
+                navController.selectedIndex.value = 2;
+                return const NavMenu();
+              },
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
@@ -1007,6 +1037,31 @@ class CContactsController extends GetxController {
           title: 'error deleting contact!',
         );
       }
+      rethrow;
+    }
+  }
+
+  /// -- fetch contact deletions that require cloud sync --
+  Future<List<CContactsDelModel>> fetchContactsForCloudDeletion() async {
+    try {
+      final contactDels = await dbHelper.fetchContactDels();
+      cloudDelContacts.assignAll(contactDels);
+
+      return cloudDelContacts.toList();
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: e.toString(),
+          title: 'Error fetching contatcs for cloud deletion!',
+        );
+      } else {
+        CPopupSnackBar.customToast(
+          forInternetConnectivityStatus: false,
+          message:
+              'An unknown error occurred while fetching contatcs for cloud deletion!',
+        );
+      }
+
       rethrow;
     }
   }

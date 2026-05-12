@@ -141,6 +141,9 @@ class CContactsScreen extends StatelessWidget {
                                                         .isEmpty &&
                                                     contactsController
                                                         .unsyncedContactUpdates
+                                                        .isEmpty &&
+                                                    contactsController
+                                                        .cloudDelContacts
                                                         .isEmpty
                                                 ? null
                                                 : () async {
@@ -153,6 +156,9 @@ class CContactsScreen extends StatelessWidget {
                                                           .isEmpty &&
                                                       contactsController
                                                           .unsyncedContactUpdates
+                                                          .isEmpty &&
+                                                      contactsController
+                                                          .cloudDelContacts
                                                           .isEmpty
                                                   ? Iconsax.cloud_add
                                                   : Iconsax.cloud_change,

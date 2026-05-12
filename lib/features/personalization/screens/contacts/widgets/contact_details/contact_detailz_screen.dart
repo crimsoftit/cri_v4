@@ -499,7 +499,7 @@ class CContactDetailsScreen extends StatelessWidget {
                                       children: [
                                         TextButton(
                                           onPressed: () async {
-                                            contactsController
+                                            await contactsController
                                                 .onDeleteContactDialog(
                                                   contactItem,
                                                 );

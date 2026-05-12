@@ -362,8 +362,8 @@ class CContactItem extends StatelessWidget {
                                                           color: CColors.white,
                                                         ),
                                               ),
-                                              onPressed: () {
-                                                contactsController
+                                              onPressed: () async {
+                                                await contactsController
                                                     .onDeleteContactDialog(
                                                       contact,
                                                     );
@@ -400,17 +400,28 @@ class CContactItem extends StatelessWidget {
                                                         contact.contactPhone !=
                                                                 ''
                                                             ? Expanded(
-                                                                child: SelectableText(
-                                                                  'Mobile ${contact.contactDialCode}${contact.contactPhone}',
+                                                                child:
+                                                                    // SelectableText(
+                                                                    //   'Mobile ${contact.contactDialCode}${contact.contactPhone}',
+                                                                    //   style:
+                                                                    //       Theme.of(
+                                                                    //         context,
+                                                                    //       ).textTheme.labelMedium!.apply(
+                                                                    //         fontSizeFactor:
+                                                                    //             1.2,
+                                                                    //       ),
+                                                                    // ),
+                                                                    SelectableText(
+                                                                      'Mobile ${contact.contactPhone}',
 
-                                                                  style:
-                                                                      Theme.of(
-                                                                        context,
-                                                                      ).textTheme.labelMedium!.apply(
-                                                                        fontSizeFactor:
-                                                                            1.2,
-                                                                      ),
-                                                                ),
+                                                                      style:
+                                                                          Theme.of(
+                                                                            context,
+                                                                          ).textTheme.labelMedium!.apply(
+                                                                            fontSizeFactor:
+                                                                                1.2,
+                                                                          ),
+                                                                    ),
                                                               )
                                                             : Expanded(
                                                                 child: Text(
@@ -707,7 +718,6 @@ class CContactItem extends StatelessWidget {
       bgColor: CColors.transparent,
       borderRadius: 5.0,
       height: 15.0,
-
       padding: const EdgeInsets.only(
         left: 10.0,
       ),
