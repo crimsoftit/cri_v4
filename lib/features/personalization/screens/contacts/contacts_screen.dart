@@ -3,7 +3,6 @@ import 'package:cri_v3/common/widgets/appbar/v2_app_bar.dart';
 import 'package:cri_v3/common/widgets/shimmers/shimmer_effects.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/screens/contacts/widgets/alphabet_scroll_view.dart';
-import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_item_raw.dart';
 import 'package:cri_v3/utils/constants/colors.dart';
 import 'package:cri_v3/utils/helpers/helper_functions.dart';
 import 'package:cri_v3/utils/helpers/network_manager.dart';
@@ -204,34 +203,39 @@ class CContactsScreen extends StatelessWidget {
             body: const TabBarView(
               physics: BouncingScrollPhysics(),
               children: [
-                // CContactItem(
-                //   space: 'all',
-                // ),
-                CContactsExpansionPanelView(
+                CContactItem(
                   space: 'all',
                 ),
-                CContactsExpansionPanelView(
+                
+                CContactItem(
                   space: 'suppliers',
                 ),
-                // CContactItem(
-                //   space: 'suppliers',
-                // ),
-                // CContactItem(
-                //   space: 'customers',
-                // ),
-                CContactsExpansionPanelView(
+                CContactItem(
                   space: 'customers',
                 ),
-                CContactsExpansionPanelView(
+                CContactItem(
                   space: 'friends',
                 ),
+                CContactItem(
+                  space: 'trashed',
+                ),
+                // CContactsExpansionPanelView(
+                //   space: 'all',
+                // ),
+                // CContactsExpansionPanelView(
+                //   space: 'suppliers',
+                // ),
+                // CContactsExpansionPanelView(
+                //   space: 'customers',
+                // ),
+                // CContactsExpansionPanelView(
+                //   space: 'friends',
+                // ),
 
                 // CContactsExpansionPanelView(
                 //   space: 'friends',
                 // ),
-                CContactsExpansionPanelView(
-                  space: 'trashed',
-                ),
+                
               ],
             ),
           ),

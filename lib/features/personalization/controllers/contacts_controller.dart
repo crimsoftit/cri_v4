@@ -69,11 +69,15 @@ class CContactsController extends GetxController {
     'Friend',
     'Supplier',
   ].obs;
+  final RxList alphabet = [].obs;
 
   final RxString contactCountryCode = 'KE'.obs;
   final RxString contactDialCode = '254'.obs;
+  final RxString contactTag = ''.obs;
 
   final RxString selectedCategory = ''.obs;
+
+  final RxMap groupedContacts = {}.obs;
 
   @override
   void onInit() async {
@@ -294,6 +298,10 @@ class CContactsController extends GetxController {
 
           break;
       }
+
+      //sortAndGroupMyContacts();
+
+      
 
       // stop loader
       isLoading.value = false;
@@ -1856,6 +1864,38 @@ class CContactsController extends GetxController {
         ? selectedCategory.value
         : contactCategories[0];
     return selectedCategory.value;
+  }
+
+  /// -- sort and group myContacts alphabetically --
+  Future sortAndGroupMyContacts() async {
+    // 1. Group by First Letter
+    //Map<String, List<CContactsModel>> groupedContacts = {};
+
+    myContacts.sort(
+      (a, b) {
+        return a.contactName.compareTo(b.contactName);
+      },
+    );
+
+    for (var contact in myContacts) {
+      if (contact.contactName.isEmpty) continue;
+
+      // -- get the 1st letter, ensure it's uppercase and valid --
+      contactTag.value = contact.contactName[0].toUpperCase();
+
+      // -- filter only A to Z --
+      if (RegExp(r'^[A-Z]$').hasMatch(contactTag.value)) {
+        groupedContacts.putIfAbsent(contactTag, () => []);
+        groupedContacts[contactTag]!.add(contact);
+      }
+    }
+
+    alphabet.value = List.generate(
+      26,
+      (i) {
+        return String.fromCharCode(65 + i);
+      },
+    );
   }
 
   resetFields() {

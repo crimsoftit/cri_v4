@@ -113,6 +113,11 @@ class AuthRepo extends GetxController {
           deviceStorage.writeIfNull('SyncContactsWithCloud', true);
 
           if (await userController.fetchUserDetails()) {
+            await contactsController.fetchMyContacts();
+
+            await invController.fetchUserInventoryItems();
+
+            await txnsController.fetchSoldItems();
             if (CNetworkManager.instance.hasConnection.value &&
                 CNetworkManager.instance.connectionIsStable.value) {
               await invController.initInvSync();
@@ -126,11 +131,7 @@ class AuthRepo extends GetxController {
             //         'Stable internet connection is required to import your data from the cloud',
             //   );
             // }
-            // await contactsController.fetchMyContacts();
 
-            // await invController.fetchUserInventoryItems();
-
-            // await txnsController.fetchSoldItems();
             Get.put(CCheckoutController());
 
             final navController = Get.put(CNavMenuController());

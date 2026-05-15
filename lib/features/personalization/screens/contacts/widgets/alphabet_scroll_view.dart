@@ -98,7 +98,17 @@ class CContactItem extends StatelessWidget {
             }
         }
 
-        if (demContacts.isEmpty && !contactsController.isLoading.value) {
+        if (demContacts.isNotEmpty &&
+            (contactsController.isLoading.value ||
+                contactsController.processingContactsSync.value)) {
+          return const CVerticalProductShimmer(
+            itemCount: 6,
+          );
+        }
+
+        if (demContacts.isEmpty &&
+            !contactsController.isLoading.value &&
+            !contactsController.processingContactsSync.value) {
           return Center(
             child: NoDataScreen(
               lottieImage: CImages.pencilAnimation,
@@ -111,20 +121,14 @@ class CContactItem extends StatelessWidget {
           );
         }
 
-        if (demContacts.isNotEmpty && contactsController.isLoading.value) {
-          return const CVerticalProductShimmer(
-            itemCount: 6,
-          );
+        if (demContacts.isNotEmpty &&
+            (!contactsController.isLoading.value ||
+                !contactsController.processingContactsSync.value)) {
+          SuspensionUtil.sortListBySuspensionTag(demContacts);
+          SuspensionUtil.setShowSuspensionStatus(demContacts);
         }
-
-        // if (demContacts.isNotEmpty &&
-        //     contactsController.isLoading.value == false) {
-        //   SuspensionUtil.sortListBySuspensionTag(demContacts);
-        //   SuspensionUtil.setShowSuspensionStatus(demContacts);
-        // }
-
         return AzListView(
-          data: [],
+          data: demContacts,
           indexBarOptions: IndexBarOptions(
             indexHintAlignment: Alignment.centerRight,
             indexHintOffset: Offset(
@@ -153,8 +157,14 @@ class CContactItem extends StatelessWidget {
               ),
             );
           },
-          itemCount: 1,
-          //indexBarMargin: const EdgeInsets.only( 10.0,),
+          itemCount:
+              contactsController.isLoading.value ||
+                  contactsController.processingContactsSync.value
+              ? demContacts.length
+              : 1,
+          indexBarMargin: const EdgeInsets.only(
+            right: 1.0,
+          ),
           itemBuilder: (context, index) {
             return SingleChildScrollView(
               child: Padding(
@@ -217,24 +227,18 @@ class CContactItem extends StatelessWidget {
                                 highlightColor: CColors.rBrown,
                                 headerBuilder: (context, isExpanded) {
                                   /// -- build alphabetic headers --
-                                  // final tag = contact.getSuspensionTag();
-                                  // final offstage = !contact.isShowSuspension;
+                                  final tag = contact.getSuspensionTag();
+                                  final offstage = !contact.isShowSuspension;
                                   return Column(
                                     children: [
-                                      // Offstage(
-                                      //   offstage: offstage,
-                                      //   child: buildHeaders(
-                                      //     context,
-                                      //     tag,
-                                      //   ),
-                                      // ),
+                                      Offstage(
+                                        offstage: offstage,
+                                        child: buildHeaders(
+                                          context,
+                                          tag,
+                                        ),
+                                      ),
                                       ListTile(
-                                        // contentPadding: const EdgeInsets.only(
-                                        //   bottom: 2.0,
-                                        //   left: 5.0,
-                                        //   right: 5.0,
-                                        //   top: 2.0,
-                                        // ),
                                         contentPadding: EdgeInsets.fromLTRB(
                                           5.0,
                                           2.0,
