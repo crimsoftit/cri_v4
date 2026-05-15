@@ -225,7 +225,9 @@ class CCartController extends GetxController {
             if (cartItems[itemIndex].quantity > inventoryItem.quantity) {
               CPopupSnackBar.warningSnackBar(
                 title: 'oh snap!',
-                message: 'only ${inventoryItem.quantity} items are stocked!',
+                message: inventoryItem.quantity == 1
+                    ? 'Only ${inventoryItem.quantity} item of ${inventoryItem.name.toUpperCase()} is stocked!'
+                    : 'Only ${inventoryItem.quantity} items of ${inventoryItem.name.toUpperCase()} are stocked!',
               );
               qtyFieldControllers[itemIndex].text =
                   inventoryItem.calibration == 'units'
@@ -258,8 +260,8 @@ class CCartController extends GetxController {
         }
       } else {
         CPopupSnackBar.warningSnackBar(
-          title: 'oh snap!',
-          message: '${cartItems[itemIndex].pName} is out of stock!',
+          title: 'Oh snap!',
+          message: '${inventoryItem.name.toUpperCase()} is out of stock!',
         );
       }
       updateCart();

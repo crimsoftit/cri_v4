@@ -157,7 +157,7 @@ class CCheckoutController extends GetxController {
 
         var userCoordinates = '';
 
-        if (CNetworkManager.instance.hasConnection.value ||
+        if (CNetworkManager.instance.hasConnection.value &&
             await CNetworkManager.instance.isConnected()) {
           userCoordinates =
               'lat: ${locationController.userLocation.value!.latitude} long: ${locationController.userLocation.value!.longitude}';

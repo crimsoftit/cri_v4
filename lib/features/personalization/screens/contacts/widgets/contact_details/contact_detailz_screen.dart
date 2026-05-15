@@ -1,6 +1,7 @@
 import 'package:cri_v3/common/widgets/buttons/icon_buttons/custom_icon_btn.dart';
 import 'package:cri_v3/common/widgets/dividers/c_divider.dart';
 import 'package:cri_v3/common/widgets/list_tiles/menu_tile.dart';
+import 'package:cri_v3/common/widgets/shimmers/vert_items_shimmer.dart';
 import 'package:cri_v3/common/widgets/txt_widgets/c_section_headings.dart';
 import 'package:cri_v3/features/personalization/controllers/contacts_controller.dart';
 import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/widgets/contact_settings_display.dart';
@@ -21,12 +22,17 @@ class CContactDetailsScreen extends StatelessWidget {
     final contactsController = Get.put(CContactsController());
     final isDarkTheme = CHelperFunctions.isDarkMode(context);
 
+    var contactItem = contactsController.myContacts.firstWhere(
+      (element) => element.contactId == Get.arguments,
+    );
+
     return Obx(
       () {
-        var contactId = Get.arguments;
-        var contactItem = contactsController.myContacts.firstWhereOrNull(
-          (element) => element.contactId == contactId,
-        );
+        if (contactsController.isLoading.value) {
+          return CVerticalProductShimmer(
+            itemCount: 5,
+          );
+        }
         return Container(
           color: isDarkTheme ? CColors.transparent : CColors.white,
           child: Scaffold(
@@ -58,7 +64,7 @@ class CContactDetailsScreen extends StatelessWidget {
                   onPressed: () async {
                     await contactsController.updateContactActionModal(
                       context,
-                      contactItem!,
+                      contactItem,
                       'edit',
                     );
                     await contactsController.fetchMyContacts();
@@ -104,7 +110,7 @@ class CContactDetailsScreen extends StatelessWidget {
                           radius: 40.0,
                           child:
                               CValidator.isFirstCharacterALetter(
-                                contactItem!.contactName,
+                                contactItem.contactName,
                               )
                               ? Text(
                                   contactItem.contactName[0].toUpperCase(),
@@ -196,10 +202,11 @@ class CContactDetailsScreen extends StatelessWidget {
                                                 context,
                                                 contactItem,
                                               )
-                                        : await contactsController.launchWhatsappChat(
-                                            '(${contactItem.contactDialCode}) ${contactItem.contactPhone}',
-                                          );
-                                          await contactsController.fetchMyContacts();
+                                        : await contactsController
+                                              .launchWhatsappChat(
+                                                '(${contactItem.contactDialCode}) ${contactItem.contactPhone}',
+                                              );
+                                    await contactsController.fetchMyContacts();
                                   },
                             width: 55.0,
                           ),

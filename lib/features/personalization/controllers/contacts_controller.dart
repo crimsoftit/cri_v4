@@ -89,8 +89,9 @@ class CContactsController extends GetxController {
 
   /// -- initialize cloud sync --
   initContactsSync() async {
-    if (localStorage.read('SyncContactsWithCloud') == true) {
-      await importContacts();
+    if (localStorage.read('SyncContactsWithCloud') == true &&
+        myContacts.isEmpty) {
+      //await importContacts();
       if (await importContacts()) {
         localStorage.write('SyncContactsWithCloud', false);
       } else {
@@ -290,6 +291,7 @@ class CContactsController extends GetxController {
           break;
         case false:
           returnItems = myContacts;
+
           break;
       }
 
@@ -1684,7 +1686,7 @@ class CContactsController extends GetxController {
 
       await fetchUserCloudContacts().then(
         (result) async {
-          if (userCloudContacts.isNotEmpty) {
+          if (userCloudContacts.isNotEmpty && myContacts.isEmpty) {
             for (var contact in userCloudContacts) {
               var forImportContacts = CContactsModel.withId(
                 contact.contactId,

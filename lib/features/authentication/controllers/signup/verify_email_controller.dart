@@ -38,24 +38,29 @@ class CVerifyEmailController extends GetxController {
 
   // -- set timer to automatically redirect upon email verification --
   setTimerForAutoRedirect() {
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
-      await FirebaseAuth.instance.currentUser?.reload();
-      final user = FirebaseAuth.instance.currentUser;
-      if (user?.emailVerified ?? false) {
-        timer.cancel();
-        Get.off(
-          () => CSuccessScreen(
-            displayReceiptGenerationSection: false,
-            image: CImages.successfulRegAnimation,
-            title: CTexts.accountCreatedTitle,
-            subTitle: CTexts.accountCreatedSubTitle,
-            onContinueBtnPressed: () {
-              AuthRepo.instance.screenRedirect();
-            },
-          ),
-        );
-      }
-    });
+    Timer.periodic(
+      const Duration(
+        seconds: 1,
+      ),
+      (timer) async {
+        await FirebaseAuth.instance.currentUser?.reload();
+        final user = FirebaseAuth.instance.currentUser;
+        if (user?.emailVerified ?? false) {
+          timer.cancel();
+          Get.off(
+            () => CSuccessScreen(
+              displayReceiptGenerationSection: false,
+              image: CImages.successfulRegAnimation,
+              title: CTexts.accountCreatedTitle,
+              subTitle: CTexts.accountCreatedSubTitle,
+              onContinueBtnPressed: () {
+                AuthRepo.instance.screenRedirect();
+              },
+            ),
+          );
+        }
+      },
+    );
   }
 
   // -- manually check if email was verified --

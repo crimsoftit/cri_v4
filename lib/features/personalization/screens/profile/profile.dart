@@ -148,7 +148,9 @@ class CProfileScreen extends StatelessWidget {
                 //   height: CSizes.spaceBtnItems / 2,
                 // ),
                 const Divider(),
-                const SizedBox(height: CSizes.spaceBtnItems),
+                const SizedBox(
+                  height: CSizes.spaceBtnItems,
+                ),
 
                 // -- profile details
                 const CSectionHeading(

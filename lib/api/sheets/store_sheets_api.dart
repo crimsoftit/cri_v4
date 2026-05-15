@@ -283,14 +283,25 @@ class StoreSheetsApi extends GetxController {
     }
   }
 
-  static Future<List<CTxnsModel>?> fetchAllTxnsFromCloud() async {
-    if (txnsSheet == null) return null;
+  static Future<List<CTxnsModel>> fetchAllTxnsFromCloud() async {
+    try {
+      if (txnsSheet == null) return [];
 
-    final txnsList = await txnsSheet!.values.map.allRows();
+      final txnsList = await txnsSheet?.values.map.allRows();
 
-    return txnsList == null
-        ? <CTxnsModel>[]
-        : txnsList.map(CTxnsModel.gSheetFromJson).toList();
+      return txnsList == null || txnsList == []
+          ? <CTxnsModel>[]
+          : txnsList.map(CTxnsModel.gSheetFromJson).toList();
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: e.toString(),
+          title: 'error fetching all cloud txns data',
+        );
+      }
+
+      rethrow;
+    }
   }
 
   /// -- update receipt item --

@@ -110,26 +110,21 @@ class CContactItem extends StatelessWidget {
             ),
           );
         }
+
         if (demContacts.isNotEmpty && contactsController.isLoading.value) {
           return const CVerticalProductShimmer(
             itemCount: 6,
           );
         }
 
-        // void initializeList() {
-        //   demContacts = items
-        //       .map(
-        //         (item) => CContactsModel.withTagAndTitle(),
-        //       )
-        //       .toList();
+        // if (demContacts.isNotEmpty &&
+        //     contactsController.isLoading.value == false) {
+        //   SuspensionUtil.sortListBySuspensionTag(demContacts);
+        //   SuspensionUtil.setShowSuspensionStatus(demContacts);
         // }
 
-        //initializeList(demContacts);
-        SuspensionUtil.sortListBySuspensionTag(demContacts);
-        SuspensionUtil.setShowSuspensionStatus(demContacts);
-
         return AzListView(
-          data: demContacts,
+          data: [],
           indexBarOptions: IndexBarOptions(
             indexHintAlignment: Alignment.centerRight,
             indexHintOffset: Offset(
@@ -222,17 +217,17 @@ class CContactItem extends StatelessWidget {
                                 highlightColor: CColors.rBrown,
                                 headerBuilder: (context, isExpanded) {
                                   /// -- build alphabetic headers --
-                                  final tag = contact.getSuspensionTag();
-                                  final offstage = !contact.isShowSuspension;
+                                  // final tag = contact.getSuspensionTag();
+                                  // final offstage = !contact.isShowSuspension;
                                   return Column(
                                     children: [
-                                      Offstage(
-                                        offstage: offstage,
-                                        child: buildHeaders(
-                                          context,
-                                          tag,
-                                        ),
-                                      ),
+                                      // Offstage(
+                                      //   offstage: offstage,
+                                      //   child: buildHeaders(
+                                      //     context,
+                                      //     tag,
+                                      //   ),
+                                      // ),
                                       ListTile(
                                         // contentPadding: const EdgeInsets.only(
                                         //   bottom: 2.0,
@@ -367,6 +362,12 @@ class CContactItem extends StatelessWidget {
                                                     .onDeleteContactDialog(
                                                       contact,
                                                     );
+                                                if (!contactsController
+                                                    .isLoading
+                                                    .value) {
+                                                  contactsController
+                                                      .fetchMyContacts();
+                                                }
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: CColors

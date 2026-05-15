@@ -199,4 +199,16 @@ class SignupController extends GetxController {
 
     fetchUserCurrencyByCountry(userCountry.value);
   }
+
+  @override
+  void dispose() {
+    fullName.dispose();
+    txtBusinessName.dispose();
+    txtEmail.dispose();
+    phoneNumber.dispose();
+    password.dispose();
+    confirmPassword.dispose();
+    currencyField.dispose();
+    super.dispose();
+  }
 }

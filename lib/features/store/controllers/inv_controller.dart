@@ -110,10 +110,13 @@ class CInventoryController extends GetxController {
   void onInit() async {
     await fetchUserInventoryItems();
 
+    if (await CNetworkManager.instance.isConnected() &&
+        CNetworkManager.instance.connectionIsStable.value) {
+      await initInvSync();
+    }
+
     fetchInvDels();
     fetchInvUpdates();
-
-    await initInvSync();
 
     //await scheduleExpiryAlerts();
 
@@ -1036,7 +1039,7 @@ class CInventoryController extends GetxController {
       // -- check internet connectivity
 
       await fetchUserInvSheetData().then((_) async {
-        if (userGSheetData.isNotEmpty) {
+        if (userGSheetData.isNotEmpty && inventoryItems.isEmpty) {
           for (var element in userGSheetData) {
             var dbData = CInventoryModel.withID(
               element.productId,

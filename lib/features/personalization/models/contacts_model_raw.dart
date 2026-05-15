@@ -2,9 +2,10 @@
 
 import 'dart:convert';
 
+import 'package:azlistview/azlistview.dart';
 import 'package:cri_v3/features/personalization/models/gsheets_contact_model.dart';
 
-class CContactsModel {
+class CContactsModelRaw implements ISuspensionBean {
   int? _contactId;
   int? _productId;
 
@@ -24,7 +25,7 @@ class CContactsModel {
 
   String? _tag = '';
 
-  CContactsModel(
+  CContactsModelRaw(
     this._addedBy,
     this._productId,
     this._contactName,
@@ -41,7 +42,7 @@ class CContactsModel {
     this._isTrashed,
   );
 
-  CContactsModel.withId(
+  CContactsModelRaw.withId(
     this._contactId,
     this._productId,
     this._addedBy,
@@ -59,13 +60,13 @@ class CContactsModel {
     this._isTrashed,
   );
 
-  CContactsModel.withTagAndTitle(
+  CContactsModelRaw.withTagAndTitle(
     this._contactName,
     this._tag,
   );
 
-  CContactsModel empty() {
-    return CContactsModel.withId(
+  CContactsModelRaw empty() {
+    return CContactsModelRaw.withId(
       0,
       0,
       '',
@@ -193,7 +194,7 @@ class CContactsModel {
   }
 
   /// -- extract a Contact object from a Map object --
-  CContactsModel.fromMapObject(Map<String, dynamic> map) {
+  CContactsModelRaw.fromMapObject(Map<String, dynamic> map) {
     _contactId = map['contactId'];
     _productId = map['productId'];
     _addedBy = map['addedBy'];
@@ -212,8 +213,8 @@ class CContactsModel {
   }
 
   /// -- extract a CContactsModel object from a Gsheet Map object --
-  static CContactsModel gSheetsFromJson(Map<String, dynamic> json) {
-    return CContactsModel.withId(
+  static CContactsModelRaw gSheetsFromJson(Map<String, dynamic> json) {
+    return CContactsModelRaw.withId(
       jsonDecode(json[GsheetsContactModel.contactId]),
       jsonDecode(json[GsheetsContactModel.productId]),
       json[GsheetsContactModel.addedBy],
@@ -232,12 +233,12 @@ class CContactsModel {
     );
   }
 
-  // @override
-  // String getSuspensionTag() {
-  //   // Return the first character of the name as the section tag
-  //   return contactName.toUpperCase().substring(0, 1);
-  // }
+  @override
+  String getSuspensionTag() {
+    // Return the first character of the name as the section tag
+    return contactName.toUpperCase().substring(0, 1);
+  }
 
-  // @override
-  // bool isShowSuspension = true;
+  @override
+  bool isShowSuspension = true;
 }

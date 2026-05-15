@@ -97,4 +97,12 @@ class CLoginController extends GetxController {
 
   /// -- handles registration of an admin user --
   Future<void> registerAdmin() async {}
+
+  /// -- dispose off controllers
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
 }

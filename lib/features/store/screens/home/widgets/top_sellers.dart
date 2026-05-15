@@ -25,106 +25,108 @@ class CTopSellers extends StatelessWidget {
       userController.user.value.currencyCode,
     );
 
-    return Obx(() {
-      if (txnsController.isLoading.value &&
-          txnsController.bestSellers.isNotEmpty) {
-        return const CHorizontalProductShimmer();
-      }
+    return Obx(
+      () {
+        if (txnsController.isLoading.value &&
+            txnsController.bestSellers.isNotEmpty) {
+          return const CHorizontalProductShimmer();
+        }
 
-      return SizedBox(
-        height: 40.0,
-        child: ListView.separated(
-          itemCount: txnsController.bestSellers.length,
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          separatorBuilder: (_, __) {
-            return SizedBox(width: CSizes.spaceBtnItems / 2);
-          },
-          itemBuilder: (context, index) {
-            var invItemIndex = invController.inventoryItems.indexWhere(
-              (item) =>
-                  item.productId == txnsController.bestSellers[index].productId,
-            );
-            return InkWell(
-              onTap: () {
-                if (invItemIndex >= 0) {
-                  Get.toNamed(
-                    '/inventory/item_details/',
-                    arguments: txnsController.bestSellers[index].productId,
-                  );
-                } else {
-                  CPopupSnackBar.warningSnackBar(
-                    message: 'this item is nolonger listed in your inventory',
-                    title: 'item not found/deleted',
-                  );
-                }
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CCircleAvatar(
-                    // avatarInitial: invItemIndex >= 0
-                    //     ? invController.inventoryItems[index].name[0]
-                    //           .toUpperCase()
-                    //     : txnsController.bestSellers[index].productName[0]
-                    //           .toUpperCase(),
-                    avatarInitial: txnsController
-                        .bestSellers[index]
-                        .productName[0]
-                        .toUpperCase(),
-                    bgColor: CColors.white,
-                    radius: 20.0,
-                    txtColor: CColors.rBrown,
-                  ),
-                  const SizedBox(width: CSizes.spaceBtnItems / 5),
-                  CRoundedContainer(
-                    bgColor: CColors.transparent,
-                    showBorder: false,
-                    width: 120.0,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          // invItemIndex >= 0
-                          //     ? invController.inventoryItems[index].name
-                          //           .toUpperCase()
-                          //     : txnsController.bestSellers[index].productName
-                          //           .toUpperCase(),
-                          txnsController.bestSellers[index].productName
-                              .toUpperCase(),
-                          style: Theme.of(context).textTheme.labelMedium!.apply(
-                            fontWeightDelta: 1,
-                            color: isDarkTheme ? CColors.white : CColors.rBrown,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        // Text(
-                        //   '${CFormatter.formatInventoryMetrics(txnsController.bestSellers[index].productId) == 'unit' ? txnsController.bestSellers[index].totalSales.toStringAsFixed(0) : txnsController.bestSellers[index].totalSales} ${CFormatter.formatInventoryMetrics(txnsController.bestSellers[index].productId)}(s) sold ($userCurrency.${CFormatter.kSuffixFormatter(txnsController.bestSellers[index].unitSellingPrice * txnsController.bestSellers[index].totalSales)})',
-                        //   style: Theme.of(context).textTheme.labelMedium!.apply(
-                        //     color: CColors.darkGrey,
-                        //   ),
-                        //   overflow: TextOverflow.ellipsis,
-                        //   maxLines: 1,
-                        // ),
-                        Text(
-                          '${txnsController.bestSellers[index].itemMetrics == 'units' ? txnsController.bestSellers[index].totalSales.toStringAsFixed(0) : txnsController.bestSellers[index].totalSales} ${CFormatter.formatItemMetrics(txnsController.bestSellers[index].itemMetrics, txnsController.bestSellers[index].totalSales)}- $userCurrency.${CFormatter.kSuffixFormatter(txnsController.bestSellers[index].unitSellingPrice * txnsController.bestSellers[index].totalSales)}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.labelMedium!.apply(
-                            color: CColors.darkGrey,
-                          ),
-                        ),
-                      ],
+        return SizedBox(
+          height: 40.0,
+          child: ListView.separated(
+            itemCount: txnsController.bestSellers.length,
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            separatorBuilder: (_, __) {
+              return SizedBox(
+                width: CSizes.spaceBtnItems / 2,
+              );
+            },
+            itemBuilder: (context, index) {
+              var invItemIndex = invController.inventoryItems.indexWhere(
+                (item) =>
+                    item.productId ==
+                    txnsController.bestSellers[index].productId,
+              );
+              return InkWell(
+                onTap: () {
+                  if (invItemIndex >= 0) {
+                    Get.toNamed(
+                      '/inventory/item_details/',
+                      arguments: txnsController.bestSellers[index].productId,
+                    );
+                  } else {
+                    CPopupSnackBar.customToast
+                    (
+                      forInternetConnectivityStatus: false,
+                      message:
+                          '${txnsController.bestSellers[index].productName.toUpperCase()} is no longer listed in your inventory',
+                      
+                    );
+                  }
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CCircleAvatar(
+                      // avatarInitial: invItemIndex >= 0
+                      //     ? invController.inventoryItems[index].name[0]
+                      //           .toUpperCase()
+                      //     : txnsController.bestSellers[index].productName[0]
+                      //           .toUpperCase(),
+                      avatarInitial: txnsController
+                          .bestSellers[index]
+                          .productName[0]
+                          .toUpperCase(),
+                      bgColor: CColors.white,
+                      radius: 20.0,
+                      txtColor: CColors.rBrown,
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      );
-    });
+                    const SizedBox(
+                      width: CSizes.spaceBtnItems / 5.0,
+                    ),
+                    CRoundedContainer(
+                      bgColor: CColors.transparent,
+                      showBorder: false,
+                      width: 120.0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            txnsController.bestSellers[index].productName
+                                .toUpperCase(),
+                            style: Theme.of(context).textTheme.labelMedium!
+                                .apply(
+                                  fontWeightDelta: 1,
+                                  color: isDarkTheme
+                                      ? CColors.white
+                                      : CColors.rBrown,
+                                ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+
+                          Text(
+                            '${txnsController.bestSellers[index].itemMetrics == 'units' ? txnsController.bestSellers[index].totalSales.toStringAsFixed(0) : txnsController.bestSellers[index].totalSales} ${CFormatter.formatItemMetrics(txnsController.bestSellers[index].itemMetrics, txnsController.bestSellers[index].totalSales)}- $userCurrency.${CFormatter.kSuffixFormatter(txnsController.bestSellers[index].unitSellingPrice * txnsController.bestSellers[index].totalSales)}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.labelMedium!
+                                .apply(
+                                  color: CColors.darkGrey,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 }

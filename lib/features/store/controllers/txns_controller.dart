@@ -39,7 +39,6 @@ class CTxnsController extends GetxController {
   /// -- variables --
   final localStorage = GetStorage();
   final dateRangeController = Get.put(CDateController());
-  final dateRangeFieldController = TextEditingController();
 
   DbHelper dbHelper = DbHelper.instance;
 
@@ -93,9 +92,11 @@ class CTxnsController extends GetxController {
   final RxDouble moneyCollected = 0.0.obs;
   final RxDouble totalProfit = 0.0.obs;
 
+  final dateRangeFieldController = TextEditingController();
   final txtAmountIssued = TextEditingController();
   final txtCustomerName = TextEditingController();
   final txtCustomerContacts = TextEditingController();
+
   final txtRefundReason = TextEditingController();
   final txtRefundQty = TextEditingController();
   final txtSaleItemQty = TextEditingController();
@@ -133,11 +134,12 @@ class CTxnsController extends GetxController {
     if (await CNetworkManager.instance.isConnected() &&
         CNetworkManager.instance.connectionIsStable.value) {
       StoreSheetsApi.initSpreadSheets();
+      await initTxnsSync();
     }
 
     await fetchSoldItems();
     await fetchTxns();
-    await initTxnsSync();
+
     await fetchTopSellersFromSales();
 
     showAmountIssuedField.value = true;
@@ -155,24 +157,16 @@ class CTxnsController extends GetxController {
     super.onInit();
   }
 
-  @override
-  void dispose() {
-    dateRangeFieldController.dispose(); // Dispose of the controller
-
-    super.dispose();
-  }
-
   /// -- initialize cloud sync --
   Future initTxnsSync() async {
-    if (localStorage.read('SyncTxnsDataWithCloud') == true) {
-      await importTxnsFromCloud();
+    await fetchSoldItems();
+    if (localStorage.read('SyncTxnsDataWithCloud') == true && sales.isEmpty) {
+      //await importTxnsFromCloud();
       if (await importTxnsFromCloud()) {
         localStorage.write('SyncTxnsDataWithCloud', false);
       } else {
         localStorage.write('SyncTxnsDataWithCloud', true);
       }
-
-      await fetchSoldItems();
     }
   }
 
@@ -233,7 +227,9 @@ class CTxnsController extends GetxController {
       }
 
       /// -- compute hourly sales --
-      dashboardController.filterHourlySales();
+      await dashboardController.filterHourlySales();
+
+      await fetchTopSellersFromSales();
 
       // stop loader
       soldItemsFetched.value = true;
@@ -873,8 +869,8 @@ class CTxnsController extends GetxController {
           } else {
             if (kDebugMode) {
               CPopupSnackBar.customToast(
-                message: '***** ALL TXNS RADA SAFI *****',
                 forInternetConnectivityStatus: false,
+                message: '***** ALL TXNS RADA SAFI *****',
               );
             }
             txnsSyncIsLoading.value = false;
@@ -918,31 +914,45 @@ class CTxnsController extends GetxController {
 
       var gSheetTxnsList = await StoreSheetsApi.fetchAllTxnsFromCloud();
 
-      allGsheetTxnsData.assignAll(gSheetTxnsList!);
-
-      userGsheetTxnsData.value = allGsheetTxnsData
-          .where(
-            (element) => element.userEmail.toLowerCase().contains(
-              userController.user.value.email.toLowerCase(),
-            ),
-          )
-          .toList();
+      if (gSheetTxnsList.isNotEmpty) {
+        allGsheetTxnsData.assignAll(gSheetTxnsList);
+        userGsheetTxnsData.value = allGsheetTxnsData
+            .where(
+              (element) => element.userEmail.toLowerCase().contains(
+                userController.user.value.email.toLowerCase(),
+              ),
+            )
+            .toList();
+        if (userGsheetTxnsData.isEmpty) {
+          return [];
+        }
+      } else {
+        userGsheetTxnsData.value = [];
+      }
 
       return userGsheetTxnsData;
     } catch (e) {
       isLoading.value = false;
 
       if (kDebugMode) {
-        CPopupSnackBar.errorSnackBar(title: 'Oh Snap!', message: e.toString());
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while fetching user\'s cloud txn data: $e',
+          title: 'Oh Snap!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while fetching user\'s cloud txn data',
+          title: 'Oh Snap! Error fetching user\'s cloud txn data',
+        );
       }
 
-      return CPopupSnackBar.errorSnackBar(
-        title: 'Oh Snap!',
-        message: 'an error occurred while fetching user\'s cloud txn data',
-      );
-    } finally {
-      isLoading.value = false;
+      rethrow;
     }
+    // finally {
+    //   isLoading.value = false;
+    // }
   }
 
   /// -- import transactions from cloud --
@@ -1001,8 +1011,14 @@ class CTxnsController extends GetxController {
           title: 'ERROR IMPORTING USER DATA FROM CLOUD!',
           message: e.toString(),
         );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'ERROR IMPORTING USER DATA FROM CLOUD!',
+          message:
+              'An unknown error occurred while fetching user cloud data...',
+        );
       }
-      return false;
+      rethrow;
     }
   }
 
@@ -1010,7 +1026,7 @@ class CTxnsController extends GetxController {
   void refundItemWarningPopup(CTxnsModel soldItem) {
     Get.defaultDialog(
       contentPadding: const EdgeInsets.all(CSizes.sm),
-      title: 'refund ${soldItem.productName}?',
+      title: 'Refund ${soldItem.productName}?',
       // middleText:
       //     'Are you certain you want to refund ${soldItem.productName} for $userCurrency.${soldItem.unitSellingPrice * soldItem.quantity}? This action can\'t be undone!',
       middleText: 'Are you certain you want to refund ${soldItem.productName}?',
@@ -1525,7 +1541,12 @@ class CTxnsController extends GetxController {
 
       // -- compute total money collected (complete txns) --
       moneyCollected.value = sales
-          .where((soldItem) => soldItem.txnStatus == 'complete')
+          .where(
+            (soldItem) =>
+                soldItem.txnStatus == 'complete' &&
+                soldItem.paymentMethod.toLowerCase() !=
+                    'On the house'.toLowerCase(),
+          )
           .fold(
             0.0,
             (sum, sale) => sum + (sale.quantity * sale.unitSellingPrice),
@@ -1904,5 +1925,19 @@ class CTxnsController extends GetxController {
   computeWhatIsOwed(double tAmount, double amountIssued, double value) {
     invoiceAmountOwed.value = (tAmount - amountIssued) - value;
     return invoiceAmountOwed.value;
+  }
+
+  @override
+  void dispose() {
+    dateRangeFieldController.dispose(); // Dispose the controller
+    txtAmountIssued.dispose();
+    txtCustomerName.dispose();
+    txtCustomerContacts.dispose();
+    txtRefundReason.dispose();
+    txtRefundQty.dispose();
+    txtSaleItemQty.dispose();
+    txtTxnAddress.dispose();
+
+    super.dispose();
   }
 }

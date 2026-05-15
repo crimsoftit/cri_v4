@@ -46,4 +46,11 @@ class CSearchBarController extends GetxController {
     showAnimatedTypeAheadField.value = !showAnimatedTypeAheadField.value;
     cartController.itemQtyInCart.value = 0;
   }
+
+  @override
+  void dispose() {
+    txtSearchField.dispose();
+    txtTypeAheadFieldController.dispose();
+    super.dispose();
+  }
 }

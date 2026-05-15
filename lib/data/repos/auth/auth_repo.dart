@@ -115,10 +115,9 @@ class AuthRepo extends GetxController {
           if (await userController.fetchUserDetails()) {
             if (CNetworkManager.instance.hasConnection.value &&
                 CNetworkManager.instance.connectionIsStable.value) {
-              await txnsController.initTxnsSync();
-
               await invController.initInvSync();
               await contactsController.initContactsSync();
+              await txnsController.initTxnsSync();
             }
             // else {
             //   CPopupSnackBar.customToast(
@@ -127,11 +126,11 @@ class AuthRepo extends GetxController {
             //         'Stable internet connection is required to import your data from the cloud',
             //   );
             // }
-            await contactsController.fetchMyContacts();
+            // await contactsController.fetchMyContacts();
 
-            await invController.fetchUserInventoryItems();
+            // await invController.fetchUserInventoryItems();
 
-            await txnsController.fetchSoldItems();
+            // await txnsController.fetchSoldItems();
             Get.put(CCheckoutController());
 
             final navController = Get.put(CNavMenuController());

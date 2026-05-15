@@ -51,13 +51,14 @@ class CProfileMenu extends StatelessWidget {
               flex: secondRowWidgetFlex,
               child: valueIsWidget!
                   ? valueWidget!
-                  : Text(
+                  : SelectableText(
                       value!,
                       style: Theme.of(context).textTheme.bodyMedium!.apply(
                         color: CColors.rBrown,
                         fontWeightDelta: 1,
                       ),
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      //overflow: TextOverflow.ellipsis,
                     ),
             ),
             if (showTrailingIcon!)
