@@ -868,12 +868,16 @@ class CCheckoutController extends GetxController {
             customerNameFieldController.text.trim(),
             '',
             CValidator.isValidPhoneNumber(
-                  customerContactsFieldController.text.trim(),
+                  customerContactsFieldController.text
+                      .trim()
+                      .removeAllWhitespace,
                 )
                 ? dialCode
                 : '',
             CValidator.isValidPhoneNumber(
-                  customerContactsFieldController.text.trim(),
+                  customerContactsFieldController.text
+                      .trim()
+                      .removeAllWhitespace,
                 )
                 ? mobileNumber
                 : '',

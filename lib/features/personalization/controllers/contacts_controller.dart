@@ -165,10 +165,18 @@ class CContactsController extends GetxController {
       // -- extract dial code from phone number
       final (dialCode, mobileNumber) =
           CValidator.isValidPhoneNumber(
-            invController.txtSupplierContacts.text.trim(),
-          )
+                invController.txtSupplierContacts.text
+                    .trim()
+                    .removeAllWhitespace,
+              ) ||
+              CValidator.isValidIntlPhoneNumber(
+                invController.txtSupplierContacts.text
+                    .trim()
+                    .removeAllWhitespace,
+                contactDialCode.value,
+              )
           ? CFormatter.seperatePhoneAndDialCode(
-              invController.txtSupplierContacts.text.trim(),
+              invController.txtSupplierContacts.text.trim().removeAllWhitespace,
             )
           : ('', '');
 
@@ -182,14 +190,25 @@ class CContactsController extends GetxController {
         fromInventoryDetails ? '' : contact!.contactCountryCode,
         fromInventoryDetails ? dialCode : '',
         fromInventoryDetails &&
-                CValidator.isValidPhoneNumber(
-                  invController.txtSupplierContacts.text.trim(),
+                    CValidator.isValidPhoneNumber(
+                      invController.txtSupplierContacts.text.trim().removeAllWhitespace,
+                    ) ||
+                CValidator.isValidIntlPhoneNumber(
+                  invController.txtSupplierContacts.text
+                      .trim()
+                      .removeAllWhitespace,
+                  dialCode,
                 )
             ? mobileNumber
             : fromInventoryDetails &&
-                  !CValidator.isValidPhoneNumber(
-                    invController.txtSupplierContacts.text.trim(),
-                  )
+                  (!CValidator.isValidPhoneNumber(
+                    invController.txtSupplierContacts.text.trim().removeAllWhitespace,
+                  ) || !CValidator.isValidIntlPhoneNumber(
+                  invController.txtSupplierContacts.text
+                      .trim()
+                      .removeAllWhitespace,
+                  dialCode,
+                ))
             ? ''
             : contact!.contactPhone,
         fromInventoryDetails &&

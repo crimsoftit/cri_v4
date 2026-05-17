@@ -611,9 +611,11 @@ class AddUpdateInventoryForm extends StatelessWidget {
                               fieldValidator: (value) {
                                 if (value == null ||
                                     value == '' ||
-                                    (!CValidator.isValidEmail(value.trim()) &&
+                                    (!CValidator.isValidEmail(
+                                          value.trim().removeAllWhitespace,
+                                        ) &&
                                         !CValidator.isValidPhoneNumber(
-                                          value.trim(),
+                                          value.trim().removeAllWhitespace,
                                         ))) {
                                   return 'Please enter a valid phone no. or e-mail address!';
                                 }
