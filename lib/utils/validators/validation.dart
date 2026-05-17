@@ -1,3 +1,4 @@
+import 'package:country_phone_validator/country_phone_validator.dart';
 import 'package:email_validator/email_validator.dart';
 
 class CValidator {
@@ -53,20 +54,34 @@ class CValidator {
   }
 
   /* ===== validation for intl phone number ===== */
+
   static bool isValidPhoneNumber(String input) {
-    return RegExp(
+    var matchesRegExp = RegExp(
       r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$',
     ).hasMatch(input);
+
+    return matchesRegExp;
+  }
+
+  static bool isValidIntlPhoneNumber(String phoneNumber, String dialCode) {
+    // var matchesRegExp = RegExp(
+    //   r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$',
+    // ).hasMatch(phoneNumber);
+
+    bool isValidPhoneNumber = CountryUtils.validatePhoneNumber(
+      phoneNumber,
+      dialCode,
+    );
+    return isValidPhoneNumber;
   }
 
   /* ===== validation for both intl phone number && email ===== */
   static String? validateEmailAndPhoneNumber(String input) {
-    if (!isValidEmail(input) && isValidPhoneNumber(input)) {
+    if (!isValidEmail(input) && !isValidPhoneNumber(input)) {
       return 'Please enter a valid email or phone number!';
     }
     return null;
   }
-
 
   /* ========== customer balance field validation ========== */
   static String? validateCustomerBal(
@@ -111,7 +126,7 @@ class CValidator {
   static String? validatePhoneNumber(String? value) {
     if (value == null || value.isEmpty) {
       return 'phone number is required!';
-    } 
+    }
 
     // -- regular expression for phone number validation (assuming a 10-digits US phone no. format) --
     final phoneNoRegExp = RegExp(r'^\d{10}$');

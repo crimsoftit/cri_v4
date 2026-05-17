@@ -166,6 +166,7 @@ dependencies:
   # -- phone number manennozzz
   country_codes: any
   country_code_picker: any
+  country_phone_validator: ^1.0.2
   flutter_libphonenumber: ^2.7.0
   flutter_otp_text_field: any
   intl_phone_field: any

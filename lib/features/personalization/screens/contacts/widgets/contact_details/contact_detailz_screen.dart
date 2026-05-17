@@ -455,18 +455,27 @@ class CContactDetailsScreen extends StatelessWidget {
                           color: CColors.rOrange,
                           size: CSizes.iconMd,
                         ),
-                        onPressed: () {
-                          contactsController.onTrashAction(
+                        onPressed: () async {
+                          await contactsController.onTrashAction(
                             context,
                             contactItem,
                           );
+                          await contactsController.fetchMyContacts();
                         },
                       ),
-                      onLeadingIconPressed: () {
-                        contactsController.onTrashAction(context, contactItem);
+                      onLeadingIconPressed: () async {
+                        await contactsController.onTrashAction(
+                          context,
+                          contactItem,
+                        );
+                        await contactsController.fetchMyContacts();
                       },
-                      onTitlePressed: () {
-                        contactsController.onTrashAction(context, contactItem);
+                      onTitlePressed: () async {
+                        await contactsController.onTrashAction(
+                          context,
+                          contactItem,
+                        );
+                        await contactsController.fetchMyContacts();
                       },
                       subTitleWidget: SizedBox.shrink(),
                       title: 'Trash',
@@ -510,6 +519,8 @@ class CContactDetailsScreen extends StatelessWidget {
                                                 .onDeleteContactDialog(
                                                   contactItem,
                                                 );
+                                            await contactsController
+                                                .fetchMyContacts();
                                           },
                                           child: Text(
                                             "Delete permanently",

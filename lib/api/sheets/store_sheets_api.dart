@@ -384,13 +384,13 @@ class StoreSheetsApi extends GetxController {
   }
 
   /// -- fetch contacts from cloud --
-  static Future<List<CContactsModel?>?> fetchContactsFromCloud() async {
+  static Future<List<CContactsModel>> fetchContactsFromCloud() async {
     try {
-      if (contactsSheet == null) return null;
+      if (contactsSheet == null) return [];
 
       final cloudContacts = await contactsSheet!.values.map.allRows();
 
-      return cloudContacts == null
+      return cloudContacts == null || cloudContacts == []
           ? <CContactsModel>[]
           : cloudContacts.map(CContactsModel.gSheetsFromJson).toList();
     } catch (e) {

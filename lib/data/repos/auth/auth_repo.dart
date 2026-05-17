@@ -104,15 +104,14 @@ class AuthRepo extends GetxController {
             await StoreSheetsApi.initSpreadSheets();
           }
 
-          final contactsController = Get.put(CContactsController());
-          final invController = Get.put(CInventoryController());
-          final txnsController = Get.put(CTxnsController());
-          // check data sync status
-          deviceStorage.writeIfNull('SyncInvDataWithCloud', true);
-          deviceStorage.writeIfNull('SyncTxnsDataWithCloud', true);
-          deviceStorage.writeIfNull('SyncContactsWithCloud', true);
-
           if (await userController.fetchUserDetails()) {
+            final contactsController = Get.put(CContactsController());
+            final invController = Get.put(CInventoryController());
+            final txnsController = Get.put(CTxnsController());
+            // check data sync status
+            deviceStorage.writeIfNull('SyncInvDataWithCloud', true);
+            deviceStorage.writeIfNull('SyncTxnsDataWithCloud', true);
+            deviceStorage.writeIfNull('SyncContactsWithCloud', true);
             await contactsController.fetchMyContacts();
 
             await invController.fetchUserInventoryItems();

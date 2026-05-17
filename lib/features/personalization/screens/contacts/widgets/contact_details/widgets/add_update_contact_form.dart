@@ -222,21 +222,10 @@ class CAddUpdateContactForm extends StatelessWidget {
                                 return;
                               }
 
-                              if (!CValidator.isValidPhoneNumber(
+                              if (!CValidator.isValidIntlPhoneNumber(
                                 contactsController.txtPhoneController.text
                                     .trim(),
-                              )) {
-                                CPopupSnackBar.errorSnackBar(
-                                  message:
-                                      'The supplied phone number is invalid!',
-                                  title: 'Invalid phone number!',
-                                );
-                                return;
-                              }
-
-                              if (!CValidator.isValidPhoneNumber(
-                                contactsController.txtPhoneController.text
-                                    .trim(),
+                                contactsController.contactDialCode.value,
                               )) {
                                 CPopupSnackBar.errorSnackBar(
                                   message:

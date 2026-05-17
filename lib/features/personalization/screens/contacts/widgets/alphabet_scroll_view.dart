@@ -28,23 +28,20 @@ class CContactItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final contactsController = Get.put(CContactsController());
     final isDarkTheme = CHelperFunctions.isDarkMode(context);
+    var demContacts = <CContactsModel>[];
+
     return Obx(
       () {
-        var demContacts = <CContactsModel>[];
-
         switch (space) {
           case 'all':
-            demContacts.clear();
-
-            demContacts = contactsController.myContacts
-                .where(
-                  (contact) => contact.isTrashed == 0,
-                )
-                .toList();
+            demContacts.assignAll(
+              contactsController.myContacts.where(
+                (contact) => contact.isTrashed == 0,
+              ),
+            );
 
             break;
           case 'customers':
-            demContacts.clear();
             demContacts.assignAll(
               contactsController.myContacts.where(
                 (contact) =>
@@ -56,7 +53,6 @@ class CContactItem extends StatelessWidget {
             );
             break;
           case 'friends':
-            demContacts.clear();
             demContacts.assignAll(
               contactsController.myContacts.where(
                 (contact) =>
@@ -68,7 +64,7 @@ class CContactItem extends StatelessWidget {
             );
             break;
           case 'suppliers':
-            demContacts.clear();
+            //demContacts.clear();
             demContacts.assignAll(
               contactsController.myContacts.where(
                 (contact) =>
@@ -80,7 +76,6 @@ class CContactItem extends StatelessWidget {
             );
             break;
           case 'trashed':
-            demContacts.clear();
             demContacts.assignAll(
               contactsController.myContacts.where(
                 (contact) => contact.isTrashed == 1,

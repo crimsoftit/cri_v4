@@ -219,11 +219,6 @@ class CInventoryController extends GetxController {
         await initializeInventorySummary();
       }
 
-      // -- fetch contacts --
-      final contactsController = Get.put(CContactsController());
-
-      contactsController.fetchMyContacts();
-
       List<CInventoryModel> returnItems;
       if (inventoryItems.isNotEmpty) {
         returnItems = [];

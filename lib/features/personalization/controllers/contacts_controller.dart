@@ -9,7 +9,7 @@ import 'package:cri_v3/common/widgets/txt_fields/custom_type_ahead_field.dart';
 import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
 import 'package:cri_v3/features/personalization/models/contacts_del_model.dart';
 import 'package:cri_v3/features/personalization/models/contacts_model.dart';
-import 'package:cri_v3/features/personalization/screens/contacts/widgets/add_update_contact_form.dart';
+import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/widgets/add_update_contact_form.dart';
 import 'package:cri_v3/features/store/controllers/inv_controller.dart';
 import 'package:cri_v3/features/store/controllers/nav_menu_controller.dart';
 import 'package:cri_v3/nav_menu.dart';
@@ -85,9 +85,9 @@ class CContactsController extends GetxController {
     isLoading.value = false;
     processingContactsSync.value = false;
     undoTrashBtnPressed.value = false;
-    await fetchMyContacts();
+    //await initContactsSync();
     await fetchContactsForCloudDeletion();
-    await initContactsSync();
+
     super.onInit();
   }
 
@@ -95,12 +95,13 @@ class CContactsController extends GetxController {
   initContactsSync() async {
     if (localStorage.read('SyncContactsWithCloud') == true &&
         myContacts.isEmpty) {
-      //await importContacts();
+      await importContacts();
       if (await importContacts()) {
         localStorage.write('SyncContactsWithCloud', false);
       } else {
         localStorage.write('SyncContactsWithCloud', true);
       }
+      await fetchMyContacts();
     }
   }
 
@@ -300,8 +301,6 @@ class CContactsController extends GetxController {
       }
 
       //sortAndGroupMyContacts();
-
-      
 
       // stop loader
       isLoading.value = false;
@@ -808,7 +807,7 @@ class CContactsController extends GetxController {
             padding: MediaQuery.of(context).viewInsets,
             child: CRoundedContainer(
               bgColor: CColors.transparent,
-              //height: CHelperFunctions.screenHeight() * .56,
+              height: CHelperFunctions.screenHeight() * .56,
               padding: const EdgeInsets.only(
                 left: CSizes.lg / 4,
                 right: CSizes.lg / 4,
@@ -816,7 +815,7 @@ class CContactsController extends GetxController {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
@@ -1694,7 +1693,10 @@ class CContactsController extends GetxController {
 
       await fetchUserCloudContacts().then(
         (result) async {
-          if (userCloudContacts.isNotEmpty && myContacts.isEmpty) {
+          if (userCloudContacts.isNotEmpty &&
+              myContacts.isEmpty &&
+              await CNetworkManager.instance.isConnected() &&
+              CNetworkManager.instance.connectionIsStable.value) {
             for (var contact in userCloudContacts) {
               var forImportContacts = CContactsModel.withId(
                 contact.contactId,
@@ -1715,23 +1717,15 @@ class CContactsController extends GetxController {
               );
 
               // -- save imported data to local sqflite database --
-              await dbHelper.addContact(forImportContacts);
+              dbHelper.addContact(forImportContacts);
             }
           }
         },
       );
 
       // -- refresh myContacts list --
-      Future.delayed(
-        Duration.zero,
-        () {
-          WidgetsBinding.instance.addPostFrameCallback(
-            (_) async {
-              await fetchMyContacts();
-            },
-          );
-        },
-      );
+      await fetchMyContacts();
+      myContacts.refresh();
 
       // -- stop loader --
       processingContactsSync.value = false;
@@ -1757,21 +1751,19 @@ class CContactsController extends GetxController {
   }
 
   /// -- fetch all contacts from cloud --
-  Future fetchUserCloudContacts() async {
+  Future<bool> fetchUserCloudContacts() async {
     try {
       var cloudContacts = await StoreSheetsApi.fetchContactsFromCloud();
 
-      allCloudContacts.assignAll(cloudContacts as Iterable<CContactsModel>);
+      userCloudContacts.assignAll(
+        cloudContacts.where(
+          (contact) => contact.addedBy.toLowerCase().contains(
+            userController.user.value.email.toLowerCase(),
+          ),
+        ),
+      );
 
-      userCloudContacts.value = allCloudContacts
-          .where(
-            (contact) => contact.addedBy.toLowerCase().contains(
-              userController.user.value.email.toLowerCase(),
-            ),
-          )
-          .toList();
-
-      return userCloudContacts;
+      return true;
     } catch (e) {
       isLoading.value = false;
       if (kDebugMode) {
