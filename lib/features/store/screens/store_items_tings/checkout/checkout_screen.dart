@@ -32,8 +32,6 @@ import 'package:iconsax/iconsax.dart';
 class CCheckoutScreen extends StatelessWidget {
   const CCheckoutScreen({super.key});
 
-  /// -- TODO: issue adding/validating items that are out of stock --
-
   @override
   Widget build(BuildContext context) {
     final cartController = Get.put(CCartController());

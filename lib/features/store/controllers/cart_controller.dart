@@ -121,7 +121,11 @@ class CCartController extends GetxController {
     if (itemQtyInCart > item.quantity) {
       CPopupSnackBar.warningSnackBar(
         title: 'oh snap!',
-        message: 'only ${item.quantity} items are stocked!',
+        message: item.quantity == 0
+            ? 'Oh no! \n${item.name.toUpperCase()} is out of stock!'
+            : item.quantity == 1
+            ? 'only 1 ${CFormatter.formatItemMetrics(item.calibration, item.quantity)} of ${item.name.toUpperCase()} is stocked!'
+            : 'only ${CFormatter.formatItemQtyDisplays(item.quantity, item.calibration)} ${CFormatter.formatItemMetrics(item.calibration, item.quantity)} of ${item.name.toUpperCase()} are stocked!',
       );
       return;
     }
@@ -202,8 +206,12 @@ class CCartController extends GetxController {
           if (fromQtyTxtField && qtyValue != '') {
             if (double.parse(qtyValue!) > inventoryItem.quantity) {
               CPopupSnackBar.warningSnackBar(
-                title: 'oh snap!',
-                message: 'only ${inventoryItem.quantity} items are stocked!',
+                title: 'Oh snap!',
+                message: inventoryItem.quantity == 0
+                    ? 'Oh no! \n${inventoryItem.name.toUpperCase()} is out of stock!'
+                    : item.quantity == 1
+                    ? 'only 1 ${CFormatter.formatItemMetrics(inventoryItem.calibration, inventoryItem.quantity)} of ${inventoryItem.name.toUpperCase()} is stocked!'
+                    : 'only ${CFormatter.formatItemQtyDisplays(inventoryItem.quantity, inventoryItem.calibration)} ${CFormatter.formatItemMetrics(inventoryItem.calibration, inventoryItem.quantity)} of ${inventoryItem.name.toUpperCase()} are stocked!',
               );
               qtyFieldControllers[itemIndex].text =
                   inventoryItem.calibration == 'units'

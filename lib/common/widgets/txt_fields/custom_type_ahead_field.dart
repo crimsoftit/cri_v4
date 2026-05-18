@@ -101,7 +101,7 @@ class CCustomTypeaheadField extends StatelessWidget {
           focusNode: focusNode,
           onChanged: onFieldValueChanged,
           scrollPadding: const EdgeInsets.only(
-            bottom: 80.0,
+            bottom: 600.0,
           ),
           style: const TextStyle(
             fontWeight: FontWeight.normal,
