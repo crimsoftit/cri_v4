@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:azlistview/azlistview.dart';
 import 'package:clock/clock.dart';
 import 'package:cri_v3/api/sheets/store_sheets_api.dart';
 import 'package:cri_v3/common/widgets/buttons/custom_dropdown_btn.dart';
@@ -191,7 +192,9 @@ class CContactsController extends GetxController {
         fromInventoryDetails ? dialCode : '',
         fromInventoryDetails &&
                     CValidator.isValidPhoneNumber(
-                      invController.txtSupplierContacts.text.trim().removeAllWhitespace,
+                      invController.txtSupplierContacts.text
+                          .trim()
+                          .removeAllWhitespace,
                     ) ||
                 CValidator.isValidIntlPhoneNumber(
                   invController.txtSupplierContacts.text
@@ -202,13 +205,16 @@ class CContactsController extends GetxController {
             ? mobileNumber
             : fromInventoryDetails &&
                   (!CValidator.isValidPhoneNumber(
-                    invController.txtSupplierContacts.text.trim().removeAllWhitespace,
-                  ) || !CValidator.isValidIntlPhoneNumber(
-                  invController.txtSupplierContacts.text
-                      .trim()
-                      .removeAllWhitespace,
-                  dialCode,
-                ))
+                        invController.txtSupplierContacts.text
+                            .trim()
+                            .removeAllWhitespace,
+                      ) ||
+                      !CValidator.isValidIntlPhoneNumber(
+                        invController.txtSupplierContacts.text
+                            .trim()
+                            .removeAllWhitespace,
+                        dialCode,
+                      ))
             ? ''
             : contact!.contactPhone,
         fromInventoryDetails &&
@@ -319,7 +325,7 @@ class CContactsController extends GetxController {
           break;
       }
 
-      //sortAndGroupMyContacts();
+      await fetchContactsForCloudDeletion();
 
       // stop loader
       isLoading.value = false;
@@ -356,6 +362,7 @@ class CContactsController extends GetxController {
               );
         },
       );
+      SuspensionUtil.sortListBySuspensionTag(contactMatches);
       return contactMatches;
     } catch (e) {
       if (kDebugMode) {
@@ -809,7 +816,7 @@ class CContactsController extends GetxController {
     final isDarkTheme = CHelperFunctions.isDarkMode(context);
 
     try {
-      return showModalBottomSheet(
+      return await showModalBottomSheet(
         backgroundColor: isDarkTheme
             ? CColors.black.withValues(
                 alpha: .9,
@@ -928,9 +935,9 @@ class CContactsController extends GetxController {
   }
 
   /// -- delete contact dialog --
-  Future onDeleteContactDialog(CContactsModel contact) async {
+  Future<dynamic> onDeleteContactDialog(CContactsModel contact) async {
     try {
-      Get.defaultDialog(
+      await Get.defaultDialog(
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -1018,12 +1025,15 @@ class CContactsController extends GetxController {
             }
 
             await fetchContactsForCloudDeletion();
-
-            Get.offAll(
-              () {
-                final navController = Get.put(CNavMenuController());
-                navController.selectedIndex.value = 2;
-                return const NavMenu();
+            await fetchMyContacts().then(
+              (_) {
+                Get.offAll(
+                  () {
+                    final navController = Get.put(CNavMenuController());
+                    navController.selectedIndex.value = 2;
+                    return const NavMenu();
+                  },
+                );
               },
             );
           },
@@ -1281,11 +1291,11 @@ class CContactsController extends GetxController {
   }
 
   /// -- bottomSheetModal for when usp is less than ubp --
-  updateDialCodeDialog(
+  Future<dynamic> updateDialCodeDialog(
     BuildContext context,
     CContactsModel contactItem,
   ) async {
-    return showModalBottomSheet(
+    return await showModalBottomSheet(
       context: context,
 
       builder: (context) {
@@ -1562,8 +1572,9 @@ class CContactsController extends GetxController {
     try {
       processingContactsSync.value = true;
       await addUnsyncedContactAppendsToCloud().then(
-        (_) {
-          updateInitiallySyncedContacts();
+        (_) async {
+          await updateInitiallySyncedContacts();
+          await deleteCloudSyncedContacts();
         },
       );
 
@@ -1680,12 +1691,8 @@ class CContactsController extends GetxController {
 
           await dbHelper.updateContact(contactAppend);
         }
-      } else {
-        CPopupSnackBar.customToast(
-          forInternetConnectivityStatus: false,
-          message: 'rada safi nani...',
-        );
       }
+
       fetchMyContacts();
     } catch (e) {
       if (kDebugMode) {
@@ -1870,43 +1877,73 @@ class CContactsController extends GetxController {
     }
   }
 
+  /// -- delete cloud-synced contacts --
+  Future<bool> deleteCloudSyncedContacts() async {
+    try {
+      var returnCmd = false;
+
+      // -- check internet connectivity
+      final isConnectedToInternet = await CNetworkManager.instance
+          .isConnected();
+      if (isConnectedToInternet &&
+          CNetworkManager.instance.connectionIsStable.value &&
+          CNetworkManager.instance.hasConnection.value) {
+        final contactDeletions = await fetchContactsForCloudDeletion();
+        cloudDelContacts.assignAll(contactDeletions);
+        if (cloudDelContacts.isNotEmpty) {
+          for (var contact in cloudDelContacts) {
+            await StoreSheetsApi.deleteContactFromCloudById(
+              contact.contactId,
+            ).then(
+              (result) async {
+                if (result) {
+                  await dbHelper.locallyDeleteSyncedContactDeletions(contact);
+                } else {
+                  if (kDebugMode) {
+                    CPopupSnackBar.errorSnackBar(
+                      title: 'error deleting cloud contact!',
+                    );
+                  }
+                }
+              },
+            );
+          }
+        }
+        if (kDebugMode) {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'cloud contact deletions rada clean...',
+          );
+        }
+        await fetchContactsForCloudDeletion();
+        returnCmd = true;
+      } else {
+        returnCmd = false;
+        CPopupSnackBar.warningSnackBar(
+          message: 'Stable internet connection is required for cloud sync!',
+          title: 'internet unstable/unavailable',
+        );
+      }
+
+      fetchContactsForCloudDeletion();
+      return returnCmd;
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error deleting inventory cloud data',
+          message: e.toString(),
+        );
+      }
+
+      rethrow;
+    }
+  }
+
   String setDefaultContactCategory() {
     selectedCategory.value = selectedCategory.value != ''
         ? selectedCategory.value
         : contactCategories[0];
     return selectedCategory.value;
-  }
-
-  /// -- sort and group myContacts alphabetically --
-  Future sortAndGroupMyContacts() async {
-    // 1. Group by First Letter
-    //Map<String, List<CContactsModel>> groupedContacts = {};
-
-    myContacts.sort(
-      (a, b) {
-        return a.contactName.compareTo(b.contactName);
-      },
-    );
-
-    for (var contact in myContacts) {
-      if (contact.contactName.isEmpty) continue;
-
-      // -- get the 1st letter, ensure it's uppercase and valid --
-      contactTag.value = contact.contactName[0].toUpperCase();
-
-      // -- filter only A to Z --
-      if (RegExp(r'^[A-Z]$').hasMatch(contactTag.value)) {
-        groupedContacts.putIfAbsent(contactTag, () => []);
-        groupedContacts[contactTag]!.add(contact);
-      }
-    }
-
-    alphabet.value = List.generate(
-      26,
-      (i) {
-        return String.fromCharCode(65 + i);
-      },
-    );
   }
 
   resetFields() {

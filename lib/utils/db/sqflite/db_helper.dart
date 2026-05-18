@@ -479,7 +479,7 @@ class DbHelper extends GetxController {
     return result;
   }
 
-  Future<int> updateDel(CInvDelsModel delItem) async {
+  Future<int> updateInvDeletion(CInvDelsModel delItem) async {
     int delRes = await _db!.update(
       invDelsForSyncTable,
       delItem.toMap(),
@@ -988,6 +988,34 @@ class DbHelper extends GetxController {
         CPopupSnackBar.errorSnackBar(
           message: 'error fetching cloud deletion contacts: $e',
           title: 'error fetching cloud deletion contacts! ',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while fetching cloud deletion contacts! Please try again later...',
+          title: 'error fetching cloud deletion contacts!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- update synced contact deletions from local db by deleting them --
+  Future<int> locallyDeleteSyncedContactDeletions(
+    CContactsDelModel contactDelItem,
+  ) async {
+    try {
+      int contactDelResult = await _db!.delete(
+        'contactDelsForSyncTable',
+        where: 'contactId = ?',
+        whereArgs: [contactDelItem.contactId],
+      );
+      return contactDelResult;
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error updating cloud deletion contacts locally: $e',
+          title: 'error updating cloud deletion contacts locally! ',
         );
       } else {
         CPopupSnackBar.errorSnackBar(

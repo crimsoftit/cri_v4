@@ -240,16 +240,23 @@ class StoreSheetsApi extends GetxController {
     } catch (e) {
       if (kDebugMode) {
         CPopupSnackBar.errorSnackBar(
-          title: 'error deleting INVENTORY data from cloud!',
           message: e.toString(),
+          title: 'error deleting INVENTORY data from cloud!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while deleting inventory cloud data',
+          title: 'error deleting INVENTORY data from cloud!',
         );
       }
       deletingInvItems.value = false;
       //throw e.toString();
       rethrow;
-    } finally {
-      deletingInvItems.value = false;
     }
+    // finally {
+    //   deletingInvItems.value = false;
+    // }
   }
 
   /// -- ## TRANSACTIONS - OPERATIONS ## --
@@ -434,6 +441,39 @@ class StoreSheetsApi extends GetxController {
         );
       }
 
+      rethrow;
+    }
+  }
+
+  static Future<bool> deleteContactFromCloudById(int contactId) async {
+    try {
+      if (contactsSheet == null) return false;
+
+      var contactItemIndex = await contactsSheet!.values.rowIndexOf(
+        contactId.toString(),
+      );
+
+      if (contactItemIndex.isNegative) {
+        CPopupSnackBar.customToast(
+          forInternetConnectivityStatus: false,
+          message: 'This contact is not synced with the cloud',
+        );
+        return false;
+      }
+      return contactsSheet!.deleteRow(contactItemIndex);
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: '$e',
+          title: 'Error deleting contact from cloud!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while deleting contact from cloud!',
+          title: 'Error deleting contact from cloud!',
+        );
+      }
       rethrow;
     }
   }

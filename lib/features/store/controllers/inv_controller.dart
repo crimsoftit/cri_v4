@@ -1134,7 +1134,7 @@ class CInventoryController extends GetxController {
               'none',
             );
 
-            await dbHelper.updateDel(delItem);
+            await dbHelper.updateInvDeletion(delItem);
           }
         }
       }
