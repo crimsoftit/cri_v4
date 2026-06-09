@@ -195,10 +195,11 @@ class CInvDetails extends StatelessWidget {
                         height: CSizes.spaceBtnSections / 2.0,
                       ),
 
-/// -- total units sold --
+                      /// -- total units sold --
                       CKPIDisplayCard(
                         animeDigit: txnsController.totalAmtSold.value,
                         anotherTitleWidget: CAnimatedDigitWidget(
+                          fractionDigits: 0,
                           prefix: ' (',
                           suffix:
                               '${CFormatter.formatItemMetrics(invItem.calibration, txnsController.numberOfUnitsSold.value)})',
@@ -209,6 +210,7 @@ class CInvDetails extends StatelessWidget {
                               ),
                           value: txnsController.numberOfUnitsSold.value,
                         ),
+                        fractionDigits: 0,
                         prefixLabel: currency,
                       ),
 
@@ -226,6 +228,7 @@ class CInvDetails extends StatelessWidget {
                           value: txnsController.grossProfitPercentage.value,
                         ),
                         prefixLabel: currency,
+                        subTitle: 'Gross Profit',
                       ),
 
                       /// -- Inventory Turnover Ratio --

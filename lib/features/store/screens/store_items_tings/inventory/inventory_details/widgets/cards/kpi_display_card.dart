@@ -8,15 +8,18 @@ class CKPIDisplayCard extends StatelessWidget {
     super.key,
     required this.animeDigit,
     this.anotherTitleWidget,
-    this.prefixLabel,
+    this.fractionDigits,
+
     this.leadingWidget,
     this.onCardTap,
+    this.prefixLabel,
     this.subTitle,
     this.trailingWidget,
     this.titleWidget,
   });
 
   final double animeDigit;
+  final int? fractionDigits;
   final String? prefixLabel, subTitle;
   final void Function()? onCardTap;
   final Widget? anotherTitleWidget, leadingWidget, titleWidget, trailingWidget;
@@ -50,6 +53,7 @@ class CKPIDisplayCard extends StatelessWidget {
                 ),
               ),
               CAnimatedDigitWidget(
+                fractionDigits: fractionDigits ?? 1,
                 prefix: '',
                 txtStyle: Theme.of(context).textTheme.titleMedium!.apply(
                   color: CColors.rOrange,

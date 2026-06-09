@@ -1878,9 +1878,9 @@ class CTxnsController extends GetxController {
                                   txnItem.customerBalance = 0.0;
                                 }
 
-                                txnItem.lastModified = DateFormat(
-                                  'yyyy-MM-dd @ kk:mm',
-                                ).format(clock.now());
+                                // txnItem.lastModified = DateFormat(
+                                //   'yyyy-MM-dd @ kk:mm',
+                                // ).format(clock.now());
                                 txnItem.syncAction = txnItem.isSynced == 0
                                     ? 'append'
                                     : 'update';
