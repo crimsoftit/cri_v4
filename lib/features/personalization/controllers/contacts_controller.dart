@@ -1,0 +1,2050 @@
+import 'dart:io';
+
+//import 'package:azlistview/azlistview.dart';
+import 'package:azlistview_plus/azlistview_plus.dart';
+import 'package:clock/clock.dart';
+import 'package:country_picker/country_picker.dart';
+import 'package:cri_v3/api/sheets/store_sheets_api.dart';
+import 'package:cri_v3/common/widgets/buttons/custom_dropdown_btn.dart';
+import 'package:cri_v3/common/widgets/custom_shapes/containers/rounded_container.dart';
+import 'package:cri_v3/common/widgets/flushbars/flushbars.dart';
+import 'package:cri_v3/common/widgets/txt_fields/custom_type_ahead_field.dart';
+import 'package:cri_v3/features/personalization/controllers/user_controller.dart';
+import 'package:cri_v3/features/personalization/models/contacts_del_model.dart';
+import 'package:cri_v3/features/personalization/models/contacts_model.dart';
+import 'package:cri_v3/features/personalization/screens/contacts/widgets/contact_details/widgets/add_update_contact_form.dart';
+import 'package:cri_v3/features/store/controllers/inv_controller.dart';
+import 'package:cri_v3/features/store/controllers/nav_menu_controller.dart';
+import 'package:cri_v3/nav_menu.dart';
+import 'package:cri_v3/utils/constants/colors.dart';
+import 'package:cri_v3/utils/constants/sizes.dart';
+import 'package:cri_v3/utils/db/sqflite/db_helper.dart';
+import 'package:cri_v3/utils/helpers/formatter.dart';
+import 'package:cri_v3/utils/helpers/helper_functions.dart';
+import 'package:cri_v3/utils/helpers/network_manager.dart';
+import 'package:cri_v3/utils/popups/snackbars.dart';
+import 'package:cri_v3/utils/validators/validation.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:send_message/send_message.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
+class CContactsController extends GetxController {
+  /// -- constructor --
+  static CContactsController get instance => Get.find();
+
+  /// -- variables --
+  DbHelper dbHelper = DbHelper.instance;
+  final invController = Get.put(CInventoryController());
+
+  final localStorage = GetStorage();
+
+  final addUpdateContactItemFormKey = GlobalKey<FormState>();
+  final userController = Get.put(CUserController());
+
+  final txtContactNameController = TextEditingController();
+
+  final txtEmailController = TextEditingController();
+
+  final txtPhoneController = TextEditingController();
+
+  final RxBool isLoading = false.obs;
+  final RxBool showContactsSearchField = false.obs;
+  final RxBool processingContactsSync = false.obs;
+  final RxBool undoTrashBtnPressed = false.obs;
+
+  final RxList<CContactsDelModel> cloudDelContacts = <CContactsDelModel>[].obs;
+
+  final RxList<CContactsModel> allCloudContacts = <CContactsModel>[].obs;
+  final RxList<CContactsModel> userCloudContacts = <CContactsModel>[].obs;
+  final RxList<CContactsModel> foundMatches = <CContactsModel>[].obs;
+  final RxList<CContactsModel> myContacts = <CContactsModel>[].obs;
+  final RxList<CContactsModel> allContactMatches = <CContactsModel>[].obs;
+  final RxList<CContactsModel> trashedContacts = <CContactsModel>[].obs;
+  final RxList<CContactsModel> unsyncedContactAppends = <CContactsModel>[].obs;
+  final RxList<CContactsModel> unsyncedContactUpdates = <CContactsModel>[].obs;
+  final RxList<String> contactCategories = [
+    'Customer',
+    'Friend',
+    'Supplier',
+  ].obs;
+  final RxList alphabet = [].obs;
+
+  final RxString contactCountryCode = 'KE'.obs;
+  final RxString contactDialCode = '254'.obs;
+  final RxString contactTag = ''.obs;
+
+  final RxString selectedContactCategory = ''.obs;
+
+  final RxMap groupedContacts = {}.obs;
+
+  final contactsSearchFieldController = TextEditingController();
+
+  @override
+  void onInit() async {
+    foundMatches.value = [];
+    isLoading.value = false;
+    processingContactsSync.value = false;
+    undoTrashBtnPressed.value = false;
+    //await initContactsSync();
+    await fetchContactsForCloudDeletion();
+
+    super.onInit();
+  }
+
+  /// -- initialize cloud sync --
+  initContactsSync() async {
+    if (localStorage.read('SyncContactsWithCloud') == true &&
+        myContacts.isEmpty) {
+      await importContacts();
+      if (await importContacts()) {
+        localStorage.write('SyncContactsWithCloud', false);
+      } else {
+        localStorage.write('SyncContactsWithCloud', true);
+      }
+      await fetchMyContacts();
+    }
+  }
+
+  /// -- check if contact details exist in the database --
+  Future<bool> contactActionIsAdd(
+    String contactName,
+    String contactDetails,
+  ) async {
+    try {
+      bool addContact = false;
+      List<CContactsModel> contactMatches = [];
+      await fetchMyContacts().then(
+        (results) {
+          switch (results.isNotEmpty) {
+            case true:
+              contactMatches = myContacts
+                  .where(
+                    (match) =>
+                        match.contactEmail.toLowerCase().contains(
+                          contactDetails.toLowerCase(),
+                        ) ||
+                        match.contactPhone.toLowerCase().contains(
+                          contactDetails.toLowerCase(),
+                        ),
+                  )
+                  .toList();
+              if (contactMatches.isNotEmpty) {
+                addContact = false;
+              } else {
+                addContact = true;
+              }
+              break;
+
+            default:
+              contactMatches = [];
+              addContact = true;
+              break;
+          }
+        },
+      );
+
+      return addContact;
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error checking contact existence: $e',
+          title: 'error checking contact existence!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- check if it's necessary to update supplier's country code --
+  Future<bool> updateSupplierCountryCode(CContactsModel supplierContact) async {
+    try {
+      return supplierContact.contactCountryCode == '' ? true : false;
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error checking for contact\'s country code: $e',
+          title: 'error checking for contact\'s country code!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- add a contact to the local database --
+  Future addContact(
+    CContactsModel contact,
+    int? productId,
+  ) async {
+    try {
+      await dbHelper.addContact(contact).then(
+        (_) {
+          fetchMyContacts();
+        },
+      );
+
+      if (kDebugMode) {
+        CPopupSnackBar.successSnackBar(
+          message: '${contact.contactName.toUpperCase()} added to contacts',
+          title: 'contact added',
+        );
+      }
+      fetchMyContacts();
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'an error occurred while adding contact: $e',
+          title: 'error adding contact!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while adding contact! Please try again later...',
+          title: 'error adding contact!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- fetch contacts from sqflite db --
+  Future<List<CContactsModel>> fetchMyContacts() async {
+    try {
+      // start loader while contacts are fetched
+      isLoading.value = true;
+
+      myContacts.clear();
+
+      final fetchedContacts = await dbHelper.fetchUserContacts(
+        userController.user.value.email,
+      );
+      myContacts.assignAll(fetchedContacts);
+
+      unsyncedContactAppends.assignAll(
+        fetchedContacts
+            .where(
+              (unsyncedAppend) =>
+                  unsyncedAppend.isSynced == 0 &&
+                  unsyncedAppend.syncAction == 'append',
+            )
+            .toList(),
+      );
+
+      trashedContacts.value = myContacts
+          .where((trashedContact) => trashedContact.isTrashed == 1)
+          .toList();
+
+      unsyncedContactUpdates.assignAll(
+        fetchedContacts
+            .where(
+              (unsyncedUpdate) =>
+                  unsyncedUpdate.isSynced == 1 &&
+                  unsyncedUpdate.syncAction.toLowerCase().contains(
+                    'update'.toLowerCase(),
+                  ),
+            )
+            .toList(),
+      );
+
+      List<CContactsModel> returnItems;
+
+      switch (myContacts.isEmpty) {
+        case true:
+          returnItems = [];
+          break;
+        case false:
+          returnItems = myContacts;
+
+          break;
+      }
+
+      await fetchContactsForCloudDeletion();
+
+      // stop loader
+      isLoading.value = false;
+      return returnItems;
+    } catch (e) {
+      // stop loader
+      isLoading.value = false;
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'an error occurred while fetching contacts: $e',
+          title: 'error fetching contacts!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  contactSuggestionsCallBackAction(String pattern) {
+    foundMatches.clear;
+    foundMatches.value = myContacts
+        .where(
+          (contact) =>
+              contact.contactName.toLowerCase().contains(
+                pattern.toLowerCase(),
+              ) ||
+              contact.contactPhone.toLowerCase().contains(
+                pattern.toLowerCase(),
+              ) ||
+              contact.contactEmail.toLowerCase().contains(
+                pattern.toLowerCase(),
+              ),
+        )
+        .toList();
+
+    return foundMatches;
+  }
+
+  /// -- update contact details --
+  Future<bool> updateContact(CContactsModel contact) async {
+    try {
+      // --  start loader --
+      isLoading.value = true;
+
+      await dbHelper.updateContact(contact);
+
+      fetchMyContacts();
+
+      // -- stop loader --
+      isLoading.value = false;
+
+      return true;
+    } catch (e) {
+      // -- stop loader --
+      isLoading.value = false;
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error updating contact: $e',
+          title: 'error updating contact!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message: 'An unknown error occurred while updating contact details!',
+          title: 'error updating contact!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- update contact details modal popup --
+  Future<dynamic> updateContactActionModal(
+    BuildContext context,
+    CContactsModel? contactItem,
+    String updateAction,
+  ) async {
+    try {
+      final isDarkTheme = CHelperFunctions.isDarkMode(context);
+      return await showModalBottomSheet(
+        backgroundColor: isDarkTheme
+            ? CColors.black.withValues(
+                alpha: .9,
+              )
+            : CColors.white,
+        context: context,
+        isDismissible: false,
+        isScrollControlled: true,
+        useSafeArea: true,
+        useRootNavigator: true,
+        builder: (context) {
+          // -- set field values --
+
+          contactDialCode.value = contactItem!.contactDialCode != ''
+              ? contactItem.contactDialCode
+              : contactDialCode.value;
+
+          txtEmailController.text = txtEmailController.text == ''
+              ? contactItem.contactEmail
+              : txtEmailController.text.trim();
+          txtContactNameController.text =
+              txtContactNameController.text.trim() == ''
+              ? contactItem.contactName
+              : txtContactNameController.text.trim();
+          txtPhoneController.text = txtPhoneController.text == ''
+              ? contactItem.contactPhone
+              : txtPhoneController.text.trim();
+
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: CRoundedContainer(
+              bgColor: CColors.transparent,
+              // height: updateAction.toLowerCase() == 'edit'.toLowerCase()
+              //     ? CHelperFunctions.screenHeight() * .51
+              //     : CHelperFunctions.screenHeight() * .39,
+              //height: CHelperFunctions.screenHeight() * .49,
+              padding: const EdgeInsets.all(
+                CSizes.lg / 3,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: CHelperFunctions.randomAestheticColor(),
+                    radius: 20.0,
+                    child:
+                        CValidator.isFirstCharacterALetter(
+                          contactItem.contactName,
+                        )
+                        ? Text(
+                            contactItem.contactName[0].toUpperCase(),
+                            style: Theme.of(context).textTheme.bodyLarge!.apply(
+                              color: CColors.white,
+                            ),
+                          )
+                        : Icon(
+                            Iconsax.user,
+                            color: CHelperFunctions.randomAestheticColor(),
+                          ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 30.0,
+                      right: 0.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          contactItem.contactName.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.headlineMedium!.apply(),
+                        ),
+                        Obx(
+                          () {
+                            return CCustomDropdownBtn(
+                              defaultItemColor: isDarkTheme
+                                  ? CColors.white
+                                  : CColors.rBrown,
+                              defaultItemFontSizeFactor: 1.3,
+                              dropdownItems: contactCategories,
+                              onValueChanged: (value) {
+                                selectedContactCategory.value = value!;
+                              },
+                              selectedValue: setDefaultContactCategory(),
+                              underlineColor: CColors.rBrown,
+                              underlineHeight: .8,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 30.0,
+                      right: 30.0,
+                      top: 30.0,
+                    ),
+                    child: Form(
+                      key: addUpdateContactItemFormKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Visibility(
+                            maintainState: false,
+                            visible:
+                                updateAction.toLowerCase() ==
+                                'edit'.toLowerCase(),
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  controller: txtContactNameController,
+                                  decoration: InputDecoration(
+                                    constraints: BoxConstraints(
+                                      minHeight: 60.0,
+                                    ),
+                                    filled: true,
+                                    fillColor: isDarkTheme
+                                        ? CColors.transparent
+                                        : CColors.lightGrey,
+                                    labelText: 'Name',
+                                    labelStyle: Theme.of(
+                                      context,
+                                    ).textTheme.labelSmall,
+                                    prefixIcon: Icon(
+                                      Iconsax.tag,
+                                      color: CColors.darkGrey,
+                                      size: CSizes.iconXs,
+                                    ),
+                                  ),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                  validator:
+                                      updateAction.toLowerCase() == 'edit'
+                                      ? (value) {
+                                          return CValidator.validateEmptyText(
+                                            'Name',
+                                            value,
+                                          );
+                                        }
+                                      : null,
+                                ),
+                                const SizedBox(
+                                  height: CSizes.spaceBtnInputFields,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // CInternationalPhoneNumberInput(
+                          //   controller: txtPhoneController,
+                          // ),
+
+                          // const SizedBox(
+                          //   height: CSizes.spaceBtnInputFields,
+                          // ),
+                          IntlPhoneField(
+                            controller: txtPhoneController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              fillColor: isDarkTheme
+                                  ? CColors.transparent
+                                  : CColors.lightGrey,
+                              labelText: 'Phone number',
+                            ),
+                            // Default country code (e.g., India)
+                            // initialCountryCode: contactItem.contactIsoCode != ''
+                            //     ? contactItem.contactIsoCode
+                            //     : 'UG',
+                            initialCountryCode: contactItem.contactCountryCode,
+
+                            invalidNumberMessage: 'Invalid phone number!',
+                            onChanged: (phone) {
+                              contactCountryCode.value = phone.countryISOCode;
+
+                              contactDialCode.value = phone.countryCode;
+
+                              if (kDebugMode) {
+                                print('=========\n');
+                                print('country code: ${phone.countryCode}\n');
+                                print('---------\n');
+                                print(
+                                  'country iso code: ${phone.countryISOCode}\n',
+                                );
+                                print('---------\n');
+                                print(
+                                  'complete number: ${phone.completeNumber}\n',
+                                );
+                                print('=========\n');
+                              }
+                            },
+                            onCountryChanged: (country) {
+                              contactCountryCode.value = country.code;
+
+                              contactDialCode.value = country.dialCode;
+
+                              if (kDebugMode) {
+                                print('=========\n');
+                                print('country code: ${country.code}\n');
+                                print('---------\n');
+                                print(
+                                  'dial code: ${country.dialCode}',
+                                );
+                                print('---------\n');
+                                print(
+                                  'full country code: ${country.fullCountryCode}\n',
+                                );
+                                print('=========\n');
+                              }
+                            },
+                          ),
+                          const SizedBox(
+                            height: CSizes.spaceBtnInputFields,
+                          ),
+                          CCustomTypeaheadField(
+                            fieldValidator: updateAction == 'add email'
+                                ? (value) {
+                                    return CValidator.validateEmail(value);
+                                  }
+                                : null,
+                            fillColor: isDarkTheme
+                                ? CColors.transparent
+                                : CColors.lightGrey,
+                            focusedBorderColor: isDarkTheme
+                                ? CColors.white
+                                : CColors.rBrown,
+                            includeAvatarOnSuggestion: true,
+                            includePrefixIcon: true,
+                            labelTxt: 'E-mail address',
+                            onFieldValueChanged: (value) {
+                              txtEmailController.text = value.trim();
+                            },
+                            onItemSelected: (suggestion) {
+                              txtEmailController.text = suggestion.contactEmail;
+                            },
+                            prefixIcon: Icon(
+                              Icons.contact_mail,
+                              color: CColors.darkGrey,
+                              size: CSizes.iconXs,
+                            ),
+                            typeAheadFieldController: txtEmailController,
+                          ),
+                          const SizedBox(
+                            height: CSizes.spaceBtnInputFields,
+                          ),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 4,
+                                child: TextButton.icon(
+                                  icon: Icon(
+                                    Iconsax.save_add,
+                                    size: CSizes.iconSm,
+                                    color: isDarkTheme
+                                        ? CColors.rBrown
+                                        : CColors.white,
+                                  ),
+                                  label: Text(
+                                    'Update',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .apply(
+                                          color: isDarkTheme
+                                              ? CColors.rBrown
+                                              : CColors.white,
+                                        ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: CColors
+                                        .white, // foreground (text) color
+                                    backgroundColor: isDarkTheme
+                                        ? CColors.white
+                                        : CColors.rBrown, // background color
+                                  ),
+                                  onPressed: () async {
+                                    // -- form validation
+                                    if (!addUpdateContactItemFormKey
+                                        .currentState!
+                                        .validate()) {
+                                      return;
+                                    }
+
+                                    // contactItem.contactCountryCode =
+                                    //     contactItem.contactCountryCode == ''
+                                    //     ? setCountryCodeFromDialCode(
+                                    //         contactItem,
+                                    //       )
+                                    //     : contactItem.contactCountryCode;
+                                    contactItem.contactDialCode =
+                                        contactItem.contactDialCode == ''
+                                        ? contactDialCode.value
+                                        : contactItem.contactDialCode;
+                                    contactItem.contactPhone =
+                                        txtPhoneController.text.trim();
+                                    contactItem.contactEmail =
+                                        txtEmailController.text.trim();
+                                    contactItem.contactName =
+                                        txtContactNameController.text.trim() !=
+                                                '' &&
+                                            updateAction == 'edit'
+                                        ? txtContactNameController.text.trim()
+                                        : contactItem.contactName;
+
+                                    contactItem.contactCategory =
+                                        selectedContactCategory.value;
+
+                                    contactItem.lastModified = DateFormat(
+                                      'yyyy-MM-dd kk:mm',
+                                    ).format(clock.now());
+
+                                    contactItem.syncAction =
+                                        contactItem.isSynced == 0
+                                        ? 'append'
+                                        : 'update';
+                                    await updateContact(contactItem);
+                                    if (await updateContact(contactItem)) {
+                                      Navigator.pop(
+                                        Get.overlayContext!,
+                                        true,
+                                      );
+
+                                      resetFields();
+                                    }
+                                  },
+                                ),
+                              ),
+                              const SizedBox(
+                                width: CSizes.spaceBtnSections / 4,
+                              ),
+                              Expanded(
+                                flex: 4,
+                                child: TextButton.icon(
+                                  icon: const Icon(
+                                    Iconsax.undo,
+                                    size: CSizes.iconSm,
+                                    color: CColors.rBrown,
+                                  ),
+                                  label: Text(
+                                    'Back',
+                                    style:
+                                        Theme.of(
+                                          context,
+                                        ).textTheme.labelMedium!.apply(
+                                          color: CColors.rBrown,
+                                        ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: CColors
+                                        .rBrown, // foreground (text) color
+                                    backgroundColor:
+                                        CColors.white, // background color
+                                  ),
+                                  onPressed: () {
+                                    //Navigator.pop(context, true);
+
+                                    resetFields();
+                                    Navigator.pop(
+                                      Get.overlayContext!,
+                                      true,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('error displaying bottom sheet modal: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error displaying bottom sheet modal: $e',
+          title: 'error popping bottom sheet modal!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- add contact modal popup--
+  Future<dynamic> addContactActionModal(BuildContext context) async {
+    final isDarkTheme = CHelperFunctions.isDarkMode(context);
+
+    try {
+      return await showModalBottomSheet(
+        backgroundColor: isDarkTheme
+            ? CColors.black.withValues(
+                alpha: .9,
+              )
+            : CColors.white,
+        context: context,
+        isDismissible: false,
+        isScrollControlled: true,
+        //sheetAnimationStyle: AnimationStyle(),
+        useSafeArea: true,
+        useRootNavigator: true,
+        builder: (context) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: CRoundedContainer(
+              bgColor: CColors.transparent,
+              height: CHelperFunctions.screenHeight() * .56,
+              padding: const EdgeInsets.only(
+                left: CSizes.lg / 4,
+                right: CSizes.lg / 4,
+                top: CSizes.lg / 4,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: CSizes.defaultSpace / 4.0,
+                      right: CSizes.defaultSpace / 4.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        CircleAvatar(
+                          backgroundColor:
+                              CHelperFunctions.randomAestheticColor(),
+                          radius: 15.0,
+                          child: Icon(
+                            Iconsax.user,
+                            color: CColors.white,
+                            size: CSizes.iconSm,
+                          ),
+                        ),
+
+                        Text(
+                          'add contact',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelLarge!.apply(),
+                        ),
+
+                        Obx(
+                          () {
+                            return CCustomDropdownBtn(
+                              defaultItemColor: isDarkTheme
+                                  ? CColors.darkGrey
+                                  : CColors.rBrown,
+                              defaultItemFontSizeFactor: 1.3,
+                              dropdownItems: contactCategories,
+                              onValueChanged: (value) {
+                                selectedContactCategory.value = value!;
+                              },
+                              selectedValue: setDefaultContactCategory(),
+                              underlineColor: CColors.rBrown,
+                              underlineHeight: .8,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  CAddUpdateContactForm(),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error displaying add contact bottom sheet modal: $e',
+          title: 'error popping bottom sheet modal!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- restore trashed contact --
+  restoreTrashedContact(CContactsModel trashedItem) async {
+    try {
+      trashedItem.isTrashed = 0;
+      trashedItem.lastModified = DateFormat(
+        'yyyy-MM-dd kk:mm',
+      ).format(clock.now());
+      trashedItem.syncAction = trashedItem.isSynced == 1 ? 'update' : 'append';
+      await updateContact(trashedItem);
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error restoring contact from trash bin: $e',
+          title: 'error restoring contact!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while restoring contact from trash bin! Please try again later...',
+          title: 'error restoring contact!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- delete contact dialog --
+  Future<dynamic> onDeleteContactDialog(CContactsModel contact) async {
+    try {
+      await Get.defaultDialog(
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              backgroundColor: CHelperFunctions.randomAestheticColor(),
+              radius: 30.0,
+              child:
+                  CValidator.isFirstCharacterALetter(
+                    contact.contactName,
+                  )
+                  ? Text(
+                      contact.contactName[0].toUpperCase(),
+                      style: Theme.of(Get.overlayContext!).textTheme.bodyLarge!
+                          .apply(
+                            color: CColors.white,
+                            fontSizeFactor: 1.5,
+                          ),
+                    )
+                  : Icon(
+                      Iconsax.user,
+                      color: CHelperFunctions.randomAestheticColor(),
+                    ),
+            ),
+            const SizedBox(
+              height: CSizes.spaceBtnSections,
+            ),
+            Text(
+              contact.contactName,
+              style: Theme.of(Get.overlayContext!).textTheme.bodyMedium!.apply(
+                fontSizeFactor: 1.3,
+                fontWeightDelta: 2,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(
+              height: CSizes.spaceBtnItems,
+            ),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text:
+                        'Are you certain you want to permanently delete this contact?',
+                  ),
+                  TextSpan(
+                    text: '\n\nTHIS ACTION CAN\'T BE UNDONE!',
+                    style: Theme.of(Get.overlayContext!).textTheme.labelMedium!
+                        .apply(
+                          fontSizeFactor: 1.5,
+                          fontWeightDelta: 2,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        contentPadding: const EdgeInsets.all(
+          CSizes.md,
+        ),
+
+        confirm: ElevatedButton(
+          onPressed: () async {
+            if (contact.isSynced == 1) {
+              // -- check internet connectivity
+              //final isConnected = await CNetworkManager.instance.isConnected();
+              var forCloudDeleteItem = CContactsDelModel(
+                contact.contactId!,
+                contact.contactEmail,
+                contact.contactName,
+                contact.contactPhone,
+                userController.user.value.email,
+                DateFormat('yyyy-MM-dd kk:mm').format(clock.now()),
+                contact.isSynced,
+                contact.syncAction,
+              );
+
+              dbHelper.addUnsyncedContactDeletions(forCloudDeleteItem).then(
+                (_) async {
+                  await dbHelper.deleteContact(contact);
+                },
+              );
+            } else {
+              await dbHelper.deleteContact(contact);
+            }
+
+            await fetchContactsForCloudDeletion();
+            await fetchMyContacts().then(
+              (_) {
+                Get.offAll(
+                  () {
+                    final navController = Get.put(CNavMenuController());
+                    navController.selectedIndex.value = 2;
+                    return const NavMenu();
+                  },
+                );
+              },
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            side: const BorderSide(
+              color: Colors.red,
+            ),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: CSizes.lg,
+            ),
+            child: Text(
+              'Delete anyway',
+            ),
+          ),
+        ),
+        cancel: OutlinedButton(
+          onPressed: () {
+            fetchMyContacts();
+            Navigator.of(Get.overlayContext!).pop();
+          },
+          child: const Text('Cancel'),
+        ),
+
+        title: 'Delete contact?',
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'An unknown error occurred while deleting contact: $e',
+          title: 'error deleting contact!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while deleting contact! Please try again later...',
+          title: 'error deleting contact!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- fetch contact deletions that require cloud sync --
+  Future<List<CContactsDelModel>> fetchContactsForCloudDeletion() async {
+    try {
+      final contactDels = await dbHelper.fetchContactDels();
+      cloudDelContacts.assignAll(contactDels);
+
+      return cloudDelContacts.toList();
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: e.toString(),
+          title: 'Error fetching contatcs for cloud deletion!',
+        );
+      } else {
+        CPopupSnackBar.customToast(
+          forInternetConnectivityStatus: false,
+          message:
+              'An unknown error occurred while fetching contatcs for cloud deletion!',
+        );
+      }
+
+      rethrow;
+    }
+  }
+
+  Future sendSimpleSms(List<String> recipients) async {
+    String message = "hi,";
+    try {
+      String result = await sendSMS(
+        message: message,
+        recipients: recipients,
+      );
+
+      return result;
+    } catch (error) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error sending simple sms: $error',
+          title: 'error sending simple sms!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message: 'an unknown error occurred while sending sms!',
+          title: 'error sending sms!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> sendDirectSms() async {
+    String message = "Test message!";
+    List<String> recipients = ["1234567890", "5556787676"];
+
+    try {
+      String result = await sendSMS(
+        message: message,
+        recipients: recipients,
+        sendDirect: true, // Skips confirmation dialog (Android only)
+      );
+      if (kDebugMode) {
+        CPopupSnackBar.customToast(
+          forInternetConnectivityStatus: false,
+          message: result,
+        );
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: error.toString(),
+          title: 'Error sending direct sms!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message: 'Unable to send direct sms! Please try again later...',
+          title: 'Error sending direct sms!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- open native dialer (make a call) --
+  Future<void> launchPhoneDialer(String phoneNumber) async {
+    try {
+      final Uri phoneUri = Uri(
+        path: phoneNumber,
+        scheme: 'tel',
+      );
+
+      if (await canLaunchUrl(phoneUri)) {
+        await launchUrl(phoneUri);
+      } else {
+        CPopupSnackBar.customToast(
+          forInternetConnectivityStatus: false,
+          message: 'could not launch $phoneUri',
+        );
+        throw 'could not launch $phoneUri';
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('error launching dialer: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error launching dialer: $e',
+          title: 'error launching dialer',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> sendEmail(String emailAddress) async {
+    try {
+      final Email email = Email(
+        body: 'This is the email body',
+        subject: 'Test Subject',
+        recipients: [emailAddress],
+        cc: ['cc@example.com'],
+        bcc: ['bcc@example.com'],
+        attachmentPaths: ['/path/to/file.pdf'],
+        isHTML: false,
+      );
+
+      await FlutterEmailSender.send(email);
+    } catch (e) {
+      if (kDebugMode) {
+        print('error sending email: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error sending email: $e',
+          title: 'error sending email',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> launchEmailApp(String emailAddress) async {
+    try {
+      final Uri emailUri = Uri(
+        scheme: 'mailto',
+        path: emailAddress,
+        queryParameters: {
+          'subject': '',
+          'body': '',
+        },
+      );
+
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri);
+      } else {
+        CPopupSnackBar.warningSnackBar(
+          message: 'Unable to launch email app! try again later.',
+          title: 'Could not launch email app!',
+        );
+        throw 'Could not launch email app!';
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('error sending email: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error sending email: $e',
+          title: 'error sending email',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> launchWhatsappChat(String recipientNumber) async {
+    try {
+      var androidWhatsappUrl =
+          'whatsapp://send?phone=$recipientNumber&text=wooza!';
+      var iosWhatsappUrl =
+          'https://wa.me/$recipientNumber?text=${Uri.parse('rada...')}';
+
+      if (Platform.isIOS) {
+        if (await canLaunchUrlString(iosWhatsappUrl)) {
+          await launchUrlString(iosWhatsappUrl);
+        } else {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'unable to launch whatsapp chat! please try again later',
+          );
+        }
+      } else {
+        if (await canLaunchUrlString(androidWhatsappUrl)) {
+          await launchUrlString(androidWhatsappUrl);
+        } else {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'unable to launch whatsapp chat! please try again later',
+          );
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('error launching whatsapp: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error launching whatsapp: $e',
+          title: 'error launching whatsapp',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message: 'unable to launch whatsapp chat! please try again later',
+          title: 'error launching whatsapp',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- bottomSheetModal for when usp is less than ubp --
+  Future<dynamic> updateDialCodeDialog(
+    BuildContext context,
+    CContactsModel contactItem,
+  ) async {
+    return await showModalBottomSheet(
+      context: context,
+
+      builder: (context) {
+        final isDarkTheme = CHelperFunctions.isDarkMode(context);
+
+        resetFields();
+        // -- set field values --
+        contactCountryCode.value = contactItem.contactCountryCode != ''
+            ? contactItem.contactCountryCode
+            : contactCountryCode.value;
+        contactDialCode.value = contactItem.contactDialCode != ''
+            ? contactItem.contactDialCode
+            : contactDialCode.value;
+        txtPhoneController.text = contactItem.contactPhone;
+        return SizedBox(
+          height: CHelperFunctions.screenHeight() * .28,
+          child: Padding(
+            padding: const EdgeInsets.all(
+              CSizes.lg * .8,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'Whatsapp requires your contact\'s country code...',
+                  style: Theme.of(context).textTheme.bodyMedium!.apply(),
+                ),
+                const SizedBox(
+                  height: CSizes.spaceBtnSections * .7,
+                ),
+                SizedBox(
+                  width: CHelperFunctions.screenWidth() * .8,
+                  child: Column(
+                    children: [
+                      IntlPhoneField(
+                        controller: txtPhoneController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          fillColor: isDarkTheme
+                              ? CColors.transparent
+                              : CColors.lightGrey,
+                          labelText: 'Phone number',
+                        ),
+                        // Default country code (e.g., India)
+                        // initialCountryCode: contactItem.contactIsoCode != ''
+                        //     ? contactItem.contactIsoCode
+                        //     : 'UG',
+                        initialCountryCode: contactItem.contactCountryCode != ''
+                            ? contactItem.contactCountryCode
+                            : 'KE',
+                        invalidNumberMessage: 'Invalid phone number!',
+                        onChanged: (phone) {
+                          contactCountryCode.value = phone.countryISOCode;
+                          contactDialCode.value = phone.countryCode;
+
+                          if (kDebugMode) {
+                            print('=========\n');
+                            print('country code: ${phone.countryISOCode}\n');
+                            print('---------\n');
+                            print(
+                              'country iso code: ${phone.countryCode}\n',
+                            );
+                            print('---------\n');
+                            print(
+                              'complete number: ${phone.completeNumber}\n',
+                            );
+                            print('=========\n');
+
+                            CPopupSnackBar.customToast(
+                              forInternetConnectivityStatus: false,
+                              message:
+                                  'country code: ${contactCountryCode.value}\n dial code: ${contactDialCode.value}',
+                            );
+                          }
+                        },
+                        onCountryChanged: (country) {
+                          contactCountryCode.value = country.code;
+
+                          contactDialCode.value = country.dialCode;
+
+                          if (kDebugMode) {
+                            print('=========\n');
+                            print('country code: ${country.code}\n');
+                            print('---------\n');
+                            print(
+                              'dial code: ${country.dialCode}',
+                            );
+                            print('---------\n');
+                            print(
+                              'full country code: ${country.fullCountryCode}\n',
+                            );
+                            print('=========\n');
+                          }
+                        },
+                      ),
+                      const SizedBox(
+                        height: CSizes.spaceBtnSections * .5,
+                      ),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextButton.icon(
+                            icon: FaIcon(
+                              FontAwesomeIcons.whatsapp,
+                              color: CColors.white,
+                              //size: 24.0,
+                            ),
+                            // Icon(
+                            //   Iconsax.save_add,
+                            //   size: CSizes.iconSm,
+                            //   color: isDarkTheme
+                            //       ? CColors.rBrown
+                            //       : CColors.white,
+                            // ),
+                            label: Text(
+                              'Proceed',
+                              style: Theme.of(context).textTheme.labelMedium!
+                                  .apply(
+                                    color: isDarkTheme
+                                        ? CColors.white
+                                        : CColors.rBrown,
+                                  ),
+                            ),
+                            onPressed: () async {
+                              contactItem.contactCountryCode =
+                                  contactItem.contactCountryCode == ''
+                                  ? contactCountryCode.value
+                                  : contactItem.contactCountryCode;
+                              contactItem.contactDialCode =
+                                  contactItem.contactDialCode == ''
+                                  ? contactDialCode.value
+                                  : contactItem.contactDialCode;
+                              contactItem.contactPhone = txtPhoneController.text
+                                  .trim();
+
+                              if (await updateContact(contactItem)) {
+                                fetchMyContacts().then(
+                                  (_) {
+                                    launchWhatsappChat(
+                                      '${contactItem.contactDialCode}${contactItem.contactPhone}',
+                                    );
+                                  },
+                                );
+
+                                //resetFields();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor:
+                                  CColors.white, // foreground (text) color
+                              // backgroundColor: isDarkTheme
+                              //     ? CColors.white
+                              //     : CColors.rBrown, // background color
+                              backgroundColor: Colors.green,
+                            ),
+                          ),
+                          TextButton.icon(
+                            icon: const Icon(
+                              Iconsax.undo,
+                              size: CSizes.iconSm,
+                              color: CColors.rBrown,
+                            ),
+                            label: Text(
+                              'Cancel',
+                              style:
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.labelMedium!.apply(
+                                    color: CColors.rBrown,
+                                  ),
+                            ),
+                            onPressed: () {
+                              resetFields();
+                              Get.back();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor:
+                                  CColors.rBrown, // foreground (text) color
+                              backgroundColor:
+                                  CColors.white, // background color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// -- on trash contact button pressed --
+  Future<void> onTrashAction(
+    BuildContext context,
+    CContactsModel trashItem,
+  ) async {
+    try {
+      CFlushbars.undo(
+        duration: const Duration(
+          seconds: 6,
+        ),
+        message: 'You can still undo this action!!',
+        onUndo: () {
+          undoTrashBtnPressed.value = true;
+          Navigator.pop(context, true);
+        },
+        undoTextStyle: Theme.of(context).textTheme.bodyMedium!.apply(
+          color: CColors.white,
+          fontSizeFactor: 1.3,
+        ),
+      ).show(context);
+
+      delayedTrashAction(trashItem);
+    } catch (e) {
+      if (kDebugMode) {
+        print('error trashing contact: $e');
+        CPopupSnackBar.errorSnackBar(
+          message: 'error trashing contact: $e',
+          title: 'error trashing contact',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to send contact to trash bin. Please try again later',
+          title: 'error trashing contact',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- restore contact from trash --
+  void delayedTrashAction(CContactsModel trashItem) async {
+    // Wait for 7 seconds
+    await Future.delayed(
+      const Duration(
+        seconds: 7,
+      ),
+      () {
+        if (undoTrashBtnPressed.value == false || !undoTrashBtnPressed.value) {
+          trashItem.isTrashed = 1;
+          trashItem.lastModified = DateFormat(
+            'yyyy-MM-dd kk:mm',
+          ).format(clock.now());
+          trashItem.syncAction = trashItem.isSynced == 0 ? 'append' : 'update';
+
+          updateContact(trashItem);
+          Get.offAll(
+            () {
+              final navController = Get.put(CNavMenuController());
+              navController.selectedIndex.value = 2;
+              undoTrashBtnPressed.value = false;
+              return const NavMenu();
+            },
+          );
+        }
+      },
+    );
+
+    // Perform action after delay
+    if (kDebugMode) {
+      print("Action performed after 7 seconds");
+    }
+
+    resetFields();
+  }
+
+  /// -- process cloud sync --
+  Future<void> processContactsSync() async {
+    try {
+      processingContactsSync.value = true;
+      await addUnsyncedContactAppendsToCloud().then(
+        (_) async {
+          await updateInitiallySyncedContacts();
+          await deleteCloudSyncedContacts();
+        },
+      );
+
+      // -- stop loader --
+      processingContactsSync.value = false;
+    } catch (e) {
+      // -- stop loader --
+      processingContactsSync.value = false;
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error processing contacts\' cloud sync: $e',
+          title: 'error processing contacts\' cloud sync',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to process contacts\' cloud sync! Please try again later..',
+          title: 'error processing contacts\' cloud sync',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- add unsynced contacts to cloud --
+  Future<bool> addUnsyncedContactAppendsToCloud() async {
+    try {
+      // -- start loader --
+      isLoading.value = true;
+
+      await fetchMyContacts();
+
+      // -- check internet connectivity
+      final isConnectedToInternet = await CNetworkManager.instance
+          .isConnected();
+
+      if (isConnectedToInternet &&
+          CNetworkManager.instance.connectionIsStable.value) {
+        var cloudContactAppends = unsyncedContactAppends.map(
+          (element) {
+            return {
+              'contactId': element.contactId,
+              'productId': element.productId,
+              'addedBy': element.addedBy,
+              'contactName': element.contactName,
+              'contactCountryCode': element.contactCountryCode,
+              'contactDialCode': element.contactDialCode,
+              'contactPhone': element.contactPhone,
+              'contactEmail': element.contactEmail,
+              'contactCategory': element.contactCategory,
+              'lastModified': element.lastModified,
+              'createdAt': element.createdAt,
+              'isSynced': 1,
+              'syncAction': 'none',
+              'isStarred': element.isStarred,
+              'isTrashed': element.isTrashed,
+            };
+          },
+        ).toList();
+
+        if (cloudContactAppends.isNotEmpty ||
+            unsyncedContactAppends.isNotEmpty) {
+          await StoreSheetsApi.addLocalContactsToCloud(
+            cloudContactAppends,
+          ).then((_) {
+            updateSyncedContactsLocally();
+          });
+        } else {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'rada safi nani...',
+          );
+        }
+        // -- stop loader --
+        isLoading.value = false;
+        fetchMyContacts();
+        return true;
+      } else {
+        CPopupSnackBar.customToast(
+          forInternetConnectivityStatus: false,
+          message:
+              "Your internet connection is not stable enough for cloud sync!",
+        );
+        // -- stop loader --
+        isLoading.value = false;
+        return false;
+      }
+    } catch (e) {
+      // -- stop loader --
+      isLoading.value = false;
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error adding contact to cloud: $e',
+          title: 'error adding contact to cloud',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to add unsynced contacts to cloud! Please try again later..',
+          title: 'error adding contact to cloud',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- update synced contacts locally --
+  Future<void> updateSyncedContactsLocally() async {
+    try {
+      if (unsyncedContactAppends.isNotEmpty) {
+        for (var contactAppend in unsyncedContactAppends) {
+          contactAppend.isSynced = 1;
+          contactAppend.syncAction = 'none';
+
+          await dbHelper.updateContact(contactAppend);
+        }
+      }
+
+      fetchMyContacts();
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error updating contacts\' sync status locally: $e',
+          title: 'error updating contacts\' sync status!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to update contacts\' sync status on your devices! Please try again later...',
+          title: 'error updating contacts\' sync status!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- import contacts from cloud to local storage --
+  Future<bool> importContacts() async {
+    try {
+      // -- start loader --
+      processingContactsSync.value = true;
+
+      await fetchUserCloudContacts().then(
+        (result) async {
+          if (userCloudContacts.isNotEmpty &&
+              myContacts.isEmpty &&
+              await CNetworkManager.instance.isConnected() &&
+              CNetworkManager.instance.connectionIsStable.value) {
+            for (var contact in userCloudContacts) {
+              var forImportContacts = CContactsModel.withId(
+                contact.contactId,
+                contact.productId,
+                contact.addedBy,
+                contact.contactName,
+                contact.contactCountryCode,
+                contact.contactDialCode,
+                contact.contactPhone,
+                contact.contactEmail,
+                contact.contactCategory,
+                contact.lastModified,
+                contact.createdAt,
+                contact.isSynced,
+                contact.syncAction,
+                contact.isStarred,
+                contact.isTrashed,
+              );
+
+              // -- save imported data to local sqflite database --
+              dbHelper.addContact(forImportContacts);
+            }
+          }
+        },
+      );
+
+      // -- refresh myContacts list --
+      await fetchMyContacts();
+      myContacts.refresh();
+
+      // -- stop loader --
+      processingContactsSync.value = false;
+
+      return true;
+    } catch (e) {
+      // -- stop loader --
+      processingContactsSync.value = false;
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error importing contacts from cloud: $e',
+          title: 'error importing contacts from cloud!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'Unable to import your contacts from cloud! Please try again later...',
+          title: 'error importing contacts from cloud!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- fetch all contacts from cloud --
+  Future<bool> fetchUserCloudContacts() async {
+    try {
+      var cloudContacts = await StoreSheetsApi.fetchContactsFromCloud();
+
+      userCloudContacts.assignAll(
+        cloudContacts.where(
+          (contact) => contact.addedBy.toLowerCase().contains(
+            userController.user.value.email.toLowerCase(),
+          ),
+        ),
+      );
+
+      return true;
+    } catch (e) {
+      isLoading.value = false;
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error fetching all contacts from cloud!',
+          message: e.toString(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error fetching all contacts from cloud!',
+          message:
+              'an unknown error occurred while fetching all contacts from cloud! Please try again later.',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- update initially synced contacts that need updating now --
+  Future updateInitiallySyncedContacts() async {
+    try {
+      // final isConnectedToInternet = await CNetworkManager.instance
+      //     .isConnected();
+
+      if (CNetworkManager.instance.hasConnection.value &&
+          CNetworkManager.instance.connectionIsStable.value) {
+        if (unsyncedContactUpdates.isNotEmpty) {
+          for (var contact in unsyncedContactUpdates) {
+            final forSyncContact = CContactsModel.withId(
+              contact.contactId,
+              contact.productId,
+              contact.addedBy,
+              contact.contactName,
+              contact.contactCountryCode,
+              contact.contactDialCode,
+              contact.contactPhone,
+              contact.contactEmail,
+              contact.contactCategory,
+              contact.lastModified,
+              contact.createdAt,
+              1,
+              'none',
+              contact.isStarred,
+              contact.isTrashed,
+            );
+            await StoreSheetsApi.updateInitiallySyncedContacts(
+              contact.contactId!,
+              forSyncContact.toMap(),
+            ).then(
+              (_) async {
+                contact.isSynced = 1;
+                contact.syncAction = 'none';
+                await dbHelper.updateContact(contact);
+              },
+            );
+          }
+        } else {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'contact sync rada safi!',
+          );
+        }
+      } else {
+        CPopupSnackBar.warningSnackBar(
+          title: 'internet unavailable/unstable',
+          message: 'This action requires a stable internet connection!',
+        );
+        return;
+      }
+      await fetchMyContacts();
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error updating contacts\'s cloud data',
+          message: e.toString(),
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          title: 'Error updating contacts\'s cloud data',
+          message:
+              'An unknown error occurred while updating contacts\'s cloud data. Please try again later!',
+        );
+      }
+
+      rethrow;
+    }
+  }
+
+  /// -- delete cloud-synced contacts --
+  Future<bool> deleteCloudSyncedContacts() async {
+    try {
+      var returnCmd = false;
+
+      // -- check internet connectivity
+      final isConnectedToInternet = await CNetworkManager.instance
+          .isConnected();
+      if (isConnectedToInternet &&
+          CNetworkManager.instance.connectionIsStable.value &&
+          CNetworkManager.instance.hasConnection.value) {
+        final contactDeletions = await fetchContactsForCloudDeletion();
+        cloudDelContacts.assignAll(contactDeletions);
+        if (cloudDelContacts.isNotEmpty) {
+          for (var contact in cloudDelContacts) {
+            await StoreSheetsApi.deleteContactFromCloudById(
+              contact.contactId,
+            ).then(
+              (result) async {
+                if (result) {
+                  await dbHelper.locallyDeleteSyncedContactDeletions(contact);
+                } else {
+                  if (kDebugMode) {
+                    CPopupSnackBar.errorSnackBar(
+                      title: 'error deleting cloud contact!',
+                    );
+                  }
+                }
+              },
+            );
+          }
+        }
+        if (kDebugMode) {
+          CPopupSnackBar.customToast(
+            forInternetConnectivityStatus: false,
+            message: 'cloud contact deletions rada clean...',
+          );
+        }
+        await fetchContactsForCloudDeletion();
+        returnCmd = true;
+      } else {
+        returnCmd = false;
+        CPopupSnackBar.warningSnackBar(
+          message: 'Stable internet connection is required for cloud sync!',
+          title: 'internet unstable/unavailable',
+        );
+      }
+
+      fetchContactsForCloudDeletion();
+      return returnCmd;
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          title: 'error deleting inventory cloud data',
+          message: e.toString(),
+        );
+      }
+
+      rethrow;
+    }
+  }
+
+  String setDefaultContactCategory() {
+    if (selectedContactCategory.value == '') {
+      // CPopupSnackBar.customToast(
+      //   forInternetConnectivityStatus: false,
+      //   message: 'contact category has to be set',
+      // );
+      selectedContactCategory.value = contactCategories[1];
+    } else {
+      // CPopupSnackBar.customToast(
+      //   forInternetConnectivityStatus: false,
+      //   message: 'contact category ALREADY set',
+      // );
+      selectedContactCategory.value = selectedContactCategory.value;
+    }
+
+    return selectedContactCategory.value;
+  }
+
+  /// -- set default country code --
+  String setCountryCodeFromDialCode(CContactsModel contact) {
+    if (contact.contactDialCode != '') {
+      contactCountryCode.value = CFormatter.getCountryCodeFromDialCode(
+        contact.contactDialCode,
+      );
+    }
+
+    return contactCountryCode.value;
+  }
+
+  /// -- toggle contacts search field visibility --
+  toggleSearchFieldDisplay() {
+    showContactsSearchField.value = !showContactsSearchField.value;
+    if (!showContactsSearchField.value) {
+      contactsSearchFieldController.clear();
+    }
+  }
+
+  /// -- perform search on contacts --
+  searchThroughContacts(String query) async {
+    try {
+      // -- start loader
+      isLoading.value = true;
+
+      var allMatches = myContacts.where(
+        (contact) {
+          return contact.contactName.toLowerCase().contains(
+                query.toLowerCase(),
+              ) ||
+              contact.contactPhone.toLowerCase().contains(
+                query.toLowerCase(),
+              ) ||
+              contact.contactEmail.toLowerCase().contains(
+                query.toLowerCase(),
+              );
+        },
+      ).toList();
+
+      allContactMatches.assignAll(allMatches);
+
+      SuspensionUtil.sortListBySuspensionTag(allContactMatches);
+
+      isLoading.value = false;
+    } catch (e) {
+      isLoading.value = false;
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error fetching contact suggestions: $e',
+          title: 'error fetching contact suggestions!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while fetching contact search results! Please try again later...',
+          title: 'Error searching through contacts!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// -- set contact's country code and(or) dial code --
+  selectContactCountry() {
+    showCountryPicker(
+      context: Get.overlayContext!,
+      onSelect: (Country country) {
+        contactCountryCode.value = country.countryCode;
+        // contactDialCode.value = CFormatter.getDialCodeFromCountryCode(
+        //   country.countryCode,
+        // );
+        contactDialCode.value = CFormatter.getDialCodeFromCountryCode(
+          contactCountryCode.value,
+        );
+        invController.txtContactCountryPicker.text = contactCountryCode.value;
+        ScaffoldMessenger.of(
+          Get.overlayContext!,
+        ).showSnackBar(
+          SnackBar(
+            content: Text(
+              'country code: ${contactCountryCode.value} \n dial code: ${contactDialCode.value} \n flag: ${country.flagEmoji}',
+            ),
+          ),
+        );
+      },
+      showPhoneCode: true,
+    );
+  }
+
+  /// -- fetch contact item's country code by phone no. or email --
+  fetchSupplierCountryCodeByProductId(String emailOrPhone) {
+    try {
+      var cCode = '';
+      var contactIndex = myContacts.indexWhere(
+        (contactItem) =>
+            contactItem.contactPhone.toLowerCase().contains(
+              emailOrPhone.toLowerCase(),
+            ) ||
+            contactItem.contactEmail.toLowerCase().contains(
+              emailOrPhone.toLowerCase(),
+            ),
+      );
+
+      if (contactIndex >= 0) {
+        var thisContact = myContacts.firstWhereOrNull(
+          (contact) =>
+              contact.contactPhone.toLowerCase().contains(
+                emailOrPhone.toLowerCase(),
+              ) ||
+              contact.contactEmail.toLowerCase().contains(
+                emailOrPhone.toLowerCase(),
+              ),
+        );
+        cCode = thisContact!.contactCountryCode.toString();
+      } else {
+        cCode = '';
+      }
+
+      return cCode;
+    } catch (e) {
+      if (kDebugMode) {
+        CPopupSnackBar.errorSnackBar(
+          message: 'error fetching supplier\'s country code: $e',
+          title: 'error fetching supplier\'s country code!',
+        );
+      } else {
+        CPopupSnackBar.errorSnackBar(
+          message:
+              'An unknown error occurred while fetching supplier\'s country code!',
+          title: 'Error fetching supplier\'s country code!!',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  resetFields() {
+    contactCountryCode.value = 'KE';
+
+    contactDialCode.value = '+254';
+
+    txtContactNameController.clear();
+    txtEmailController.clear();
+    txtPhoneController.clear();
+
+    undoTrashBtnPressed.value = false;
+  }
+
+  /// -- dispose text editing controllers --
+  @override
+  void dispose() {
+    contactsSearchFieldController.dispose();
+    txtContactNameController.dispose();
+    txtEmailController.dispose();
+    txtPhoneController.dispose();
+    super.dispose();
+  }
+}
